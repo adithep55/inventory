@@ -1,0 +1,20 @@
+Options +FollowSymLinks -MultiViews
+RewriteEngine On
+RewriteBase /
+Options -Indexes
+
+# สำหรับไฟล์ในโฟลเดอร์หลัก
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/?$ $1.php [L,QSA,NC]
+
+# สำหรับไฟล์ในโฟลเดอร์ย่อย (รวมถึง views/)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^(.+)/?$ $1.php [L,QSA,NC]
+
+# กฎเฉพาะสำหรับ inventory/locationInfo
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^inventory/locationInfo/([^/]+)/?$ views/inventory_details.php?id=$1 [L,QSA,NC]

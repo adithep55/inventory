@@ -1,0 +1,44 @@
+[2024-08-26 19:56:56] Script started. Request method: POST
+[2024-08-26 19:56:56] POST data: {"ids":["A001","A002"]}
+[2024-08-26 19:56:56] Attempting to delete products: ["A001","A002"]
+[2024-08-26 19:56:56] Executing query: DELETE FROM products WHERE product_id IN (?,?)
+[2024-08-26 19:56:56] With parameters: ["A001","A002"]
+[2024-08-26 19:56:56] Query execution failed
+[2024-08-26 19:56:56] Sending response: {"status":"error","message":"\u0e40\u0e01\u0e34\u0e14\u0e02\u0e49\u0e2d\u0e1c\u0e34\u0e14\u0e1e\u0e25\u0e32\u0e14\u0e43\u0e19\u0e01\u0e32\u0e23\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: \u0e01\u0e32\u0e23\u0e14\u0e33\u0e40\u0e19\u0e34\u0e19\u0e01\u0e32\u0e23\u0e25\u0e49\u0e21\u0e40\u0e2b\u0e25\u0e27"}
+[2024-08-26 19:57:44] Script started. Request method: POST
+[2024-08-26 19:57:44] POST data: {"ids":["A001","A002"]}
+[2024-08-26 19:57:44] Attempting to delete products: ["A001","A002"]
+[2024-08-26 19:57:44] Executing query: DELETE FROM products WHERE product_id IN (?,?)
+[2024-08-26 19:57:44] With parameters: ["A001","A002"]
+[2024-08-26 19:57:44] PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`inventory`.`d_receive`, CONSTRAINT `d_receive_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`))
+[2024-08-26 19:57:44] Sending response: {"status":"error","message":"\u0e40\u0e01\u0e34\u0e14\u0e02\u0e49\u0e2d\u0e1c\u0e34\u0e14\u0e1e\u0e25\u0e32\u0e14\u0e43\u0e19\u0e01\u0e32\u0e23\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`inventory`.`d_receive`, CONSTRAINT `d_receive_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`))"}
+[2024-08-26 19:58:33] Script started. Request method: POST
+[2024-08-26 19:58:33] POST data: {"ids":["A001","A002"]}
+[2024-08-26 19:58:33] Attempting to delete products: ["A001","A002"]
+[2024-08-26 19:58:33] Executing query: DELETE FROM products WHERE product_id IN (?,?)
+[2024-08-26 19:58:33] With parameters: ["A001","A002"]
+[2024-08-26 19:58:33] PDOException: SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`inventory`.`d_receive`, CONSTRAINT `d_receive_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`))
+[2024-08-26 19:58:33] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e43\u0e19\u0e23\u0e30\u0e1a\u0e1a \u0e01\u0e23\u0e38\u0e13\u0e32\u0e25\u0e1a\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e01\u0e48\u0e2d\u0e19\u0e17\u0e33\u0e01\u0e32\u0e23\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32"}
+[2024-08-26 20:04:17] Script started. Request method: POST
+[2024-08-26 20:04:17] POST data: {"ids":["A001","A002"]}
+[2024-08-26 20:04:17] Attempting to delete products: ["A001","A002"]
+[2024-08-26 20:04:17] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07:\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 2 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 6 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n","relatedRecords":{"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"2","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"6"}}
+[2024-08-26 20:04:23] Script started. Request method: POST
+[2024-08-26 20:04:23] POST data: {"ids":["A001","A002"]}
+[2024-08-26 20:04:23] Attempting to delete products: ["A001","A002"]
+[2024-08-26 20:04:23] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07:\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 2 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 6 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n","relatedRecords":{"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"2","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"6"}}
+[2024-08-26 20:05:07] Script started. Request method: POST
+[2024-08-26 20:05:07] POST data: {"ids":["A001","A002","A003"]}
+[2024-08-26 20:05:07] Attempting to delete products: ["A001","A002","A003"]
+[2024-08-26 20:05:07] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07:\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 2 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 6 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n","relatedRecords":{"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"2","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"6"}}
+[2024-08-26 20:05:15] Script started. Request method: POST
+[2024-08-26 20:05:15] POST data: {"ids":["A003"]}
+[2024-08-26 20:05:15] Attempting to delete products: ["A003"]
+[2024-08-26 20:05:15] Executing query: DELETE FROM products WHERE product_id IN (?)
+[2024-08-26 20:05:15] With parameters: ["A003"]
+[2024-08-26 20:05:15] Deleted count: 1
+[2024-08-26 20:05:15] Sending response: {"status":"success","message":"\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 1 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23"}
+[2024-08-26 20:17:06] Script started. Request method: POST
+[2024-08-26 20:17:06] POST data: {"ids":["A001","A002"]}
+[2024-08-26 20:17:06] Attempting to delete products: ["A001","A002"]
+[2024-08-26 20:17:06] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07:\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 2 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 6 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n","relatedRecords":{"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"2","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"6"}}
