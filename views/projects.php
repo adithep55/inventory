@@ -216,29 +216,29 @@
     });
 }
 
-    function loadUsers() {
-        $.ajax({
-            url: '../api/get_users.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                if (response.data && response.data.length > 0) {
-                    var options = '<option value="">เลือกผู้รับผิดชอบ</option>';
-                    $.each(response.data, function(i, user) {
-                        options += '<option value="' + user.UserID + '">' + user.full_name + '</option>';
-                    });
-                    $('#user_id').html(options);
-                } else {
-                    console.error('Failed to load users: No data returned');
-                    Swal.fire('Error', 'ไม่พบข้อมูลผู้ใช้', 'error');
-                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Error loading users:', textStatus, errorThrown);
-                Swal.fire('Error', 'เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้', 'error');
+function loadUsers() {
+    $.ajax({
+        url: '../api/get_users.php?for_project_dropdown=true',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success' && response.data && response.data.length > 0) {
+                var options = '<option value="">เลือกผู้รับผิดชอบ</option>';
+                $.each(response.data, function(i, user) {
+                    options += '<option value="' + user.UserID + '">' + user.full_name + '</option>';
+                });
+                $('#user_id').html(options);
+            } else {
+                console.error('Failed to load users: No data returned');
+                Swal.fire('Error', 'ไม่พบข้อมูลผู้ใช้', 'error');
             }
-        });
-    }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('Error loading users:', textStatus, errorThrown);
+            Swal.fire('Error', 'เกิดข้อผิดพลาดในการโหลดข้อมูลผู้ใช้', 'error');
+        }
+    });
+}
 
     function validateForm() {
         var isValid = true;

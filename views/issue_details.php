@@ -34,13 +34,25 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">
-                                <i class="fas fa-info-circle mr-2"></i>  ข้อมูลการเบิกสินค้า
-                            </h4>
+           <div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="card-title">
+                        <i class="fas fa-info-circle mr-2"></i> ข้อมูลการเบิกสินค้า
+                    </h4>
+                    <div class="wordset">
+                        <ul class="list-inline mb-0">
+                            <li class="list-inline-item">
+                                <a id="pdfButton" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
+                                    <img src="../assets/img/icons/pdf.svg" alt="PDF">
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -73,6 +85,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -113,70 +126,88 @@
     <script src="../assets/js/dataTables.bootstrap4.min.js"></script>
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/plugins/select2/js/select2.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="../assets/js/script.js"></script>
 
     <script>
-        $(document).ready(function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const issueId = urlParams.get('id');
+$(document).ready(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const issueId = urlParams.get('id');
 
-            if (issueId) {
-                loadIssueDetails(issueId);
-            } else {
-                alert('ไม่พบรหัสการเบิกสินค้า');
+    // เริ่มต้น tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    if (issueId) {
+        loadIssueDetails(issueId);
+    } else {
+        alert('ไม่พบรหัสการเบิกสินค้า');
+    }
+
+    // PDF button
+    $('#pdfButton').on('click', function(e) {
+        e.preventDefault();
+        if (issueId) {
+            window.open(`../report/generate_issue_report.php?id=${issueId}`, '_blank');
+        } else {
+            alert('ไม่พบรหัสการเบิกสินค้า');
+        }
+    });
+
+    function loadIssueDetails(issueId) {
+        $.ajax({
+            url: '../api/get_issue_details.php',
+            type: 'GET',
+            data: { id: issueId },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status === 'success') {
+                    displayIssueDetails(response.data);
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('ไม่สามารถโหลดข้อมูลได้');
             }
         });
+    }
 
-        function loadIssueDetails(issueId) {
-            $.ajax({
-                url: '../api/get_issue_details.php',
-                type: 'GET',
-                data: { id: issueId },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        displayIssueDetails(response.data);
-                    } else {
-                        alert('เกิดข้อผิดพลาด: ' + response.message);
-                    }
-                },
-                error: function() {
-                    alert('ไม่สามารถโหลดข้อมูลได้');
-                }
-            });
+    function displayIssueDetails(data) {
+        $('#billNumber').val(data.bill_number);
+        $('#issueDate').val(data.issue_date);
+        $('#issueType').val(data.issue_type === 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ');
+        $('#requesterName').val(data.user_name);
+        $('#updatedAt').val(data.updated_at);
+        
+        if (data.issue_type === 'sale') {
+            $('#customerProjectLabel').html('<i class="fas fa-user mr-2"></i>  ลูกค้า');
+            $('#customerProject').val(data.customer_name);
+        } else {
+            $('#customerProjectLabel').html('<i class="fas fa-project-diagram mr-2"></i>  โครงการ');
+            $('#customerProject').val(data.project_name);
         }
 
-        function displayIssueDetails(data) {
-            $('#billNumber').val(data.bill_number);
-            $('#issueDate').val(data.issue_date);
-            $('#issueType').val(data.issue_type === 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ');
-            $('#requesterName').val(data.user_name);
-            $('#updatedAt').val(data.updated_at);
-            
-            if (data.issue_type === 'sale') {
-                $('#customerProjectLabel').html('<i class="fas fa-user mr-2"></i>  ลูกค้า');
-                $('#customerProject').val(data.customer_name);
-            } else {
-                $('#customerProjectLabel').html('<i class="fas fa-project-diagram mr-2"></i>  โครงการ');
-                $('#customerProject').val(data.project_name);
-            }
-
-            const itemsTable = $('#issueItemsTable tbody');
-            itemsTable.empty();
-            
-            data.items.forEach(function(item) {
-                itemsTable.append(`
-                    <tr>
-                        <td>${item.product_id}</td>
-                        <td>${item.product_name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.unit}</td>
-                        <td>${item.location_name}</td>
-                    </tr>
-                `);
-            });
-        }
-    </script>
+        const itemsTable = $('#issueItemsTable tbody');
+        itemsTable.empty();
+        
+        data.items.forEach(function(item) {
+            itemsTable.append(`
+                <tr>
+                    <td>${item.product_id}</td>
+                    <td>${item.product_name}</td>
+                    <td>${item.quantity}</td>
+                    <td>${item.unit}</td>
+                    <td>${item.location_name}</td>
+                </tr>
+            `);
+        });
+    }
+});
+</script>
 </body>
 
 </html>

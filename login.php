@@ -45,103 +45,120 @@ if (isset($_SESSION['UserID'])) {
 
     <script>
 
-        $(document).ready(function () {
 
-            $(document).ready(function () {
-                // ซ่อน userInfoContainer เมื่อโหลดหน้า
-                $("#userInfoContainer").hide();
+$(document).ready(function () {
+    // ซ่อน userInfoContainer เมื่อโหลดหน้า
+    $("#userInfoContainer").hide();
 
-                $("#user").on('blur', function () {
-                    var username = $(this).val().trim();
-                    if (username) {
-                        $.ajax({
-                            type: 'GET',
-                            url: 'system/login.php',
-                            data: { action: 'getUserInfo', username: username },
-                            dataType: 'json',
-                            success: function (result) {
-                                if (result.status == "success") {
-                                    showUserInfo(result.message.fname + " " + result.message.lname, false);
-                                } else {
-                                    showUserInfo("❌ ไม่พบผู้ใช้", true);
-                                }
-                            },
-                            error: function () {
-                                showUserInfo("❌ เกิดข้อผิดพลาดในการตรวจสอบผู้ใช้", true);
-                            }
-                        });
-                    } else {
-                        hideUserInfo();
-                    }
-                });
-            });
+    // ฟังก์ชันแสดงข้อมูลผู้ใช้
+    function showUserInfo(message, isError) {
+        var $userInfo = $("#userInfo");
+        if (isError) {
+            $userInfo.val(message).addClass('error');
+        } else {
+            $userInfo.val("ยินดีต้อนรับ🤗 : " + message).removeClass('error');
+        }
+        $("#userInfoContainer").show();
+    }
 
-            function showUserInfo(message, isError) {
-                var $userInfo = $("#userInfo");
-                if (isError) {
-                    $userInfo.val(message).addClass('error');
-                } else {
-                    $userInfo.val("ยินดีต้อนรับ🤗 : " + message).removeClass('error');
-                }
-                $("#userInfoContainer").show();
-            }
+    // ฟังก์ชันซ่อนข้อมูลผู้ใช้
+    function hideUserInfo() {
+        $("#userInfoContainer").hide();
+        $("#userInfo").val("");
+    }
 
-            function hideUserInfo() {
-                $("#userInfoContainer").hide();
-                $("#userInfo").val("");
-            }
-
-            $("#user").on('input', function () {
-                if ($(this).val().trim() === "") {
-                    hideUserInfo();
-                }
-            });
-
-            $("#btn_regis").on('click', function (e) {
-                var formData = new FormData();
-                formData.append('user', $("#user").val());
-                formData.append('pass', $("#pass").val());
-
-                $('#btn_regis').attr('disabled', 'disabled');
-
-                $.ajax({
-                    type: 'POST',
-                    url: 'system/login.php',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    dataType: 'text',
-                }).done(function (res) {
-                    result = JSON.parse(res);
-                    console.log(result);
-
+    // ตรวจสอบข้อมูลผู้ใช้เมื่อออกจากช่อง username
+    $("#user").on('blur', function () {
+        var username = $(this).val().trim();
+        if (username) {
+            $.ajax({
+                type: 'GET',
+                url: 'system/login.php',
+                data: { action: 'getUserInfo', username: username },
+                dataType: 'json',
+                success: function (result) {
                     if (result.status == "success") {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'สำเร็จ',
-                            text: result.message
-                        }).then(function () {
-                            window.location.href = 'index';
-                        });
-                    } else if (result.status == "fail") {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'ผิดพลาด',
-                            text: result.message
-                        });
-                        $('#btn_regis').removeAttr('disabled');
+                        showUserInfo(result.message.fname + " " + result.message.lname, false);
+                    } else {
+                        showUserInfo("❌ ไม่พบผู้ใช้", true);
                     }
-                }).fail(function (jqXHR) {
-                    console.log(jqXHR);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
-                    });
-                    $('#btn_regis').removeAttr('disabled');
-                });
+                },
+                error: function () {
+                    showUserInfo("❌ เกิดข้อผิดพลาดในการตรวจสอบผู้ใช้", true);
+                }
             });
+        } else {
+            hideUserInfo();
+        }
+    });
+
+    // ซ่อนข้อมูลผู้ใช้เมื่อมีการพิมพ์ใหม่
+    $("#user").on('input', function () {
+        if ($(this).val().trim() === "") {
+            hideUserInfo();
+        }
+    });
+
+    // ฟังก์ชันทำการ login
+    function performLogin() {
+        var formData = new FormData();
+        formData.append('user', $("#user").val());
+        formData.append('pass', $("#pass").val());
+
+        $('#btn_regis').attr('disabled', 'disabled');
+
+        $.ajax({
+            type: 'POST',
+            url: 'system/login.php',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'text',
+        }).done(function (res) {
+            result = JSON.parse(res);
+            console.log(result);
+
+            if (result.status == "success") {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ',
+                    text: result.message
+                }).then(function () {
+                    window.location.href = 'index';
+                });
+            } else if (result.status == "fail") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ผิดพลาด',
+                    text: result.message
+                });
+                $('#btn_regis').removeAttr('disabled');
+            }
+        }).fail(function (jqXHR) {
+            console.log(jqXHR);
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาด',
+                text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
+            });
+            $('#btn_regis').removeAttr('disabled');
         });
+    }
+
+    // Event listener สำหรับปุ่ม Login
+    $("#btn_regis").on('click', function (e) {
+        performLogin();
+    });
+
+    // Event listener สำหรับการกดปุ่ม Enter
+    $("#user, #pass").on('keypress', function (e) {
+        if (e.which === 13) { // 13 คือรหัสปุ่ม Enter
+            e.preventDefault(); // ป้องกันการ submit form โดยปกติ
+            performLogin();
+        }
+    });
+});
+
     </script>
 </body>
 <?php

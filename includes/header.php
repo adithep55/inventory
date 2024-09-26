@@ -6,7 +6,7 @@ if (!isset($_SESSION['UserID'])) {
 }
 function base_url()
 {
-  return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+    return (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
 }
 $links_re = base_url();
 ?>
@@ -39,43 +39,6 @@ $links_re = base_url();
 
         <ul class="nav user-menu">
 
-            <li class="nav-item">
-                <div class="top-nav-search">
-                    <a href="javascript:void(0);" class="responsive-search">
-                        <i class="fa fa-search"></i>
-                    </a>
-                    <form action="#">
-                        <div class="searchinputs">
-                            <input type="text" placeholder="Search Here ...">
-                            <div class="search-addon">
-                                <span><img src="../assets/img/icons/closes.svg" alt="img"></span>
-                            </div>
-                        </div>
-                        <a class="btn" id="searchdiv"><img src="../assets/img/icons/search.svg" alt="img"></a>
-                    </form>
-                </div>
-            </li>
-
-
-            <li class="nav-item dropdown has-arrow flag-nav">
-                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="javascript:void(0);" role="button">
-                    <img src="../assets/img/flags/us1.png" alt="" height="20">
-                </a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="../assets/img/flags/us.png" alt="" height="16"> English
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="../assets/img/flags/fr.png" alt="" height="16"> French
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="../assets/img/flags/es.png" alt="" height="16"> Spanish
-                    </a>
-                    <a href="javascript:void(0);" class="dropdown-item">
-                        <img src="../assets/img/flags/de.png" alt="" height="16"> German
-                    </a>
-                </div>
-            </li>
 
 
             <li class="nav-item dropdown">
@@ -129,7 +92,8 @@ $links_re = base_url();
                                             <p class="noti-details"><span class="noti-title">Misty Tison</span> added
                                                 <span class="noti-title">Domenic Houston</span> and <span
                                                     class="noti-title">Claire Mapes</span> to project <span
-                                                    class="noti-title">Doctor available module</span></p>
+                                                    class="noti-title">Doctor available module</span>
+                                            </p>
                                             <p class="noti-time"><span class="notification-time">8 mins ago</span></p>
                                         </div>
                                     </div>
@@ -174,27 +138,26 @@ $links_re = base_url();
 
             <li class="nav-item dropdown has-arrow main-drop">
                 <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
-                    <span class="user-img"><img src="../assets/img/profiles/avator1.jpg" alt="">
+                    <span class="user-img"><img id="userProfileImage" src="../assets/img/profiles/avator1.jpg" alt="">
                         <span class="status online"></span></span>
                 </a>
                 <div class="dropdown-menu menu-drop-user">
                     <div class="profilename">
                         <div class="profileset">
-                            <span class="user-img"><img src="../assets/img/profiles/avator1.jpg" alt="">
+                            <span class="user-img"><img id="userProfileImageDropdown"
+                                    src="../assets/img/profiles/avator1.jpg" alt="">
                                 <span class="status online"></span></span>
                             <div class="profilesets">
-                                <h6>John Doe</h6>
-                                <h5>Admin</h5>
+                                <h6 id="userName">Loading...</h6>
+                                <h5 id="userRole">Loading...</h5>
                             </div>
                         </div>
                         <hr class="m-0">
-                        <a class="dropdown-item" href="profile.html"> <i class="me-2" data-feather="user"></i> My
-                            Profile</a>
-                        <a class="dropdown-item" href="generalsettings.html"><i class="me-2"
-                                data-feather="settings"></i>Settings</a>
+                        <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile"> <i class="me-2"
+                                data-feather="user"></i> โปรไฟล์ของฉัน</a>
                         <hr class="m-0">
-                        <a class="dropdown-item logout pb-0" href="signin.html"><img
-                                src="../assets/img/icons/log-out.svg" class="me-2" alt="img">Logout</a>
+                        <a class="dropdown-item logout pb-0" href="<?php echo base_url(); ?>/logout"><img
+                                src="../assets/img/icons/log-out.svg" class="me-2" alt="img">ออกจากระบบ</a>
                     </div>
                 </div>
             </li>
@@ -205,10 +168,46 @@ $links_re = base_url();
             <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                 aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="profile.html">My Profile</a>
-                <a class="dropdown-item" href="generalsettings.html">Settings</a>
-                <a class="dropdown-item" href="signin.html">Logout</a>
+                <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile">โปรไฟล์ของฉัน</a>
+                <a class="dropdown-item" href="signin.html">ออกจากระบบ</a>
             </div>
         </div>
 
     </div>
+</div>
+<script src="../assets/js/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        loadUserProfile();
+    });
+
+    function loadUserProfile() {
+        $.ajax({
+            url: '../system/profile.php',
+            type: 'GET',
+            data: { action: 'getUserInfo' },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    updateProfileUI(response.data);
+                } else {
+                    console.error('Failed to load user profile:', response.message);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', status, error);
+            }
+        });
+    }
+
+    function updateProfileUI(userData) {
+        $('#userProfileImage, #userProfileImageDropdown').attr('src', '../img/profile/' + userData.img);
+        $('#userName').text(userData.fname);
+        $('#userRole').text(userData.role);
+    }
+</script>
+
+
+</body>
+
+</html>

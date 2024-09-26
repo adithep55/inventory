@@ -6,6 +6,60 @@ require_once('../assets/fpdf186/fpdf.php');
 
 define('FPDF_FONTPATH', 'C:/xampp/htdocs/assets/fpdf186/font/');
 
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    die('Issue ID is required and must not be empty');
+}
+
+$issueId = intval($_GET['id']); 
+
+if ($issueId <= 0) {
+    die('Invalid Issue ID');
+}
+
+$query = "
+SELECT 
+    hi.bill_number,
+    hi.issue_date,
+    hi.issue_type,
+    u.fname AS issuer_fname,
+    u.lname AS issuer_lname,
+    CASE 
+        WHEN hi.issue_type = 'sale' THEN c.name
+        ELSE p.project_name
+    END AS customer_project_name,
+    di.product_id,
+    pr.name_th AS product_name,
+    di.quantity,
+    pr.unit,
+    l.location AS location_name,
+    i.quantity AS current_quantity,
+    (
+        SELECT hr.bill_number
+        FROM h_receive hr
+        JOIN d_receive dr ON hr.receive_header_id = dr.receive_header_id
+        WHERE dr.product_id = di.product_id
+        ORDER BY hr.received_date DESC
+        LIMIT 1
+    ) AS last_receive_number
+FROM 
+    h_issue hi
+JOIN d_issue di ON hi.issue_header_id = di.issue_header_id
+JOIN products pr ON di.product_id = pr.product_id
+JOIN users u ON hi.user_id = u.UserID
+JOIN locations l ON di.location_id = l.location_id
+LEFT JOIN customers c ON hi.customer_id = c.customer_id
+LEFT JOIN projects p ON hi.project_id = p.project_id
+LEFT JOIN inventory i ON di.product_id = i.product_id AND di.location_id = i.location_id
+WHERE hi.issue_header_id = :issue_id
+";
+
+$result = dd_q($query, [':issue_id' => $issueId]);
+$issueData = $result->fetchAll(PDO::FETCH_ASSOC);
+
+if (empty($issueData)) {
+    die('Issue data not found');
+}
+
 class PDF extends FPDF
 {
     function Header()
@@ -28,96 +82,67 @@ class PDF extends FPDF
     }
 }
 
-$query = "
-SELECT DISTINCT p.product_id, p.name_th AS product_name, p.unit
-FROM products p
-JOIN d_receive dr ON p.product_id = dr.product_id
-ORDER BY p.product_id
-";
-
-$result = dd_q($query);
-$products = $result->fetchAll(PDO::FETCH_ASSOC);
-
 $pdf = new PDF();
 $pdf->AliasNbPages();
+$pdf->AddPage();
 
-foreach ($products as $product) {
-    $pdf->AddPage();
-    
-    $pdf->AddFont('THSarabunNew', '', 'THSarabunNew.php');
-    $pdf->SetFont('THSarabunNew', '', 18);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'รายงานการเบิกสินค้าตามการรับ'), 0, 1, 'C');
-    $pdf->Ln(5);
+$pdf->AddFont('THSarabunNew', '', 'THSarabunNew.php');
+$pdf->SetFont('THSarabunNew', '', 18);
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'รายการเบิกสินค้า'), 0, 1, 'C');
+$pdf->Ln(5);
 
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'รหัสสินค้า:'), 0);
-    $pdf->Cell(0, 10, $product['product_id'], 0, 1);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ชื่อสินค้า:'), 0);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $product['product_name']), 0, 1);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'หน่วยนับ:'), 0);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $product['unit']), 0, 1);
+$pdf->SetFont('THSarabunNew', '', 14);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เลขที่เอกสาร:'), 0);
+$pdf->Cell(0, 10, $issueData[0]['bill_number'], 0, 1);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่:'), 0);
+$pdf->Cell(0, 10, date('d/m/Y', strtotime($issueData[0]['issue_date'])), 0, 1);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ผู้เบิกสินค้า:'), 0);
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['issuer_fname'] . ' ' . $issueData[0]['issuer_lname']), 0, 1);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ประเภทการเบิก:'), 0);
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ')), 0, 1);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ลูกค้า:' : 'โครงการ:')), 0);
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_project_name']), 0, 1);
 
-    $pdf->Ln(10);
-    $pdf->SetFont('THSarabunNew', '', 12);
-    $pdf->SetFillColor(200, 220, 255);
-    $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'เลขที่เอกสารรับ'), 1, 0, 'C', true);
-    $pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'วันที่รับ'), 1, 0, 'C', true);
-    $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'คลังรับ'), 1, 0, 'C', true);
-    $pdf->Cell(20, 10, iconv('UTF-8', 'cp874', 'จำนวนรับ'), 1, 0, 'C', true);
-    $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'เลขที่เอกสารเบิก'), 1, 0, 'C', true);
-    $pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'วันที่เบิก'), 1, 0, 'C', true);
-    $pdf->Cell(20, 10, iconv('UTF-8', 'cp874', 'จำนวนเบิก'), 1, 1, 'C', true);
+$pdf->Ln(10);
+$pdf->SetFont('THSarabunNew', '', 12);
+$pdf->SetFillColor(200, 220, 255);
+$pdf->Cell(15, 10, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
+$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
+$pdf->Cell(70, 10, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'คลัง'), 1, 0, 'C', true);
+$pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
 
-    $receiveQuery = "
-    SELECT 
-        hr.bill_number AS receive_bill,
-        hr.received_date,
-        l.location AS receive_location,
-        dr.quantity AS receive_quantity,
-        hi.bill_number AS issue_bill,
-        hi.issue_date,
-        di.quantity AS issue_quantity
-    FROM 
-        h_receive hr
-    JOIN d_receive dr ON hr.receive_header_id = dr.receive_header_id
-    JOIN locations l ON dr.location_id = l.location_id
-    LEFT JOIN d_issue di ON dr.product_id = di.product_id AND dr.receive_header_id = (
-        SELECT receive_header_id 
-        FROM d_receive 
-        WHERE product_id = di.product_id AND quantity >= di.quantity
-        ORDER BY received_date DESC 
-        LIMIT 1
-    )
-    LEFT JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
-    WHERE dr.product_id = :product_id
-    ORDER BY hr.received_date DESC, hi.issue_date DESC
-    ";
+$pdf->Ln();
 
-    $receiveResult = dd_q($receiveQuery, [':product_id' => $product['product_id']]);
-    $receiveData = $receiveResult->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($receiveData as $row) {
-        $pdf->SetFont('THSarabunNew', '', 10);
-        $pdf->Cell(30, 10, $row['receive_bill'], 1);
-        $pdf->Cell(25, 10, date('d/m/Y', strtotime($row['received_date'])), 1);
-        $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', $row['receive_location']), 1);
-        $pdf->Cell(20, 10, $row['receive_quantity'], 1, 0, 'R');
-        $pdf->Cell(30, 10, $row['issue_bill'] ?? '-', 1);
-        $pdf->Cell(25, 10, $row['issue_date'] ? date('d/m/Y', strtotime($row['issue_date'])) : '-', 1);
-        $pdf->Cell(20, 10, $row['issue_quantity'] ?? '-', 1, 1, 'R');
-    }
-
-    // Calculate and display total
-    $totalReceived = array_sum(array_column($receiveData, 'receive_quantity'));
-    $totalIssued = array_sum(array_column($receiveData, 'issue_quantity'));
-    $currentStock = $totalReceived - $totalIssued;
-
-    $pdf->Ln(10);
-    $pdf->SetFont('THSarabunNew', '', 12);
-    $pdf->Cell(90, 10, iconv('UTF-8', 'cp874', 'รวมรับทั้งหมด: ' . $totalReceived . ' ' . $product['unit']), 0, 1);
-    $pdf->Cell(90, 10, iconv('UTF-8', 'cp874', 'รวมเบิกทั้งหมด: ' . $totalIssued . ' ' . $product['unit']), 0, 1);
-    $pdf->Cell(90, 10, iconv('UTF-8', 'cp874', 'คงเหลือ: ' . $currentStock . ' ' . $product['unit']), 0, 1);
+$total = 0;
+$i = 1;
+foreach ($issueData as $item) {
+    $pdf->Cell(15, 10, $i, 1, 0, 'C');
+    $pdf->Cell(25, 10, $item['product_id'], 1);
+    $pdf->Cell(70, 10, iconv('UTF-8', 'cp874', $item['product_name']), 1);
+    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', $item['location_name']), 1);
+    $pdf->Cell(30, 10, $item['quantity'] . ' ' . iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'R');
+    $pdf->Ln();
+    $total += $item['quantity'];
+    $i++;
 }
 
-$pdf->Output('I', 'product_issue_report.pdf');
+$pdf->SetFont('THSarabunNew', '', 12);
+$pdf->SetTextColor(0, 0, 0);
+$pdf->Cell(150, 10, iconv('UTF-8', 'cp874', 'รวม'), 1, 0, 'R');
+$pdf->Cell(30, 10, $total, 1, 0, 'R');
+$pdf->Ln(20);
+
+$pdf->SetFont('THSarabunNew', '', 12);
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'ผู้เบิกสินค้า'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'ผู้จ่ายสินค้า'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'ผู้ตรวจสอบ'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'ผู้อนุมัติ'), 0, 1, 'C');
+$pdf->Ln(15);
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'วันที่ ___/___/___'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'วันที่ ___/___/___'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'วันที่ ___/___/___'), 0, 0, 'C');
+$pdf->Cell(47, 10, iconv('UTF-8', 'cp874', 'วันที่ ___/___/___'), 0, 1, 'C');
+
+$pdf->Output('I', 'issue_report.pdf');
 ?>
