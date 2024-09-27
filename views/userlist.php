@@ -131,6 +131,46 @@
     </div>
 </div>
 
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">เพิ่มผู้ใช้ใหม่</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label for="add_username" class="form-label">ชื่อผู้ใช้</label>
+                        <input type="text" class="form-control" id="add_username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_password" class="form-label">รหัสผ่าน</label>
+                        <input type="password" class="form-control" id="add_password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_fname" class="form-label">ชื่อ</label>
+                        <input type="text" class="form-control" id="add_fname" name="fname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_lname" class="form-label">นามสกุล</label>
+                        <input type="text" class="form-control" id="add_lname" name="lname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add_role" class="form-label">บทบาท</label>
+                        <select class="form-select" id="add_role" name="role" required>
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="saveNewUser">บันทึก</button>
+            </div>
+        </div>
+    </div>
+</div>
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/feather.min.js"></script>
     <script src="../assets/js/jquery.slimscroll.min.js"></script>
@@ -151,6 +191,11 @@ $(document).ready(function () {
         resetEditUserForm();
     });
 
+    $('.btn-added').on('click', function(e) {
+        e.preventDefault();
+        loadRoles();  // โหลดข้อมูลบทบาทใหม่ทุกครั้งที่เปิด Modal เพิ่มผู้ใช้
+        $('#addUserModal').modal('show');
+    });
     loadRoles();
 
     var userTable = $('#userTable').DataTable({
@@ -242,6 +287,11 @@ $(document).ready(function () {
     $('#saveUserChanges').on('click', function() {
         saveUserChanges();
     });
+
+    // Event listener สำหรับปุ่มบันทึกผู้ใช้ใหม่
+    $('#saveNewUser').on('click', function() {
+        saveNewUser();
+    });
 });
 
 function updateSelectAllCheckbox() {
@@ -260,7 +310,7 @@ function loadRoles() {
                 $.each(response.data, function(i, role) {
                     options += '<option value="' + role.RoleID + '">' + role.RoleName + '</option>';
                 });
-                $('#edit_role').html(options);
+                $('#edit_role, #add_role').html(options);
             } else {
                 console.error('Failed to load roles:', response.message);
                 Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลบทบาทได้', 'error');
@@ -290,6 +340,7 @@ function editUser(userId) {
                 $('#edit_username').val(user.Username);
                 $('#edit_fname').val(user.fname);
                 $('#edit_lname').val(user.lname);
+                loadRoles();  // โหลดข้อมูลบทบาทใหม่ทุกครั้งที่เปิด Modal แก้ไข
                 $('#edit_role').val(user.RoleID);
                 $('#editUserModal').modal('show');
             } else {
@@ -376,5 +427,35 @@ function deleteUser(userId) {
             });
         }
     });
+
+    
 }
+$('#saveNewUser').on('click', function() {
+    var formData = $('#addUserForm').serialize();
+    $.ajax({
+        url: '../system/add_user.php',
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                $('#addUserModal').modal('hide');
+                Swal.fire('สำเร็จ', 'เพิ่มผู้ใช้ใหม่เรียบร้อยแล้ว', 'success').then(() => {
+                    $('#userTable').DataTable().ajax.reload(null, false);
+                });
+                $('#addUserForm')[0].reset();
+            } else {
+                Swal.fire('Error', response.message || 'ไม่สามารถเพิ่มผู้ใช้ใหม่ได้', 'error');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX Error:', status, error);
+            let errorMessage = 'เกิดข้อผิดพลาดในการเพิ่มผู้ใช้ใหม่';
+            if (xhr.responseText) {
+                errorMessage += ': ' + xhr.responseText;
+            }
+            Swal.fire('Error', errorMessage, 'error');
+        }
+    });
+});
 </script>

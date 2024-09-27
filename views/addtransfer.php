@@ -156,13 +156,13 @@ $(document).ready(function() {
             "url": "../api/get_inventory_TF.php",
             "type": "POST"
         },
-        "columns": [
-            { 
-                "data": null,
-                "render": function (data, type, row) {
-                    return '<input type="checkbox" class="product-select" value="' + row.product_id + '">';
-                }
-            },
+       "columns": [
+    { 
+        "data": null,
+        "render": function (data, type, row) {
+            return '<input type="checkbox" class="product-select" value="' + row.product_id + '" data-available-locations="' + row.available_locations + '">';
+        }
+    },
             { 
                 "data": "image_url",
                 "render": function(data, type, row) {
@@ -179,69 +179,144 @@ $(document).ready(function() {
     });
 
     function addProductToTransfer(productId, productName, unit) {
-        $.ajax({
-            url: '../api/get_product_locations.php',
-            type: 'POST',
-            data: { product_id: productId },
-            dataType: 'json',
-            success: function(response) {
-                let fromLocationOptions = response.locations.map(loc => 
+    $.ajax({
+        url: '../api/get_product_locations.php',
+        type: 'POST',
+        data: { product_id: productId },
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+                // เรียงลำดับคลังสินค้าตามจำนวนสินค้าจากมากไปน้อย
+                response.locations.sort((a, b) => b.quantity - a.quantity);
+
+                // กรองคลังสินค้าที่ยังไม่ถูกเลือก
+                let selectedLocations = getSelectedLocations(productId);
+                let availableLocations = response.locations.filter(loc => !selectedLocations.includes(loc.location_id));
+
+                if (availableLocations.length === 0) {
+                    Swal.fire('ข้อผิดพลาด', 'ไม่มีคลังสินค้าที่สามารถเลือกได้แล้ว', 'error');
+                    return;
+                }
+
+                let fromLocationOptions = availableLocations.map(loc => 
                     `<option value="${loc.location_id}" data-quantity="${loc.quantity}">${loc.location} (${loc.quantity} ${unit})</option>`
                 ).join('');
 
                 let toLocationOptions = response.all_locations.map(loc => 
                     `<option value="${loc.location_id}">${loc.location}</option>`
                 ).join('');
-
                 let newRow = `
-            <tr>
-                <td>${productName}</td>
-                <td>
-                    <select class="form-control from-location" required>
-                        <option value="">เลือกคลังสินค้าต้นทาง</option>
-                        ${fromLocationOptions}
-                    </select>
-                </td>
-                <td>
-                    <select class="form-control to-location" required>
-                        <option value="">เลือกคลังสินค้าปลายทาง</option>
-                        ${toLocationOptions}
-                    </select>
-                </td>
-                <td><input type="number" class="form-control quantity" min="1" step="1" required></td>
-                <td>${unit}</td>
-                <td><button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button></td>
-                <input type="hidden" name="product_ids[]" value="${productId}">
-            </tr>
-        `;
-        $('#transferTable tbody').append(newRow);
-    },
-            error: function() {
-                alert('Error fetching product locations');
-            }
-        });
-    }
+        <tr data-product-id="${productId}">
+            <td>${productName}</td>
+            <td>
+                <select class="form-control from-location" required>
+                    <option value="">เลือกคลังสินค้าต้นทาง</option>
+                    ${fromLocationOptions}
+                </select>
+            </td>
+            <td>
+                <select class="form-control to-location" required>
+                    <option value="">เลือกคลังสินค้าปลายทาง</option>
+                    ${toLocationOptions}
+                </select>
+            </td>
+            <td><input type="number" class="form-control quantity" min="1" step="1" required></td>
+            <td>${unit}</td>
+            <td><button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button></td>
+        </tr>
+    `;
+    $('#transferTable tbody').append(newRow);
 
-    $('#productTable').on('change', '.product-select', function() {
-        var row = $(this).closest('tr');
-        var data = productTable.row(row).data();
-        if (this.checked) {
-            addProductToTransfer(data.product_id, data.name_th, data.unit);
-        } else {
-            $('#transferTable tbody').find(`input[value="${data.product_id}"]`).closest('tr').remove();
+                // เลือกคลังสินค้าต้นทางอัตโนมัติ
+                let newRowElement = $('#transferTable tbody tr:last');
+                let fromLocationSelect = newRowElement.find('.from-location');
+                if (availableLocations.length > 0) {
+                    fromLocationSelect.val(availableLocations[0].location_id);
+                    // ตั้งค่า max quantity สำหรับ input จำนวน
+                    newRowElement.find('.quantity').attr('max', availableLocations[0].quantity);
+                }
+
+                updateProductSelectionStatus(productId, response.locations.length);
+            } else {
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลคลังสินค้าได้', 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
         }
     });
-
-    $('#transferTable').on('click', '.remove-row', function() {
-        $(this).closest('tr').remove();
+}
+function getSelectedLocations(productId) {
+    let selectedLocations = [];
+    $('#transferTable tbody tr[data-product-id="' + productId + '"]').each(function() {
+        let locationId = $(this).find('.from-location').val();
+        if (locationId) {
+            selectedLocations.push(locationId);
+        }
     });
+    return selectedLocations;
+}
 
-    $('#transferTable').on('change', '.from-location', function() {
-        let row = $(this).closest('tr');
-        let quantityInput = row.find('.quantity');
-        let maxQuantity = $(this).find('option:selected').data('quantity');
-        quantityInput.attr('max', maxQuantity);
-    });
+function updateProductSelectionStatus(productId, availableLocations) {
+    var checkbox = $('#productTable').find(`input[value="${productId}"]`);
+    var currentSelections = getProductSelectionCount(productId);
+    
+    if (currentSelections >= availableLocations) {
+        checkbox.prop('disabled', true);
+    } else {
+        checkbox.prop('disabled', false);
+    }
+    
+    // ทำให้ติ๊กถูกหายไปเมื่อเลือกแล้ว
+    checkbox.prop('checked', false);
+}
+
+function getProductSelectionCount(productId) {
+    return $('#transferTable tbody tr[data-product-id="' + productId + '"]').length;
+}
+
+$('#productTable').on('change', '.product-select', function() {
+    var row = $(this).closest('tr');
+    var data = productTable.row(row).data();
+    if (this.checked) {
+        addProductToTransfer(data.product_id, data.name_th, data.unit);
+        // ทำให้ติ๊กถูกหายไปทันทีหลังจากเลือก
+        $(this).prop('checked', false);
+    } else {
+        removeLastProductTransfer(data.product_id);
+    }
+});
+
+function removeLastProductTransfer(productId) {
+    var lastRow = $('#transferTable tbody tr[data-product-id="' + productId + '"]:last');
+    if (lastRow.length) {
+        lastRow.remove();
+        var availableLocations = parseInt($('#productTable').find(`input[value="${productId}"]`).data('available-locations'));
+        updateProductSelectionStatus(productId, availableLocations);
+        // อัพเดทตัวเลือกคลังสินค้าสำหรับแถวที่เหลือ
+        updateAvailableLocations(productId);
+    }
+}
+
+$('#transferTable').on('click', '.remove-row', function() {
+    var row = $(this).closest('tr');
+    var productId = row.data('product-id');
+    row.remove();
+    var availableLocations = parseInt($('#productTable').find(`input[value="${productId}"]`).data('available-locations'));
+    updateProductSelectionStatus(productId, availableLocations);
+});
+
+$('#transferTable').on('change', '.from-location', function() {
+    let row = $(this).closest('tr');
+    let quantityInput = row.find('.quantity');
+    let maxQuantity = $(this).find('option:selected').data('quantity');
+    quantityInput.attr('max', maxQuantity);
+    
+    // ถ้าจำนวนปัจจุบันมากกว่าจำนวนสูงสุดที่มีในคลัง ให้ปรับเป็นจำนวนสูงสุด
+    if (parseInt(quantityInput.val()) > maxQuantity) {
+        quantityInput.val(maxQuantity);
+    }
+});
 
     $('#transferTable').on('change', '.from-location, .to-location, .quantity', function() {
         let row = $(this).closest('tr');
@@ -341,8 +416,9 @@ $(document).ready(function() {
             products: []
         };
 
-        $('#transferTable tbody tr').each(function() {
-        let productId = $(this).find('input[name="product_ids[]"]').val();
+      
+    $('#transferTable tbody tr').each(function() {
+        let productId = $(this).data('product-id'); // เปลี่ยนวิธีการดึง product_id
         let fromLocation = $(this).find('.from-location').val();
         let toLocation = $(this).find('.to-location').val();
         let quantity = $(this).find('.quantity').val();
