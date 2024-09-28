@@ -171,35 +171,46 @@ $(document).ready(function() {
         }
 
         function displayTransferDetails(data) {
-            $('#billNumber').val(data.bill_number);
-            $('#transferDate').val(data.transfer_date);
+    console.log("Transfer details:", data);  // เพิ่ม log นี้
+    $('#billNumber').val(data.bill_number);
+    $('#transferDate').val(data.transfer_date);
 
-            const itemsTable = $('#transferItemsTable tbody');
-            itemsTable.empty();
+    const itemsTable = $('#transferItemsTable tbody');
+    itemsTable.empty();
 
-            data.items.forEach(function(item) {
-                addProductToTransfer(item.product_id, item.product_name, item.from_location, item.to_location, item.quantity, item.unit);
-            });
-        }
+    data.items.forEach(function(item) {
+        addProductToTransfer(
+            item.product_id, 
+            item.product_name_th || item.product_name_en, 
+            item.from_location, 
+            item.to_location, 
+            item.quantity, 
+            item.unit
+        );
+    });
+}
 
-        function addProductToTransfer(productId, productName, fromLocation, toLocation, quantity, unit) {
+function addProductToTransfer(productId, productName, fromLocation, toLocation, quantity, unit) {
+    console.log("Adding product:", productId, productName, fromLocation, toLocation, quantity, unit);  // เพิ่ม log นี้
     $.ajax({
         url: '../api/get_product_locations.php',
         type: 'POST',
         data: { product_id: productId },
         dataType: 'json',
         success: function(response) {
+            console.log("Product locations response:", response);  // เพิ่ม log นี้
+            
             let fromLocationOptions = response.all_locations.map(loc => 
-                `<option value="${loc.location_id}" ${loc.location === fromLocation ? 'selected' : ''}>${loc.location} ${loc.location === fromLocation ? `(${quantity} ${unit})` : ''}</option>`
+                `<option value="${loc.location_id}" ${loc.location === fromLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'} ${loc.location === fromLocation ? `(${quantity} ${unit})` : ''}</option>`
             ).join('');
 
             let toLocationOptions = response.all_locations.map(loc => 
-                `<option value="${loc.location_id}" ${loc.location === toLocation ? 'selected' : ''}>${loc.location}</option>`
+                `<option value="${loc.location_id}" ${loc.location === toLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'}</option>`
             ).join('');
 
             let newRow = `
             <tr>
-                <td>${productName}</td>
+                <td>${productName || 'ไม่ระบุ'}</td>
                 <td>
                     <select class="form-control from-location" required>
                         <option value="">เลือกคลังสินค้าต้นทาง</option>
@@ -213,14 +224,16 @@ $(document).ready(function() {
                     </select>
                 </td>
                 <td><input type="number" class="form-control quantity" min="1" step="1" value="${quantity}" required></td>
-                <td>${unit}</td>
+                <td>${unit || 'ไม่ระบุ'}</td>
                 <td><button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button></td>
                 <input type="hidden" name="product_ids[]" value="${productId}">
             </tr>
             `;
             $('#transferItemsTable tbody').append(newRow);
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error fetching product locations:', error);
+            console.error('Response:', xhr.responseText);
             alert('Error fetching product locations');
         }
     });

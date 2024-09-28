@@ -75,13 +75,14 @@
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/time.svg" alt="img"><span> รายงาน</span> <span class="menu-arrow"></span></a>
                         <ul>
-                            <li><a href="purchaseorderreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'purchaseorderreport.html') ? 'class="active"' : ''; ?>>Purchase order report</a></li>
-                            <li><a href="inventoryreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'inventoryreport.html') ? 'class="active"' : ''; ?>>Inventory Report</a></li>
+                            <li><a href="<?php echo base_url();?>/report/product_movement" <?php echo (basename($_SERVER['PHP_SELF']) == 'product_movement.php') ? 'class="active"' : ''; ?>>รายงานสินค้าเคลื่อนไหว</a></li>
+                            <li><a href="<?php echo base_url();?>/report/inventory_summary" <?php echo (basename($_SERVER['PHP_SELF']) == 'inventory_summary.php') ? 'class="active"' : ''; ?>>รายงานสินค้าคงเหลือ</a></li>
+                            <!-- <li><a href="inventoryreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'inventoryreport.html') ? 'class="active"' : ''; ?>>Inventory Report</a></li>
                             <li><a href="salesreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'salesreport.html') ? 'class="active"' : ''; ?>>Sales Report</a></li>
                             <li><a href="invoicereport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'invoicereport.html') ? 'class="active"' : ''; ?>>Invoice Report</a></li>
                             <li><a href="purchasereport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'purchasereport.html') ? 'class="active"' : ''; ?>>Purchase Report</a></li>
                             <li><a href="supplierreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'supplierreport.html') ? 'class="active"' : ''; ?>>Supplier Report</a></li>
-                            <li><a href="customerreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'customerreport.html') ? 'class="active"' : ''; ?>>Customer Report</a></li>
+                            <li><a href="customerreport.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'customerreport.html') ? 'class="active"' : ''; ?>>Customer Report</a></li> -->
                         </ul>
                     </li>
 
