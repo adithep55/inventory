@@ -35,6 +35,7 @@
 
     <form id="addProductForm" enctype="multipart/form-data">
         <div class="page-wrapper">
+             <?php require_once '../includes/notification.php'; ?>
             <div class="content">
                 <div class="page-header">
                     <div class="page-title">

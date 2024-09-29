@@ -1,8 +1,9 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . 'custom-error.log'); // กำหนดไฟล์ error.log
+
 require_once '../config/connect.php';
 
 function dd_return($status, $message) {
@@ -17,6 +18,17 @@ function randtext($range) {
     $start = rand(1, (strlen($char) - $range));
     $shuffled = str_shuffle($char);
     return substr($shuffled, $start, $range);
+}
+
+function dd_q($sql, $params = []) {
+    global $conn;
+    $stmt = $conn->prepare($sql);
+    if ($stmt->execute($params)) {
+        return $stmt;
+    } else {
+        error_log("SQL Error: " . implode(", ", $stmt->errorInfo())); // บันทึกข้อผิดพลาด SQL
+        return false;
+    }
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -65,9 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     if (move_uploaded_file($_FILES['img']['tmp_name'], $uploadPath . $newfile)) {
                         $img_path = $newfile;
                     } else {
+                        error_log("File upload error: Unable to move uploaded file."); // บันทึกข้อผิดพลาดการอัปโหลดไฟล์
                         dd_return(false, "ไม่สามารถอัปโหลดไฟล์ได้");
                     }
                 } else {
+                    error_log("File upload error: Invalid file type."); // บันทึกข้อผิดพลาดประเภทไฟล์
                     dd_return(false, "ไฟล์ที่อัปโหลดต้องเป็นรูปภาพเท่านั้น");
                 }
             }
@@ -90,16 +104,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($stmt) {
                 dd_return(true, "เพิ่มสินค้าสำเร็จ");
             } else {
-                $error = $stmt->errorInfo();
+                $error = $conn->errorInfo();
+                error_log("SQL Error: " . implode(", ", $error));
                 dd_return(false, "SQL ผิดพลาด: " . $error[2]);
             }
         } else {
+            error_log("Validation error: Missing required fields."); // บันทึกข้อผิดพลาดการตรวจสอบข้อมูล
             dd_return(false, "กรุณากรอกข้อมูลให้ครบ");
         }
     } else {
+        error_log("Authentication error: User not logged in."); // บันทึกข้อผิดพลาดการตรวจสอบสิทธิ์
         dd_return(false, "เข้าสู่ระบบก่อนดำเนินการครับ");
     }
 } else {
+    error_log("Method error: Invalid request method '{$_SERVER['REQUEST_METHOD']}'"); // บันทึกข้อผิดพลาดวิธีการร้องขอ
     dd_return(false, "Method '{$_SERVER['REQUEST_METHOD']}' not allowed!");
 }
 ?>
