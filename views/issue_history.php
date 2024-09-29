@@ -20,7 +20,8 @@
 <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-        <div class="content container-fluid">
+    <div class="content container-fluid">
+    <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="row">
                     <div class="col">
@@ -49,7 +50,6 @@
                                             <th>ลูกค้า/โครงการ</th>
                                             <th>รายการสินค้า</th>
                                             <th>ผู้เบิก</th>
-                                            <th>สถานะ</th>
                                             <th>การดำเนินการ</th>
                                         </tr>
                                     </thead>
@@ -98,14 +98,15 @@ $(document).ready(function () {
             { data: 'customer_project' },
             { data: 'items' },
             { data: 'user_name' },
-            { data: 'status' },
             { 
                 data: null,
                 render: function (data, type, row) {
                     return `
-                        <a href="issue_details.php?id=${row.issue_id}" class="btn btn-sm btn-info">รายละเอียด</a> 
-                        <a href="edit_issue.php?id=${row.issue_id}" class="btn btn-sm btn-warning">แก้ไข</a>
-                        <button class="btn btn-sm btn-danger delete-issue" data-id="${row.issue_id}">ลบ</button>
+                                               <a href="issue_details.php?id=${row.issue_id}" class="me-3">
+                            <img src="../assets/img/icons/eye.svg" alt="img">
+                        </a>
+                        <a href="edit_issue.php?id=${row.issue_id}" ><img src="../assets/img/icons/edit.svg" alt="img" class="me-3"></a>
+                        <button class="me-3" data-id="${row.issue_id}">    <img src="../assets/img/icons/delete.svg" alt="img"></button>
                     `;
                 },
                 orderable: false,

@@ -17,7 +17,8 @@
     <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-        <div class="content">
+    <div class="content container-fluid">
+    <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="page-title">
                     <h4>จัดการโครงการ</h4>

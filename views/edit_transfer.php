@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>แก้ไขการโอนย้ายสินค้า</title>
-    
+
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
@@ -18,7 +19,8 @@
     <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-        <div class="content container-fluid">
+    <div class="content container-fluid">
+    <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
@@ -51,7 +53,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <h4>รายการสินค้าที่โอนย้าย</h4>
@@ -117,98 +119,98 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-$(document).ready(function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const transferId = urlParams.get('id');
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const transferId = urlParams.get('id');
 
-    // แก้ไขการตั้งค่า max ของ input วันที่
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const maxDate = tomorrow.toISOString().split('T')[0];
-    $('#transferDate').attr('max', maxDate);
+            // แก้ไขการตั้งค่า max ของ input วันที่
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const maxDate = tomorrow.toISOString().split('T')[0];
+            $('#transferDate').attr('max', maxDate);
 
-    if (transferId) {
-        loadTransferDetails(transferId);
-    } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'ข้อผิดพลาด',
-                text: 'ไม่พบรหัสการโอนย้าย',
-                confirmButtonText: 'ตกลง'
-            }).then(() => {
-                window.location.href = 'transfer_history.php';
-            });
-        }
+            if (transferId) {
+                loadTransferDetails(transferId);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ข้อผิดพลาด',
+                    text: 'ไม่พบรหัสการโอนย้าย',
+                    confirmButtonText: 'ตกลง'
+                }).then(() => {
+                    window.location.href = 'transfer_history.php';
+                });
+            }
 
-        function loadTransferDetails(transferId) {
-            $.ajax({
-                url: '../api/get_transfer_details.php',
-                type: 'GET',
-                data: { id: transferId },
-                dataType: 'json',
-                success: function(response) {
-                    if (response.error) {
+            function loadTransferDetails(transferId) {
+                $.ajax({
+                    url: '../api/get_transfer_details.php',
+                    type: 'GET',
+                    data: { id: transferId },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ข้อผิดพลาด',
+                                text: response.error,
+                                confirmButtonText: 'ตกลง'
+                            });
+                            return;
+                        }
+                        displayTransferDetails(response);
+                    },
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'ข้อผิดพลาด',
-                            text: response.error,
+                            text: 'ไม่สามารถโหลดข้อมูลการโอนย้ายได้',
                             confirmButtonText: 'ตกลง'
                         });
-                        return;
                     }
-                    displayTransferDetails(response);
-                },
-                error: function() {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'ข้อผิดพลาด',
-                        text: 'ไม่สามารถโหลดข้อมูลการโอนย้ายได้',
-                        confirmButtonText: 'ตกลง'
-                    });
-                }
-            });
-        }
+                });
+            }
 
-        function displayTransferDetails(data) {
-    console.log("Transfer details:", data);  // เพิ่ม log นี้
-    $('#billNumber').val(data.bill_number);
-    $('#transferDate').val(data.transfer_date);
+            function displayTransferDetails(data) {
+                console.log("Transfer details:", data);  // เพิ่ม log นี้
+                $('#billNumber').val(data.bill_number);
+                $('#transferDate').val(data.transfer_date);
 
-    const itemsTable = $('#transferItemsTable tbody');
-    itemsTable.empty();
+                const itemsTable = $('#transferItemsTable tbody');
+                itemsTable.empty();
 
-    data.items.forEach(function(item) {
-        addProductToTransfer(
-            item.product_id, 
-            item.product_name_th || item.product_name_en, 
-            item.from_location, 
-            item.to_location, 
-            item.quantity, 
-            item.unit
-        );
-    });
-}
+                data.items.forEach(function (item) {
+                    addProductToTransfer(
+                        item.product_id,
+                        item.product_name_th || item.product_name_en,
+                        item.from_location,
+                        item.to_location,
+                        item.quantity,
+                        item.unit
+                    );
+                });
+            }
 
-function addProductToTransfer(productId, productName, fromLocation, toLocation, quantity, unit) {
-    console.log("Adding product:", productId, productName, fromLocation, toLocation, quantity, unit);  // เพิ่ม log นี้
-    $.ajax({
-        url: '../api/get_product_locations.php',
-        type: 'POST',
-        data: { product_id: productId },
-        dataType: 'json',
-        success: function(response) {
-            console.log("Product locations response:", response);  // เพิ่ม log นี้
-            
-            let fromLocationOptions = response.all_locations.map(loc => 
-                `<option value="${loc.location_id}" ${loc.location === fromLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'} ${loc.location === fromLocation ? `(${quantity} ${unit})` : ''}</option>`
-            ).join('');
+            function addProductToTransfer(productId, productName, fromLocation, toLocation, quantity, unit) {
+                console.log("Adding product:", productId, productName, fromLocation, toLocation, quantity, unit);  // เพิ่ม log นี้
+                $.ajax({
+                    url: '../api/get_product_locations.php',
+                    type: 'POST',
+                    data: { product_id: productId },
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log("Product locations response:", response);  // เพิ่ม log นี้
 
-            let toLocationOptions = response.all_locations.map(loc => 
-                `<option value="${loc.location_id}" ${loc.location === toLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'}</option>`
-            ).join('');
+                        let fromLocationOptions = response.all_locations.map(loc =>
+                            `<option value="${loc.location_id}" ${loc.location === fromLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'} ${loc.location === fromLocation ? `(${quantity} ${unit})` : ''}</option>`
+                        ).join('');
 
-            let newRow = `
+                        let toLocationOptions = response.all_locations.map(loc =>
+                            `<option value="${loc.location_id}" ${loc.location === toLocation ? 'selected' : ''}>${loc.location || 'ไม่ระบุ'}</option>`
+                        ).join('');
+
+                        let newRow = `
             <tr>
                 <td>${productName || 'ไม่ระบุ'}</td>
                 <td>
@@ -229,209 +231,210 @@ function addProductToTransfer(productId, productName, fromLocation, toLocation, 
                 <input type="hidden" name="product_ids[]" value="${productId}">
             </tr>
             `;
-            $('#transferItemsTable tbody').append(newRow);
-        },
-        error: function(xhr, status, error) {
-            console.error('Error fetching product locations:', error);
-            console.error('Response:', xhr.responseText);
-            alert('Error fetching product locations');
-        }
-    });
-}
-
-        var productTable = $('#productTable').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": {
-                "url": "../api/get_inventory_TF.php",
-                "type": "POST"
-            },
-            "columns": [
-                { 
-                    "data": null,
-                    "render": function (data, type, row) {
-                        return '<input type="checkbox" class="product-select" value="' + row.product_id + '">';
+                        $('#transferItemsTable tbody').append(newRow);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching product locations:', error);
+                        console.error('Response:', xhr.responseText);
+                        alert('Error fetching product locations');
                     }
-                },
-                { 
-                    "data": "image_url",
-                    "render": function(data, type, row) {
-                        return '<img src="' + data + '" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">';
-                    }
-                },
-                { "data": "name_th" },
-                { "data": "name_en" },
-                { "data": "product_id" },
-                { "data": "product_type_name" },
-                { "data": "product_category_name" },
-                { "data": "unit" }
-            ]
-        });
-
-        $('#productTable').on('change', '.product-select', function() {
-            var row = $(this).closest('tr');
-            var data = productTable.row(row).data();
-            if (this.checked) {
-                addProductToTransfer(data.product_id, data.name_th, '', '', 1, data.unit);
-            } else {
-                $('#transferItemsTable tbody').find(`input[value="${data.product_id}"]`).closest('tr').remove();
-            }
-        });
-
-        $('#transferItemsTable').on('click', '.remove-row', function() {
-            $(this).closest('tr').remove();
-        });
-
-        $('#transferItemsTable').on('change', '.from-location', function() {
-            let row = $(this).closest('tr');
-            let quantityInput = row.find('.quantity');
-            let maxQuantity = $(this).find('option:selected').data('quantity');
-            quantityInput.attr('max', maxQuantity);
-        });
-
-        $('#transferItemsTable').on('change', '.from-location, .to-location, .quantity', function() {
-            let row = $(this).closest('tr');
-            let fromLocation = row.find('.from-location');
-            let toLocation = row.find('.to-location');
-            let quantityInput = row.find('.quantity');
-            let quantity = parseInt(quantityInput.val());
-            let maxQuantity = parseInt(fromLocation.find('option:selected').data('quantity'));
-
-            if (fromLocation.val() === toLocation.val()) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'คลังสินค้าไม่ถูกต้อง',
-                    text: 'คลังสินค้าต้นทางและปลายทางต้องไม่เป็นคลังเดียวกัน',
-                    confirmButtonText: 'ตกลง'
                 });
-                toLocation.val('');
             }
 
-            if (quantity < 1) {
-                quantityInput.val(1);
-            }
+            var productTable = $('#productTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "../api/get_inventory_TF.php",
+                    "type": "POST"
+                },
+                "columns": [
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return '<input type="checkbox" class="product-select" value="' + row.product_id + '">';
+                        }
+                    },
+                    {
+                        "data": "image_url",
+                        "render": function (data, type, row) {
+                            return '<img src="' + data + '" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover;">';
+                        }
+                    },
+                    { "data": "name_th" },
+                    { "data": "name_en" },
+                    { "data": "product_id" },
+                    { "data": "product_type_name" },
+                    { "data": "product_category_name" },
+                    { "data": "unit" }
+                ]
+            });
 
-            if (quantity > maxQuantity) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'จำนวนไม่ถูกต้อง',
-                    text: `จำนวนที่โอนย้ายต้องไม่เกิน ${maxQuantity}`,
-                    confirmButtonText: 'ตกลง'
+            $('#productTable').on('change', '.product-select', function () {
+                var row = $(this).closest('tr');
+                var data = productTable.row(row).data();
+                if (this.checked) {
+                    addProductToTransfer(data.product_id, data.name_th, '', '', 1, data.unit);
+                } else {
+                    $('#transferItemsTable tbody').find(`input[value="${data.product_id}"]`).closest('tr').remove();
+                }
+            });
+
+            $('#transferItemsTable').on('click', '.remove-row', function () {
+                $(this).closest('tr').remove();
+            });
+
+            $('#transferItemsTable').on('change', '.from-location', function () {
+                let row = $(this).closest('tr');
+                let quantityInput = row.find('.quantity');
+                let maxQuantity = $(this).find('option:selected').data('quantity');
+                quantityInput.attr('max', maxQuantity);
+            });
+
+            $('#transferItemsTable').on('change', '.from-location, .to-location, .quantity', function () {
+                let row = $(this).closest('tr');
+                let fromLocation = row.find('.from-location');
+                let toLocation = row.find('.to-location');
+                let quantityInput = row.find('.quantity');
+                let quantity = parseInt(quantityInput.val());
+                let maxQuantity = parseInt(fromLocation.find('option:selected').data('quantity'));
+
+                if (fromLocation.val() === toLocation.val()) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'คลังสินค้าไม่ถูกต้อง',
+                        text: 'คลังสินค้าต้นทางและปลายทางต้องไม่เป็นคลังเดียวกัน',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    toLocation.val('');
+                }
+
+                if (quantity < 1) {
+                    quantityInput.val(1);
+                }
+
+                if (quantity > maxQuantity) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'จำนวนไม่ถูกต้อง',
+                        text: `จำนวนที่โอนย้ายต้องไม่เกิน ${maxQuantity}`,
+                        confirmButtonText: 'ตกลง'
+                    });
+                    quantityInput.val(maxQuantity);
+                }
+            });
+
+            $('#editTransferForm').submit(function (e) {
+                e.preventDefault();
+                let transferDate = new Date($('#transferDate').val());
+                let maxAllowedDate = new Date(maxDate);
+
+                if (transferDate > maxAllowedDate) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'วันที่ไม่ถูกต้อง',
+                        text: 'วันที่โอนย้ายต้องไม่เป็นวันในอนาคต',
+                        confirmButtonText: 'ตกลง'
+                    });
+                    return;
+                }
+
+                let formData = {
+                    transfer_id: transferId,
+                    transfer_date: $('#transferDate').val(),
+                    products: []
+                };
+
+                $('#transferItemsTable tbody tr').each(function () {
+                    let productId = $(this).find('input[name="product_ids[]"]').val();
+                    let fromLocation = $(this).find('.from-location').val();
+                    let toLocation = $(this).find('.to-location').val();
+                    let quantity = $(this).find('.quantity').val();
+                    let unit = $(this).find('td:eq(4)').text();
+
+                    formData.products.push({
+                        product_id: productId,
+                        from_location_id: fromLocation,
+                        to_location_id: toLocation,
+                        quantity: quantity,
+                        unit: unit
+                    });
+                    $('#transferDate').on('change', function () {
+                        let selectedDate = new Date($(this).val());
+                        let maxAllowedDate = new Date(maxDate);
+
+                        if (selectedDate > maxAllowedDate) {
+                            $(this).val(maxDate);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'วันที่ไม่ถูกต้อง',
+                                text: 'ไม่สามารถเลือกวันที่ในอนาคตได้',
+                                confirmButtonText: 'ตกลง'
+                            });
+                        }
+                    });
                 });
-                quantityInput.val(maxQuantity);
-            }
-        });
 
-        $('#editTransferForm').submit(function(e) {
-        e.preventDefault();
-        let transferDate = new Date($('#transferDate').val());
-        let maxAllowedDate = new Date(maxDate);
+                $.ajax({
+                    url: '../system/update_transfer.php',
+                    type: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ',
+                                text: 'บันทึกการแก้ไขการโอนย้ายสินค้าเรียบร้อยแล้ว',
+                                confirmButtonText: 'ตกลง'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'transfer_history.php';
+                                }
+                            });
 
-        if (transferDate > maxAllowedDate) {
-            Swal.fire({
-                icon: 'error',
-                title: 'วันที่ไม่ถูกต้อง',
-                text: 'วันที่โอนย้ายต้องไม่เป็นวันในอนาคต',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
-        }
-
-        let formData = {
-            transfer_id: transferId,
-            transfer_date: $('#transferDate').val(),
-            products: []
-        };
-
-$('#transferItemsTable tbody tr').each(function() {
-    let productId = $(this).find('input[name="product_ids[]"]').val();
-    let fromLocation = $(this).find('.from-location').val();
-    let toLocation = $(this).find('.to-location').val();
-    let quantity = $(this).find('.quantity').val();
-    let unit = $(this).find('td:eq(4)').text();
-    
-    formData.products.push({
-        product_id: productId,
-        from_location_id: fromLocation,
-        to_location_id: toLocation,
-        quantity: quantity,
-        unit: unit
-    });
-    $('#transferDate').on('change', function() {
-        let selectedDate = new Date($(this).val());
-        let maxAllowedDate = new Date(maxDate);
-
-        if (selectedDate > maxAllowedDate) {
-            $(this).val(maxDate);
-            Swal.fire({
-                icon: 'error',
-                title: 'วันที่ไม่ถูกต้อง',
-                text: 'ไม่สามารถเลือกวันที่ในอนาคตได้',
-                confirmButtonText: 'ตกลง'
-            });
-        }
-});
-});
-
-            $.ajax({
-                url: '../system/update_transfer.php',
-                type: 'POST',
-                data: JSON.stringify(formData),
-                contentType: 'application/json',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.status === 'success') {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'สำเร็จ',
-                            text: 'บันทึกการแก้ไขการโอนย้ายสินค้าเรียบร้อยแล้ว',
-                            confirmButtonText: 'ตกลง'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = 'transfer_history.php';
-                            }
-                        });
-                        
-                    } else {
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: response.message,
+                                confirmButtonText: 'ตกลง'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("XHR Status:", status);
+                        console.error("Error:", error);
+                        console.error("Response Text:", xhr.responseText);
                         Swal.fire({
                             icon: 'error',
                             title: 'เกิดข้อผิดพลาด',
-                            text: response.message,
+                            text: 'ไม่สามารถบันทึกการแก้ไขการโอนย้ายสินค้าได้ โปรดลองอีกครั้งหรือติดต่อผู้ดูแลระบบ',
                             confirmButtonText: 'ตกลง'
                         });
                     }
-                },
-                error: function(xhr, status, error) {
-                    console.error("XHR Status:", status);
-                    console.error("Error:", error);
-                    console.error("Response Text:", xhr.responseText);
+                });
+            });
+            $('#transferDate').on('change', function () {
+                let selectedDate = new Date($(this).val());
+                let maxDate = new Date();
+                maxDate.setHours(0, 0, 0, 0);
+                maxDate.setDate(maxDate.getDate() + 1);
+
+                if (selectedDate > maxDate) {
+                    $(this).val(today);
                     Swal.fire({
                         icon: 'error',
-                        title: 'เกิดข้อผิดพลาด',
-                        text: 'ไม่สามารถบันทึกการแก้ไขการโอนย้ายสินค้าได้ โปรดลองอีกครั้งหรือติดต่อผู้ดูแลระบบ',
+                        title: 'วันที่ไม่ถูกต้อง',
+                        text: 'ไม่สามารถเลือกวันที่ในอนาคตได้',
                         confirmButtonText: 'ตกลง'
                     });
                 }
             });
-        });
-        $('#transferDate').on('change', function() {
-        let selectedDate = new Date($(this).val());
-        let maxDate = new Date();
-        maxDate.setHours(0, 0, 0, 0);
-        maxDate.setDate(maxDate.getDate() + 1);
 
-        if (selectedDate > maxDate) {
-            $(this).val(today);
-            Swal.fire({
-                icon: 'error',
-                title: 'วันที่ไม่ถูกต้อง',
-                text: 'ไม่สามารถเลือกวันที่ในอนาคตได้',
-                confirmButtonText: 'ตกลง'
-            });
-        }
-    });
-    
-    });
+        });
     </script>
 </body>
+
 </html>

@@ -39,46 +39,6 @@ $links_re = base_url();
 
         <ul class="nav user-menu">
 
-
-<ul class="nav user-menu">
-    <li class="nav-item dropdown">
-        <a href="javascript:void(0);" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-            
-            <i class="fas fa-bell"></i>
-            <span class="badge rounded-pill bg-danger low-stock-notification-count" style="position: absolute; top: 0; right: 0;">0</span>
-        </a>
-        <div class="dropdown-menu notifications">
-            <div class="topnav-dropdown-header">
-                <span class="notification-title">การแจ้งเตือน</span>
-            </div>
-            <div class="noti-content">
-                <ul class="notification-list">
-                    <li class="notification-message low-stock-notification" style="display: none;">
-                        <a href="javascript:void(0);" id="show-low-stock-details-header">
-                            <div class="media d-flex">
-                            <span class="avatar flex-shrink-0">
-    <img alt="Low Stock Warning" src="../assets/img/icons/warning.svg">
-</span>
-                                <div class="media-body flex-grow-1">
-                                    <p class="noti-details">
-                                        <span class="noti-title">สินค้าใกล้หมด</span>
-                                        <span class="text-danger">มีสินค้า <span class="low-stock-notification-count">0</span> รายการที่ใกล้หมด</span>
-                                    </p>
-                                    <p class="noti-time"><span class="notification-time">ตรวจสอบเดี๋ยวนี้</span></p>
-                                </div>
-                            </div>
-                        </a>
-                    </li>
-                    <!-- เพิ่มการแจ้งเตือนอื่นๆ ตามต้องการ -->
-                </ul>
-            </div>
-            <div class="topnav-dropdown-footer">
-                <a href="notifications.php">ดูการแจ้งเตือนทั้งหมด</a>
-            </div>
-        </div>
-    </li>
-    <!-- เพิ่มรายการเมนูอื่นๆ ตามต้องการ -->
-</ul>
             <li class="nav-item dropdown has-arrow main-drop">
     <a href="javascript:void(0);" class="dropdown-toggle nav-link userset" data-bs-toggle="dropdown">
         <span class="user-img"><img id="userProfileImage" src="../assets/img/profiles/avator1.jpg" alt="">

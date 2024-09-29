@@ -52,20 +52,8 @@
 
     <div class="page-wrapper">
         <div class="content container-fluid">
-            <div class="row">
-                <!-- เพิ่มส่วนแสดงสินค้าใกล้หมดที่เด่นชัด -->
-                <div class="col-lg-12 col-sm-12 col-12 mb-4">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body">
-                            <h4 class="card-title mb-0">
-                                <i class="fas fa-exclamation-triangle"></i> แจ้งเตือน: สินค้าใกล้หมด
-                            </h4>
-                            <p class="mt-2 mb-0">มีสินค้า <span id="low-stock-count" class="font-weight-bold">0</span>
-                                รายการที่ใกล้หมด</p>
-                            <button id="show-low-stock-details" class="btn btn-light mt-3">ดูรายละเอียด</button>
-                        </div>
-                    </div>
-                </div>
+    
+<?php require_once 'includes/notification.php'; ?>
 
                 <div class="row">
                     <div class="col-lg-3 col-sm-6 col-12">
@@ -224,20 +212,6 @@
     <script>
 $(document).ready(function () {
     loadDashboardData();
-
-    $('#show-low-stock-details').click(function () {
-        $('#lowStockModal').modal('show');
-    });
-
-    $('.close, .btn-secondary').click(function () {
-        $('#lowStockModal').modal('hide');
-    });
-
-    $(window).on('resize', function () {
-        if ($('#lowStockModal').hasClass('show')) {
-            updateLowStockModal(window.lowStockProducts);
-        }
-    });
 });
 
 function loadDashboardData() {
@@ -267,10 +241,6 @@ function updateDashboard(data) {
     createInventoryChart(data.inventory_stats);
     updateRecentProductsTable(data.recent_products);
     updateRecentTransactionsTable(data.recent_transactions);
-
-    $('#low-stock-count').text(data.low_stock_count);
-    updateLowStockModal(data.low_stock_products);
-    window.lowStockProducts = data.low_stock_products;
 
     $('.card.bg-danger')[data.low_stock_count > 0 ? 'show' : 'hide']();
 }
@@ -355,40 +325,7 @@ function updateRecentTransactionsTable(transactions) {
     });
 }
 
-function updateLowStockModal(products) {
-    var table = $('#low-stock-table tbody');
-    var list = $('#low-stock-list');
-    table.empty();
-    list.empty();
 
-    products.forEach(function (product) {
-        var isLowStock = parseInt(product.total_quantity) <= parseInt(product.low_level);
-        var status = isLowStock ? 'ต่ำกว่าเกณฑ์' : 'ปกติ';
-        var statusClass = isLowStock ? 'text-danger' : 'text-success';
-        var statusBadge = isLowStock ? '<span class="badge bg-danger">ใกล้หมด</span>' : '<span class="badge bg-success">ปกติ</span>';
-
-        table.append(`
-            <tr>
-                <td>${product.product_id}</td>
-                <td>${product.name_th}</td>
-                <td>${product.total_quantity}</td>
-                <td>${product.low_level}</td>
-                <td>${statusBadge}</td>
-            </tr>
-        `);
-
-        list.append(`
-            <div class="list-group-item m-1">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">${product.name_th}</h5>
-                    <small class="text-muted">${product.product_id}</small>
-                </div>
-                <p class="mb-1">จำนวนคงเหลือ: <strong>${product.total_quantity}</strong> / ระดับต่ำสุด: ${product.low_level}</p>
-                <small class="${statusClass}">${status}</small>
-            </div>
-        `);
-    });
-}
     </script>
 </body>
 </html>
