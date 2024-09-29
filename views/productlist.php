@@ -24,8 +24,8 @@
 <?php require_once '../includes/header.php'; ?>
 <?php require_once '../includes/sidebar.php'; ?>
     <div class="page-wrapper">
-    <div class="content container-fluid">
-    <?php require_once '../includes/notification.php'; ?>
+         <div class="content container-fluid">
+        <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="page-title">
                     <h4>รายการสินค้า</h4>

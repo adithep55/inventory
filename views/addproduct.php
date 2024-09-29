@@ -35,7 +35,6 @@
 
     <form id="addProductForm" enctype="multipart/form-data">
         <div class="page-wrapper">
-             <?php require_once '../includes/notification.php'; ?>
             <div class="content">
                 <div class="page-header">
                     <div class="page-title">
@@ -207,284 +206,278 @@
         </div>
     </div>
     <script>
-        document.getElementById('img').addEventListener('change', function (e) {
-            var fileName = e.target.files[0].name;
-            document.getElementById('file-name').textContent = 'รูปที่อัปโหลด: ' + fileName;
-        });
+$(document).ready(function () {
+    // Load main categories
+    $.ajax({
+        url: '../api/get_types.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            var options = '<option value="">เลือกหมวดหมู่หลัก</option>';
+            $.each(data, function (index, type) {
+                options += '<option value="' + type.type_id + '">' + type.name + '</option>';
+            });
+            $('#type_id').html(options);
+        }
+    });
 
-        $(document).ready(function () {
-            // Load main categories
+    // Load subcategories when main category is selected
+    $('#type_id').change(function () {
+        var typeId = $(this).val();
+        if (typeId) {
+            $('#addSubCategory').show();
             $.ajax({
-                url: '../api/get_types.php',
+                url: '../api/get_categories.php',
                 type: 'GET',
+                data: { type_id: typeId },
                 dataType: 'json',
                 success: function (data) {
-                    var options = '<option value="">เลือกหมวดหมู่หลัก</option>';
-                    $.each(data, function (index, type) {
-                        options += '<option value="' + type.type_id + '">' + type.name + '</option>';
+                    var options = '<option value="">เลือกประเภทย่อย</option>';
+                    $.each(data, function (index, category) {
+                        options += '<option value="' + category.category_id + '">' + category.name + '</option>';
                     });
-                    $('#type_id').html(options);
+                    $('#category_id').html(options);
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
                 }
             });
+        } else {
+            $('#addSubCategory').hide();
+            $('#category_id').html('<option value="">เลือกประเภทย่อย</option>');
+        }
+    });
 
-            // Load subcategories when main category is selected
-            $('#type_id').change(function () {
-                var typeId = $(this).val();
-                if ($(this).val()) {
-                    $('#addSubCategory').show();
+    // Display selected file name
+    $('#img').on('change', function (e) {
+        var fileName = e.target.files[0].name;
+        $('#file-name').text('รูปที่อัปโหลด: ' + fileName);
+    });
+
+    // Validate product ID
+    function validateProductId(input) {
+        var regex = /^[a-zA-Z0-9]+$/;
+        return regex.test(input);
+    }
+
+    // Check if product ID exists
+    function checkProductIdExists(productId) {
+        return $.ajax({
+            url: '../system/add_product.php',
+            type: 'POST',
+            data: {
+                check_product_id: 1,
+                product_id: productId
+            },
+            dataType: 'json'
+        });
+    }
+
+    // Product ID input validation
+    $("#product_id").on('input', function () {
+        var input = $(this);
+        var productId = input.val();
+
+        if (!validateProductId(productId)) {
+            input.addClass('is-invalid');
+            input.removeClass('is-valid');
+            if (!input.next('.invalid-feedback').length) {
+                input.after('<div class="invalid-feedback">รหัสสินค้าต้องประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น</div>');
+            }
+        } else {
+            input.removeClass('is-invalid');
+            input.next('.invalid-feedback').remove();
+
+            if (productId !== '') {
+                checkProductIdExists(productId).then(function (response) {
+                    if (response.exists) {
+                        input.addClass('is-invalid');
+                        input.removeClass('is-valid');
+                        if (!input.next('.invalid-feedback').length) {
+                            input.after('<div class="invalid-feedback">รหัสสินค้านี้มีอยู่ในระบบแล้ว</div>');
+                        }
+                    } else {
+                        input.removeClass('is-invalid');
+                        input.addClass('is-valid');
+                        input.next('.invalid-feedback').remove();
+                    }
+                });
+            } else {
+                input.removeClass('is-valid');
+            }
+        }
+    });
+
+    // Form submission
+    $("#addProductForm").submit(function (e) {
+        e.preventDefault();
+        var productId = $("#product_id").val();
+
+        if (!validateProductId(productId)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'รหัสสินค้าไม่ถูกต้อง',
+                text: 'รหัสสินค้าต้องประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น'
+            });
+            return;
+        }
+
+        var formData = new FormData(this);
+
+        $.ajax({
+            type: 'POST',
+            url: '../system/add_product.php',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'กำลังบันทึก...',
+                    text: 'กรุณารอสักครู่',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    },
+                });
+            },
+            success: function (response) {
+                if (response.status === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: response.message
+                    }).then(function () {
+                        window.location.href = 'productlist';
+                    });
                 } else {
-                    $('#addSubCategory').hide();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: response.message
+                    });
                 }
-                if (typeId) {
+            },
+            error: function (xhr, status, error) {
+                console.error(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้'
+                });
+            }
+        });
+    });
+
+    // Add main category
+    $('#addMainCategory').click(function () {
+        $('#addMainCategoryModal').modal('show');
+    });
+
+    $('#saveMainCategory').click(function () {
+        var mainCategoryName = $('#mainCategoryName').val();
+        if (!mainCategoryName) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณากรอกชื่อหมวดหมู่หลัก', 'error');
+            return;
+        }
+
+        $.ajax({
+            url: '../system/add_type.php',
+            type: 'POST',
+            data: { name: mainCategoryName },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    Swal.fire('สำเร็จ', 'เพิ่มหมวดหมู่หลักเรียบร้อยแล้ว', 'success');
+                    $('#addMainCategoryModal').modal('hide');
+                    // Reload main categories
+                    $.ajax({
+                        url: '../api/get_types.php',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            var options = '<option value="">เลือกหมวดหมู่หลัก</option>';
+                            $.each(data, function (index, type) {
+                                options += '<option value="' + type.type_id + '">' + type.name + '</option>';
+                            });
+                            $('#type_id').html(options);
+                        }
+                    });
+                } else {
+                    Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มหมวดหมู่หลักได้', 'error');
+                }
+            },
+            error: function () {
+                Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+            }
+        });
+    });
+
+    // Add sub category
+    $('#addSubCategory').click(function () {
+        var selectedMainCategory = $('#type_id').val();
+        if (!selectedMainCategory) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกหมวดหมู่หลักก่อน', 'error');
+            return;
+        }
+        $('#subCategoryMainId').val(selectedMainCategory);
+        $('#addSubCategoryModal').modal('show');
+    });
+
+    $('#saveSubCategory').click(function () {
+        var subCategoryName = $('#subCategoryName').val();
+        var mainCategoryId = $('#subCategoryMainId').val();
+
+        if (!subCategoryName) {
+            Swal.fire('ข้อผิดพลาด', 'กรุณากรอกชื่อประเภทย่อย', 'error');
+            return;
+        }
+
+        $.ajax({
+            url: '../system/add_category.php',
+            type: 'POST',
+            data: {
+                name: subCategoryName,
+                product_category_id: mainCategoryId
+            },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success') {
+                    Swal.fire('สำเร็จ', 'เพิ่มประเภทย่อยเรียบร้อยแล้ว', 'success');
+                    $('#addSubCategoryModal').modal('hide');
+                    // Reload sub categories
                     $.ajax({
                         url: '../api/get_categories.php',
                         type: 'GET',
-                        data: { type_id: typeId },
+                        data: { type_id: mainCategoryId },
                         dataType: 'json',
                         success: function (data) {
-                            var options = '<option value="">เลือกหมวดหมู่ย่อย</option>';
+                            var options = '<option value="">เลือกประเภทย่อย</option>';
                             $.each(data, function (index, category) {
                                 options += '<option value="' + category.category_id + '">' + category.name + '</option>';
                             });
                             $('#category_id').html(options);
-                        },
-                        error: function (xhr, status, error) {
-                            console.error(xhr.responseText);
                         }
                     });
                 } else {
-                    $('#category_id').html('<option value="">เลือกหมวดหมู่ย่อย</option>');
+                    Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มประเภทย่อยได้', 'error');
                 }
-            });
-
-            // Display selected file name
-            $('.custom-file-input').on('change', function () {
-                let fileName = $(this).val().split('\\').pop();
-                $(this).next('.custom-file-label').addClass("selected").html(fileName);
-            });
-
-            // Submit form
-            $("#addProductForm").submit(function (e) {
-                e.preventDefault();
-                var productId = $("#product_id").val();
-
-                if (!validateProductId(productId)) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'รหัสสินค้าไม่ถูกต้อง',
-                        text: 'รหัสสินค้าต้องประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น'
-                    });
-                    return;
-                }
-
-                checkProductIdExists(productId).then(function (response) {
-                    if (response.exists) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'รหัสสินค้าซ้ำ',
-                            text: 'รหัสสินค้านี้มีอยู่ในระบบแล้ว'
-                        });
-                    } else {
-                        var formData = new FormData(e.target);
-
-                        $.ajax({
-                            type: 'POST',
-                            url: '../system/add_product.php',
-                            data: formData,
-                            contentType: false,
-                            processData: false,
-                            beforeSend: function () {
-                                Swal.fire({
-                                    title: 'กำลังบันทึก...',
-                                    text: 'กรุณารอสักครู่',
-                                    allowOutsideClick: false,
-                                    onBeforeOpen: () => {
-                                        Swal.showLoading();
-                                    },
-                                });
-                            },
-                            success: function (response) {
-                                if (response.status === 'success') {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'สำเร็จ',
-                                        text: response.message
-                                    }).then(function () {
-                                        window.location.href = 'productlist';
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'เกิดข้อผิดพลาด',
-                                        text: response.message
-                                    });
-                                }
-                            },
-                        });
-                    }
-                });
-            });
-            function validateProductId(input) {
-                var regex = /^[a-zA-Z0-9]+$/;
-                return regex.test(input);
+            },
+            error: function () {
+                Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
             }
-            function checkProductIdExists(productId) {
-                return $.ajax({
-                    url: '../system/add_product.php',
-                    type: 'POST',
-                    data: {
-                        check_product_id: 1,
-                        product_id: productId
-                    },
-                    dataType: 'json'
-                });
-            }
-            $("#product_id").on('input', function () {
-                var input = $(this);
-                var productId = input.val();
-
-                if (!validateProductId(productId)) {
-                    input.addClass('is-invalid');
-                    input.removeClass('is-valid');
-                    if (!input.next('.invalid-feedback').length) {
-                        input.after('<div class="invalid-feedback">รหัสสินค้าต้องประกอบด้วยตัวอักษรภาษาอังกฤษหรือตัวเลขเท่านั้น</div>');
-                    }
-                } else {
-                    input.removeClass('is-invalid');
-                    input.next('.invalid-feedback').remove();
-
-                    if (productId !== '') {
-                        checkProductIdExists(productId).then(function (response) {
-                            if (response.exists) {
-                                input.addClass('is-invalid');
-                                input.removeClass('is-valid');
-                                if (!input.next('.invalid-feedback').length) {
-                                    input.after('<div class="invalid-feedback">รหัสสินค้านี้มีอยู่ในระบบแล้ว</div>');
-                                }
-                            } else {
-                                input.removeClass('is-invalid');
-                                // input.addClass('is-valid');
-                                input.next('.invalid-feedback').remove();
-                            }
-                        });
-                    } else {
-                        input.removeClass('is-valid');
-                    }
-                }
-            });
-
-            $('#addMainCategory').click(function () {
-                $('#addMainCategoryModal').modal('show');
-            });
-
-            // บันทึกหมวดหมู่หลักใหม่
-            $('#saveMainCategory').click(function () {
-                var mainCategoryName = $('#mainCategoryName').val();
-                if (!mainCategoryName) {
-                    Swal.fire('ข้อผิดพลาด', 'กรุณากรอกชื่อหมวดหมู่หลัก', 'error');
-                    return;
-                }
-
-                $.ajax({
-                    url: '../system/add_type.php',
-                    type: 'POST',
-                    data: { name: mainCategoryName },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire('สำเร็จ', 'เพิ่มหมวดหมู่หลักเรียบร้อยแล้ว', 'success');
-                            $('#addMainCategoryModal').modal('hide');
-                            // โหลดหมวดหมู่หลักใหม่
-                            $.ajax({
-                                url: '../api/get_types.php',
-                                type: 'GET',
-                                dataType: 'json',
-                                success: function (data) {
-                                    var options = '<option value="">เลือกหมวดหมู่หลัก</option>';
-                                    $.each(data, function (index, type) {
-                                        options += '<option value="' + type.type_id + '">' + type.name + '</option>';
-                                    });
-                                    $('#type_id').html(options);
-                                }
-                            });
-                        } else {
-                            Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มหมวดหมู่หลักได้', 'error');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
-                    }
-                });
-            });
-
-            // เปิด modal เพิ่มประเภทย่อย
-            $('#addSubCategory').click(function () {
-                var selectedMainCategory = $('#type_id').val();
-                if (!selectedMainCategory) {
-                    Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกหมวดหมู่หลักก่อน', 'error');
-                    return;
-                }
-                $('#subCategoryMainId').val(selectedMainCategory);
-                $('#addSubCategoryModal').modal('show');
-            });
-
-            // บันทึกประเภทย่อยใหม่
-            $('#saveSubCategory').click(function () {
-                var subCategoryName = $('#subCategoryName').val();
-                var mainCategoryId = $('#subCategoryMainId').val();
-
-                if (!subCategoryName) {
-                    Swal.fire('ข้อผิดพลาด', 'กรุณากรอกชื่อประเภทย่อย', 'error');
-                    return;
-                }
-
-                $.ajax({
-                    url: '../system/add_category.php',
-                    type: 'POST',
-                    data: {
-                        name: subCategoryName,
-                        product_category_id: mainCategoryId
-                    },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire('สำเร็จ', 'เพิ่มประเภทย่อยเรียบร้อยแล้ว', 'success');
-                            $('#addSubCategoryModal').modal('hide');
-                            // โหลดประเภทย่อยใหม่
-                            $.ajax({
-                                url: '../api/get_categories.php',
-                                type: 'GET',
-                                data: { type_id: mainCategoryId },
-                                dataType: 'json',
-                                success: function (data) {
-                                    var options = '<option value="">เลือกประเภทย่อย</option>';
-                                    $.each(data, function (index, category) {
-                                        options += '<option value="' + category.category_id + '">' + category.name + '</option>';
-                                    });
-                                    $('#category_id').html(options);
-                                }
-                            });
-                        } else {
-                            Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มประเภทย่อยได้', 'error');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
-                    }
-                });
-            });
-
-            $('#addMainCategoryModal .btn-secondary').click(function () {
-                $('#addMainCategoryModal').modal('hide');
-            });
-            $('#addSubCategoryModal .btn-secondary').click(function () {
-                $('#addSubCategoryModal').modal('hide');
-            });
-
-            $('.modal .close').click(function() {
-        $(this).closest('.modal').modal('hide');
-    });
         });
+    });
+
+    // Modal close buttons
+    $('#addMainCategoryModal .btn-secondary, #addMainCategoryModal .close').click(function () {
+        $('#addMainCategoryModal').modal('hide');
+    });
+
+    $('#addSubCategoryModal .btn-secondary, #addSubCategoryModal .close').click(function () {
+        $('#addSubCategoryModal').modal('hide');
+    });
+});
     </script>
 
     <script src="../assets/js/jquery-3.6.0.min.js"></script>

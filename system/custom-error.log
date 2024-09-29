@@ -21,3 +21,50 @@ Stack trace:
 [29-Sep-2024 17:06:02 Asia/Bangkok] Error in add_product.php: รหัสสินค้านี้มีอยู่แล้ว
 [29-Sep-2024 12:06:43 Europe/Berlin] PHP Notice:  session_start(): Ignoring session_start() because a session is already active in C:\xampp\htdocs\config\connect.php on line 2
 [29-Sep-2024 17:06:43 Asia/Bangkok] Error in add_product.php: รหัสสินค้านี้มีอยู่แล้ว
+[29-Sep-2024 17:14:18 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:20) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:14:31 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:20) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:14:32 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:20) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:14:33 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:20) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:14:33 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:20) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 22:18:10 Asia/Bangkok] PHP Fatal error:  Uncaught Error: Call to a member function errorInfo() on bool in C:\xampp\htdocs\system\add_product.php:92
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\system\add_product.php on line 92
+[29-Sep-2024 22:18:59 Asia/Bangkok] PHP Fatal error:  Uncaught Error: Call to a member function errorInfo() on bool in C:\xampp\htdocs\system\add_product.php:92
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\system\add_product.php on line 92
+[29-Sep-2024 22:19:21 Asia/Bangkok] PHP Fatal error:  Uncaught Error: Call to a member function errorInfo() on bool in C:\xampp\htdocs\system\add_product.php:92
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\system\add_product.php on line 92
+[29-Sep-2024 22:21:37 Asia/Bangkok] Product ID: A005
+[29-Sep-2024 22:21:37 Asia/Bangkok] Name TH: แมว
+[29-Sep-2024 22:21:37 Asia/Bangkok] Name EN: กัน
+[29-Sep-2024 22:21:37 Asia/Bangkok] Type ID: 17
+[29-Sep-2024 22:21:37 Asia/Bangkok] Category ID: 14
+[29-Sep-2024 22:21:37 Asia/Bangkok] Size: 6.1 นิ้ว
+[29-Sep-2024 22:21:37 Asia/Bangkok] Unit: กรัม
+[29-Sep-2024 22:21:37 Asia/Bangkok] Low Level: 2
+[29-Sep-2024 22:21:37 Asia/Bangkok] Error in add_product.php: ไม่สามารถเพิ่มข้อมูลสินค้าได้
+[29-Sep-2024 22:23:20 Asia/Bangkok] Error in add_product.php: ไม่สามารถเพิ่มข้อมูลสินค้าได้
+[29-Sep-2024 22:26:30 Asia/Bangkok] Error in add_product.php: ไม่สามารถเพิ่มข้อมูลสินค้าได้
+[2024-09-29 22:43:26] Script started. Request method: POST
+[2024-09-29 22:43:26] POST data: {"id":"A005"}
+[2024-09-29 22:43:26] Attempting to delete products: "A005"
+[2024-09-29 22:43:26] Executing query: DELETE FROM products WHERE product_id IN (?)
+[2024-09-29 22:43:26] With parameters: ["A005"]
+[2024-09-29 22:43:26] Deleted count: 1
+[2024-09-29 22:43:26] Sending response: {"status":"success","message":"\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 1 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23"}
+[2024-09-29 22:43:32] Script started. Request method: POST
+[2024-09-29 22:43:32] POST data: {"ids":["A001","A002","A003"]}
+[2024-09-29 22:43:32] Attempting to delete products: ["A001","A002","A003"]
+[2024-09-29 22:43:32] Sending response: {"status":"error","message":"\u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07\u0e08\u0e32\u0e01\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e17\u0e35\u0e48\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07:\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 15 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e40\u0e1a\u0e34\u0e01\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 8 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n- \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32: 4 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\n","relatedRecords":{"\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"15","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e40\u0e1a\u0e34\u0e01\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"8","\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e42\u0e2d\u0e19\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32":"4"}}
+[29-Sep-2024 22:51:59 Asia/Bangkok] Error in add_product.php: ไม่สามารถเพิ่มข้อมูลสินค้าได้
+[2024-09-29 23:05:06] Script started. Request method: POST
+[2024-09-29 23:05:06] POST data: {"ids":["A005","A007"]}
+[2024-09-29 23:05:06] Attempting to delete products: ["A005","A007"]
+[2024-09-29 23:05:06] Executing query: DELETE FROM products WHERE product_id IN (?,?)
+[2024-09-29 23:05:06] With parameters: ["A005","A007"]
+[2024-09-29 23:05:06] Deleted count: 2
+[2024-09-29 23:05:06] Sending response: {"status":"success","message":"\u0e25\u0e1a\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08 2 \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23"}

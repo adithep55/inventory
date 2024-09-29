@@ -20,3 +20,5 @@
 [29-Sep-2024 12:18:42 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:23) in C:\xampp\htdocs\config\connect.php on line 16
 [29-Sep-2024 12:18:42 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:23) in C:\xampp\htdocs\config\connect.php on line 16
 [29-Sep-2024 12:18:42 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:23) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:12:38 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:23) in C:\xampp\htdocs\config\connect.php on line 16
+[29-Sep-2024 17:12:48 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\add_product.php:23) in C:\xampp\htdocs\config\connect.php on line 16
