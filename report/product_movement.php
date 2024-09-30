@@ -37,39 +37,23 @@
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-md-3">
-                                    <input type="date" id="startDate" class="form-control" placeholder="วันที่เริ่มต้น">
-                                </div>
-                                <div class="col-md-3">
-                                    <input type="date" id="endDate" class="form-control" placeholder="วันที่สิ้นสุด">
-                                </div>
-                                <div class="col-md-3">
-                                    <select id="productFilter" class="form-control select2">
-                                        <option value="">เลือกสินค้า</option>
-                                        <!-- Options will be populated by JavaScript -->
+                                    <select id="startProductId" class="form-control select2">
+                                        <option value="">เลือกรหัสสินค้าเริ่มต้น</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <button id="exportExcel" class="btn btn-primary">Export to Excel</button>
+                                    <select id="endProductId" class="form-control select2">
+                                        <option value="">เลือกรหัสสินค้าสิ้นสุด</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="date" id="endDate" class="form-control" placeholder="วันที่สิ้นสุดรายงาน">
+                                </div>
+                                <div class="col-md-3">
+                                    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
                                 </div>
                             </div>
-                            <div class="table-responsive">
-                                <table id="movementTable" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>วันที่</th>
-                                            <th>รหัสสินค้า</th>
-                                            <th>ชื่อสินค้า</th>
-                                            <th>ประเภทการเคลื่อนไหว</th>
-                                            <th>จำนวน</th>
-                                            <th>คลังสินค้า</th>
-                                            <th>ผู้ดำเนินการ</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Data will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
+                            <div id="productReports"></div>
                         </div>
                     </div>
                 </div>
@@ -91,79 +75,126 @@
     <script src="../assets/js/script.js"></script>
     <script>
     $(document).ready(function() {
-    $('.select2').select2();
+        $('.select2').select2();
 
-    // Initialize DataTable
-    var table = $('#movementTable').DataTable({
+        function createProductTable(productId) {
+            return $('<table>').addClass('table table-striped table-bordered')
+                .attr('id', 'movementTable_' + productId)
+                .append($('<thead>').append($('<tr>')
+                    .append($('<th>').text('วันที่'))
+                    .append($('<th>').text('รับ'))
+                    .append($('<th>').text('เบิก'))
+                    .append($('<th>').text('โอนย้าย'))
+                    .append($('<th>').text('คงเหลือ'))
+                ));
+        }
+
+        function initializeDataTable(productId) {
+    $('#movementTable_' + productId).DataTable({
         processing: true,
         serverSide: true,
         ajax: {
             url: '../api/report/get_product_movement.php',
             type: 'POST',
             data: function(d) {
-                d.startDate = $('#startDate').val();
-                d.endDate = $('#endDate').val();
-                d.productId = $('#productFilter').val();
+                return {
+                    productId: productId,
+                    startProductId: $('#startProductId').val(),
+                    endProductId: $('#endProductId').val(),
+                    endDate: $('#endDate').val(),
+                    draw: d.draw,
+                    start: d.start,
+                    length: d.length
+                };
+            },
+            dataSrc: function(json) {
+                console.log("Raw API response:", json);
+                if (!json.data) {
+                    console.error("Invalid data structure received from API");
+                    return [];
+                }
+                return json.data;
             }
         },
         columns: [
             { data: 'date' },
-            { data: 'product_id' },
-            { data: 'product_name' },
-            { data: 'movement_type' },
-            { data: 'quantity' },
-            { data: 'location' },
-            { data: 'user' }
+            { data: 'receive', render: $.fn.dataTable.render.number(',', '.', 2, '') },
+            { data: 'issue', render: $.fn.dataTable.render.number(',', '.', 2, '') },
+            { data: 'transfer', render: $.fn.dataTable.render.number(',', '.', 2, '') },
+            { data: 'balance', render: $.fn.dataTable.render.number(',', '.', 2, '') }
         ],
-        order: [[0, 'desc']]
-    });
-
-    // Reload table when filters change
-    $('#startDate, #endDate, #productFilter').change(function() {
-        table.ajax.reload();
-    });
-
-    // Load product options
-    $.ajax({
-        url: '../api/get_products.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                var options = '<option value="">เลือกสินค้า</option>';
-                $.each(response.data, function(index, product) {
-                    options += '<option value="' + product.product_id + '">' + product.name_th + ' (' + product.product_id + ')</option>';
-                });
-                $('#productFilter').html(options);
-            }
+        order: [[0, 'asc']],
+        error: function(xhr, error, thrown) {
+            console.error('DataTables error:', error, thrown);
         }
     });
+}
+$('#generateReport').click(function() {
+    var startId = $('#startProductId').val();
+    var endId = $('#endProductId').val();
+    var endDate = $('#endDate').val();
 
-    // Export to Excel
-    $('#exportExcel').click(function() {
+    if (startId && endId && endDate) {
         $.ajax({
-            url: '../api/report/get_product_movement.php',
-            type: 'POST',
-            data: {
-                startDate: $('#startDate').val(),
-                endDate: $('#endDate').val(),
-                productId: $('#productFilter').val(),
-                export: true
-            },
+            url: '../api/get_products.php',
+            type: 'GET',
             dataType: 'json',
             success: function(response) {
-                if (response.status === 'success') {
-                    var wb = XLSX.utils.book_new();
-                    var ws = XLSX.utils.json_to_sheet(response.data);
-                    XLSX.utils.book_append_sheet(wb, ws, "Product Movement");
-                    XLSX.writeFile(wb, "ProductMovementReport.xlsx");
-                } else {
-                    alert('เกิดข้อผิดพลาดในการ export ข้อมูล');
+                console.log("Generate report response:", response);
+                if (response.data && Array.isArray(response.data)) {
+                    $('#productReports').empty();
+                    var filteredProducts = response.data.filter(function(product) {
+                        return product.product_id >= startId && product.product_id <= endId;
+                    });
+                    filteredProducts.forEach(function(product) {
+                        var $productSection = $('<div>').addClass('mb-4');
+                        $productSection.append($('<h4>').text('รายงานสินค้า: ' + product.product_id + ' - ' + (product.name_th || product.name_en)));
+                        $productSection.append(createProductTable(product.product_id));
+                        $('#productReports').append($productSection);
+                        initializeDataTable(product.product_id);
+                    });
                 }
+                 else {
+                    console.error("Invalid product data structure:", response);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Ajax error loading products:", error);
             }
         });
-    });
+    } else {
+        alert('กรุณาเลือกรหัสสินค้าเริ่มต้น, สิ้นสุด และวันที่สิ้นสุดรายงาน');
+    }
 });
-</script>
+
+// โหลดตัวเลือกสินค้า
+$.ajax({
+    url: '../api/get_products.php',
+    type: 'GET',
+    dataType: 'json',
+    success: function(response) {
+        console.log("Product API response:", response);
+        if (response.data && Array.isArray(response.data)) {
+            var options = '<option value="">เลือกรหัสสินค้า</option>';
+            response.data.forEach(function(product) {
+                var productId = product.product_id || '';
+                var productName = product.name_th || product.name_en || '';
+                options += '<option value="' + productId + '">' + productId + ' - ' + productName + '</option>';
+            });
+            $('#startProductId, #endProductId').html(options);
+        } else {
+            console.error("Invalid product data structure:", response);
+        }
+    },
+    error: function(xhr, status, error) {
+        console.error("Ajax error loading products:", error);
+    }
+});
+
+        // ตั้งค่าวันที่เริ่มต้นเป็นวันแรกของเดือนปัจจุบัน
+        var today = new Date();
+        $('#endDate').val(today.toISOString().split('T')[0]);
+    });
+    </script>
 </body>
 </html>
