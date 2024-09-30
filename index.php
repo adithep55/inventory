@@ -250,44 +250,70 @@ function createInventoryChart(stats) {
     var options = {
         series: [{
             name: 'เบิก',
-            type: 'column',
             data: stats.map(item => item.issue_count)
         }, {
             name: 'รับ',
-            type: 'column',
             data: stats.map(item => item.receive_count)
         }],
         chart: {
+            type: 'bar',
             height: 350,
-            type: 'line',
-            stacked: false
+            toolbar: {
+                show: false
+            }
         },
-        dataLabels: { enabled: false },
-        stroke: { width: [1, 1] },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '55%',
+                endingShape: 'rounded'
+            },
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent']
+        },
         title: {
             text: `สถิติการเบิกและรับสินค้าปี ${currentYear}`,
             align: 'left'
         },
-        xaxis: { categories: stats.map(item => item.month) },
-        yaxis: [{
-            axisTicks: { show: true },
-            axisBorder: { show: true, color: '#008FFB' },
-            labels: { style: { colors: '#008FFB' } },
+        xaxis: {
+            categories: stats.map(item => item.month),
             title: {
-                text: "จำนวนรายการ (เบิก/รับ)",
-                style: { color: '#008FFB' }
-            },
-            tooltip: { enabled: true }
-        }],
-        tooltip: {
-            fixed: {
-                enabled: true,
-                position: 'topLeft',
-                offsetY: 30,
-                offsetX: 60
-            },
+                text: 'เดือน'
+            }
         },
-        legend: { horizontalAlign: 'left', offsetX: 40 }
+        yaxis: {
+            title: {
+                text: 'จำนวนรายการ'
+            },
+            min: 0,
+            forceNiceScale: true,
+            labels: {
+                formatter: function (value) {
+                    return Math.round(value);
+                }
+            }
+        },
+        fill: {
+            opacity: 1
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val + " รายการ"
+                }
+            }
+        },
+        legend: {
+            position: 'top',
+            horizontalAlign: 'left'
+        },
+        colors: ['#008FFB', '#00E396']
     };
 
     new ApexCharts(document.querySelector("#inventory_chart"), options).render();

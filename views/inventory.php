@@ -43,7 +43,6 @@
                                             <th>ชื่อสินค้า (ไทย)</th>
                                             <th>จำนวนสินค้า</th>
                                             <th>หน่วย</th>
-                                            <th>เลขบิลการรับ ต้องลบออกเพราะไว้ในประวัติการรับ</th>
                                             <th>การดำเนินการ</th>
                                         </tr>
                                     </thead>
@@ -87,12 +86,11 @@ $(document).ready(function () {
             { data: 'name_th' },
             { data: 'total_quantity' },
             { data: 'unit' },
-            { data: 'bill_number' },
             {
                 data: null,
                 render: function (data, type, row) {
                     var url = '/inventory/locationInfo/' + encodeURIComponent(row.product_id);
-                    return '<a href="' + url + '" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> ดูรายละเอียด</a>';
+                    return '<a href="' + url + '" style="height: 100%;"><img src="../assets/img/icons/eye.svg" ></a>';
                 }
             }
         ],

@@ -152,8 +152,8 @@
             {
                 data: null,
                 render: function(data, type, row) {
-                    return '<a href="edit_project.php?id=' + row.project_id + '" class="btn btn-sm btn-primary edit-project" data-id="' + row.project_id + '">แก้ไข</a> ' +
-                           '<a href="#" class="btn btn-sm btn-danger delete-project" data-id="' + row.project_id + '">ลบ</a>';
+                    return '<a href="edit_project.php?id=' + row.project_id + '" class="me-3 edit-project" data-id="' + row.project_id + '"><img src="../assets/img/icons/edit.svg" alt="แก้ไข"></a>' +
+                    '<img src="../assets/img/icons/delete.svg" alt="ลบ" class="delete-project" data-id="' + row.project_id + '" style="cursor: pointer;">';
                 }
             }
         ]

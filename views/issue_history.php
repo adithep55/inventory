@@ -16,12 +16,12 @@
 </head>
 
 <body>
-<?php require_once '../includes/header.php'; ?>
-<?php require_once '../includes/sidebar.php'; ?>
+    <?php require_once '../includes/header.php'; ?>
+    <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-    <div class="content container-fluid">
-    <?php require_once '../includes/notification.php'; ?>
+        <div class="content container-fluid">
+            <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="row">
                     <div class="col">
@@ -75,46 +75,46 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-$(document).ready(function () {
-    var issueHistoryTable = $('#issueHistoryTable').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '../api/get_issue_history.php',
-            type: 'POST'
-        },
-        columns: [
-            { 
-                data: null,
-                render: function (data, type, row) {
-                    return '<label class="checkboxs"><input type="checkbox" value="' + row.issue_id + '"><span class="checkmarks"></span></label>';
+        $(document).ready(function () {
+            var issueHistoryTable = $('#issueHistoryTable').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: '../api/get_issue_history.php',
+                    type: 'POST'
                 },
-                orderable: false,
-                searchable: false
-            },
-            { data: 'bill_number' },
-            { data: 'issue_date' },
-            { data: 'issue_type' },
-            { data: 'customer_project' },
-            { data: 'items' },
-            { data: 'user_name' },
-            { 
-                data: null,
-                render: function (data, type, row) {
-                    return `
-                                               <a href="issue_details.php?id=${row.issue_id}" class="me-3">
-                            <img src="../assets/img/icons/eye.svg" alt="img">
-                        </a>
-                        <a href="edit_issue.php?id=${row.issue_id}" ><img src="../assets/img/icons/edit.svg" alt="img" class="me-3"></a>
-                        <button class="me-3" data-id="${row.issue_id}">    <img src="../assets/img/icons/delete.svg" alt="img"></button>
-                    `;
-                },
-                orderable: false,
-                searchable: false
-            }
-        ],
-        order: [[1, 'desc']]
-    });
+                columns: [
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return '<label class="checkboxs"><input type="checkbox" value="' + row.issue_id + '"><span class="checkmarks"></span></label>';
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    { data: 'bill_number' },
+                    { data: 'issue_date' },
+                    { data: 'issue_type' },
+                    { data: 'customer_project' },
+                    { data: 'items' },
+                    { data: 'user_name' },
+                    {
+                        data: null,
+                        render: function (data, type, row) {
+                            return `
+            <a href="issue_details.php?id=${row.issue_id}" class="me-3">
+                <img src="../assets/img/icons/eye.svg" alt="img">
+            </a>
+            <a href="edit_issue.php?id=${row.issue_id}"><img src="../assets/img/icons/edit.svg" alt="img" class="me-3"></a>
+           <img src="../assets/img/icons/delete.svg" alt="ลบ" class="delete-issue" data-id="${row.issue_id}" style="cursor: pointer;">
+        `;
+                        },
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                order: [[1, 'desc']]
+            });
 
             // Handle "Select All" checkbox
             $('#select-all').on('click', function () {
@@ -123,19 +123,19 @@ $(document).ready(function () {
             });
 
             // Handle view details button click
-            $('#issueHistoryTable').on('click', '.view-details', function(e) {
+            $('#issueHistoryTable').on('click', '.view-details', function (e) {
                 e.preventDefault();
                 var issueId = $(this).data('id');
                 showIssueDetails(issueId);
             });
-            
+
 
             function showIssueDetails(issueId) {
                 $.ajax({
                     url: '../api/get_issue_details.php',
                     type: 'GET',
                     data: { id: issueId },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status === 'success') {
                             var detailsHtml = '<h4>รายละเอียดการเบิก</h4>';
                             detailsHtml += '<p>เลขที่เบิก: ' + response.data.bill_number + '</p>';
@@ -144,7 +144,7 @@ $(document).ready(function () {
                             detailsHtml += '<p>ผู้เบิก: ' + response.data.user_name + '</p>';
                             detailsHtml += '<h5>รายการสินค้า:</h5>';
                             detailsHtml += '<ul>';
-                            response.data.items.forEach(function(item) {
+                            response.data.items.forEach(function (item) {
                                 detailsHtml += '<li>' + item.product_name + ' - จำนวน: ' + item.quantity + ' ' + item.unit + '</li>';
                             });
                             detailsHtml += '</ul>';
@@ -159,53 +159,53 @@ $(document).ready(function () {
                             Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
                         }
                     },
-                    error: function() {
+                    error: function () {
                         Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลได้', 'error');
                     }
                 });
             }
-            $('#issueHistoryTable').on('click', '.delete-issue', function() {
-        var issueId = $(this).data('id');
-        deleteIssue(issueId);
-    });
+            $('#issueHistoryTable').on('click', '.delete-issue', function () {
+                var issueId = $(this).data('id');
+                deleteIssue(issueId);
+            });
             function deleteIssue(issueId) {
-        Swal.fire({
-            title: 'ยืนยันการลบ',
-            text: "คุณแน่ใจหรือไม่ที่จะลบรายการเบิกนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'ใช่, ลบเลย',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '../system/delete_issue.php',
-                    type: 'POST',
-                    data: { id: issueId },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            Swal.fire(
-                                'ลบสำเร็จ!',
-                                'รายการเบิกถูกลบและคลังสินค้าถูกปรับปรุงแล้ว',
-                                'success'
-                            ).then(() => {
-                                issueHistoryTable.ajax.reload();
-                            });
-                        } else {
-                            Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบรายการได้', 'error');
+                Swal.fire({
+                    title: 'ยืนยันการลบ',
+                    text: "คุณแน่ใจหรือไม่ที่จะลบรายการเบิกนี้? การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'ใช่, ลบเลย',
+                    cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '../system/delete_issue.php',
+                            type: 'POST',
+                            data: { id: issueId },
+                            success: function (response) {
+                                if (response.status === 'success') {
+                                    Swal.fire(
+                                        'ลบสำเร็จ!',
+                                        'รายการเบิกถูกลบและคลังสินค้าถูกปรับปรุงแล้ว',
+                                        'success'
+                                    ).then(() => {
+                                        issueHistoryTable.ajax.reload();
+                                    });
+                                } else {
+                                    Swal.fire('เกิดข้อผิดพลาด', response.message, 'error');
+                                }
+                            },
+                            error: function () {
+                                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถลบรายการได้', 'error');
+                            }
+                        });
                     }
                 });
             }
         });
-    }
-        });
-        
+
     </script>
 </body>
 

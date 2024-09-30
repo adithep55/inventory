@@ -24,8 +24,8 @@ SELECT
     COALESCE(hr.received_date, ht.transfer_date) AS last_received_date
 FROM 
     products p
-LEFT JOIN product_types pt ON p.product_type_id = pt.type_id
 LEFT JOIN product_cate pc ON p.product_type_id = pc.category_id
+LEFT JOIN product_types pt ON pc.product_category_id = pt.type_id
 CROSS JOIN locations l
 LEFT JOIN inventory i ON p.product_id = i.product_id AND i.location_id = l.location_id
 LEFT JOIN (

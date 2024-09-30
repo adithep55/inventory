@@ -14,11 +14,11 @@ $productId = $_GET['id'];
 
 try {
     $query = "SELECT p.*, pt.name AS product_type_name, pc.name AS product_category_name, u.Username AS created_by
-              FROM products p
-              LEFT JOIN product_types pt ON p.product_type_id = pt.type_id
-              LEFT JOIN product_cate pc ON pt.type_id = pc.category_id  
-              LEFT JOIN users u ON p.user_id = u.UserID
-              WHERE p.product_id = :product_id";
+    FROM products p
+    LEFT JOIN product_cate pc ON p.product_type_id = pc.category_id
+    LEFT JOIN product_types pt ON pc.product_category_id = pt.type_id
+    LEFT JOIN users u ON p.user_id = u.UserID
+    WHERE p.product_id = :product_id";
 
     $stmt = $conn->prepare($query);
     $stmt->bindParam(':product_id', $productId, PDO::PARAM_STR);

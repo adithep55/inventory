@@ -99,9 +99,9 @@ $(document).ready(function () {
             { 
                 data: null,
                 render: function (data, type, row) {
-                    return '<a href="receive_details.php?id=' + row.receive_header_id + '" class="btn btn-sm btn-info">รายละเอียด</a> ' +
-                           '<a href="edit_receive.php?id=' + row.receive_header_id + '" class="btn btn-sm btn-warning">แก้ไข</a> ' +
-                           '<button class="btn btn-sm btn-danger delete-receive" data-id="' + row.receive_header_id + '">ลบ</button>';
+                    return '<a href="receive_details.php?id=' + row.receive_header_id + '" class="me-3"><img src="../assets/img/icons/eye.svg" alt="รายละเอียด"></a>' +
+       '<a href="edit_receive.php?id=' + row.receive_header_id + '" class="me-3"><img src="../assets/img/icons/edit.svg" alt="แก้ไข"></a>' +
+       '<img src="../assets/img/icons/delete.svg" alt="ลบ" class="delete-receive" data-id="' + row.receive_header_id + '" style="cursor: pointer;">';
                 },
                 orderable: false,
                 searchable: false

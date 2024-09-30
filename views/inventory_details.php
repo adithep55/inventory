@@ -136,8 +136,8 @@
                 <div class="col-md-6">
                     <h4>${data.name_th} <small>(${data.name_en})</small></h4>
                     <p><strong>รหัสสินค้า:</strong> ${data.product_id}</p>
-                    <p><strong>ประเภทสินค้า:</strong> ${data.product_type_name}</p>
-                    <p><strong>หมวดหมู่สินค้า:</strong> ${data.product_category_name}</p>
+                    <p><strong>หมวดหมู่สินค้า:</strong> ${data.product_type_name}</p>
+                    <p><strong>ประเภทสินค้า:</strong> ${data.product_category_name}</p>
                     <p><strong>ขนาด:</strong> ${data.size}</p>
                     <p><strong>หน่วย:</strong> ${data.unit}</p>
                     <p><strong>ระดับต่ำสุด:</strong> ${data.low_level} ${data.unit}</p>
