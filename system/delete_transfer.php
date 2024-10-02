@@ -3,7 +3,6 @@ require_once '../config/connect.php';
 
 header('Content-Type: application/json');
 
-
 if (!isset($_POST['transfer_id'])) {
     echo json_encode(['status' => 'error', 'message' => 'Transfer ID is required']);
     exit;
@@ -28,25 +27,65 @@ try {
     }
 
     foreach ($items as $item) {
-        // Revert inventory for 'from' location
-        $stmt = $conn->prepare("UPDATE inventory 
-                                SET quantity = quantity + :quantity 
+        // Check current inventory for 'from' location
+        $stmt = $conn->prepare("SELECT quantity FROM inventory 
                                 WHERE product_id = :product_id AND location_id = :from_location_id");
         $stmt->execute([
-            ':quantity' => $item['quantity'],
             ':product_id' => $item['product_id'],
             ':from_location_id' => $item['from_location_id']
         ]);
+        $fromQuantity = $stmt->fetchColumn();
 
-        // Revert inventory for 'to' location
-        $stmt = $conn->prepare("UPDATE inventory 
-                                SET quantity = quantity - :quantity 
+        // Check current inventory for 'to' location
+        $stmt = $conn->prepare("SELECT quantity FROM inventory 
                                 WHERE product_id = :product_id AND location_id = :to_location_id");
         $stmt->execute([
-            ':quantity' => $item['quantity'],
             ':product_id' => $item['product_id'],
             ':to_location_id' => $item['to_location_id']
         ]);
+        $toQuantity = $stmt->fetchColumn();
+
+        // Calculate new quantities
+        $newFromQuantity = $fromQuantity + $item['quantity'];
+        $newToQuantity = $toQuantity - $item['quantity'];
+
+        // Update or delete inventory for 'from' location
+        if ($newFromQuantity > 0) {
+            $stmt = $conn->prepare("INSERT INTO inventory (product_id, location_id, quantity) 
+                                    VALUES (:product_id, :from_location_id, :quantity)
+                                    ON DUPLICATE KEY UPDATE quantity = :quantity");
+            $stmt->execute([
+                ':product_id' => $item['product_id'],
+                ':from_location_id' => $item['from_location_id'],
+                ':quantity' => $newFromQuantity
+            ]);
+        } else {
+            $stmt = $conn->prepare("DELETE FROM inventory 
+                                    WHERE product_id = :product_id AND location_id = :from_location_id");
+            $stmt->execute([
+                ':product_id' => $item['product_id'],
+                ':from_location_id' => $item['from_location_id']
+            ]);
+        }
+
+        // Update or delete inventory for 'to' location
+        if ($newToQuantity > 0) {
+            $stmt = $conn->prepare("INSERT INTO inventory (product_id, location_id, quantity) 
+                                    VALUES (:product_id, :to_location_id, :quantity)
+                                    ON DUPLICATE KEY UPDATE quantity = :quantity");
+            $stmt->execute([
+                ':product_id' => $item['product_id'],
+                ':to_location_id' => $item['to_location_id'],
+                ':quantity' => $newToQuantity
+            ]);
+        } else {
+            $stmt = $conn->prepare("DELETE FROM inventory 
+                                    WHERE product_id = :product_id AND location_id = :to_location_id");
+            $stmt->execute([
+                ':product_id' => $item['product_id'],
+                ':to_location_id' => $item['to_location_id']
+            ]);
+        }
     }
 
     // Delete transfer details

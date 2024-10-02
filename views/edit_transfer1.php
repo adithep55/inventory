@@ -503,7 +503,7 @@ function updateQuantityLimit(productId) {
     console.log('Submitting transfer data:', formData);
 
     $.ajax({
-        url: '../system/update_transfer.php',
+        url: '../system/update_transfer1.php',
         type: 'POST',
         data: JSON.stringify(formData),
         contentType: 'application/json',

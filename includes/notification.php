@@ -52,7 +52,7 @@
     <script>
 $(document).ready(function () {
     loadNotifications();
-    setInterval(loadNotifications, 100);
+    setInterval(loadNotifications, 500); 
 
     $('#show-low-stock-details').click(function () {
         $('#lowStockModal').modal('show');

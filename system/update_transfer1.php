@@ -8,7 +8,7 @@ function logError($message) {
     $logMessage = "[$timestamp] $message" . PHP_EOL;
     file_put_contents($logFile, $logMessage, FILE_APPEND);
 }
-$user_id = $_SESSION['UserID'];
+
 // รับข้อมูล JSON จาก request
 $json = file_get_contents('php://input');
 $data = json_decode($json, true);
@@ -92,13 +92,13 @@ try {
             ':product_id' => $product['product_id'],
             ':location_id' => $fromLocationId,
             ':quantity' => $inventory[$product['product_id']][$fromLocationId],
-            ':user_id' => $user_id
+            ':user_id' => 1 // ควรใช้ ID ของผู้ใช้ที่กำลังทำรายการ
         ]);
         $updateInventoryStmt->execute([
             ':product_id' => $product['product_id'],
             ':location_id' => $toLocationId,
             ':quantity' => $inventory[$product['product_id']][$toLocationId],
-            ':user_id' => $user_id
+            ':user_id' => 1 // ควรใช้ ID ของผู้ใช้ที่กำลังทำรายการ
         ]);
     }
 

@@ -459,7 +459,7 @@ $('#transferTable').on('change', '.from-location', function() {
                         confirmButtonText: 'ตกลง'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            location.reload();
+                            location = '<?php echo base_url(); ?>/views/transfer_history';
                         }
                     });
                 } else {

@@ -1,1383 +1,22 @@
-[07-Sep-2024 09:42:07 Europe/Berlin] PHP Fatal error:  Cannot redeclare dd_q() (previously declared in C:\xampp\htdocs\system\update_issue.php:18) in C:\xampp\htdocs\config\connect.php on line 16
-[07-Sep-2024 09:44:10 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"5","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]}
-[07-Sep-2024 09:44:10 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:44:29 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"6","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]}
-[07-Sep-2024 09:44:29 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:56:28 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"6","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]}
-[07-Sep-2024 09:56:28 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:56:28 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 09:56:28 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]
-[07-Sep-2024 09:56:29 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}
-[07-Sep-2024 09:56:29 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 09:56:35 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"6","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]}
-[07-Sep-2024 09:56:35 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:56:35 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 09:56:35 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]
-[07-Sep-2024 09:56:35 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}
-[07-Sep-2024 09:56:35 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 09:57:44 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"6","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]}
-[07-Sep-2024 09:57:44 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:57:44 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 09:57:44 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}]
-[07-Sep-2024 09:57:44 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":30,"originalQuantity":30}
-[07-Sep-2024 09:57:44 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 09:57:50 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"6","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]}
-[07-Sep-2024 09:57:50 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 09:57:50 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 09:57:50 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]
-[07-Sep-2024 09:57:50 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}
-[07-Sep-2024 09:57:50 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 10:05:08 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"5","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]}
-[07-Sep-2024 10:05:08 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 10:05:08 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 10:05:08 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}]
-[07-Sep-2024 10:05:08 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":10,"originalQuantity":30}
-[07-Sep-2024 10:05:08 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 10:07:43 Europe/Berlin] Received data: {"issueId":"D670001","issueDate":"2024-09-05","issueType":"sale","customerId":"5","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":20},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":20}]}
-[07-Sep-2024 10:07:43 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 20
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 20
-                )
-
-        )
-
-)
-
-[07-Sep-2024 10:07:43 Europe/Berlin] Starting transaction for issueId: D670001
-[07-Sep-2024 10:07:43 Europe/Berlin] Items to process: [{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":20},{"productId":"A001","locationId":"1","quantity":10,"originalQuantity":20}]
-[07-Sep-2024 10:07:43 Europe/Berlin] Processing item: {"productId":"A001","locationId":"1","quantity":10,"originalQuantity":20}
-[07-Sep-2024 10:07:43 Europe/Berlin] Transaction rolled back. Error: ไม่สามารถเพิ่มรายการสินค้า A001 ได้
-[07-Sep-2024 10:09:55 Europe/Berlin] Received data: {"issueId":"","issueDate":"2024-09-05","issueType":"sale","customerId":"5","projectId":null,"items":[{"productId":"A001","locationId":"1","quantity":"25"}]}
-[07-Sep-2024 10:09:55 Europe/Berlin] Decoded data: Array
-(
-    [issueId] => 
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 25
-                )
-
-        )
-
-)
-
-[07-Sep-2024 19:21:07 Europe/Berlin] PHP Warning:  Undefined variable $originalItemMap in C:\xampp\htdocs\system\update_issue.php on line 134
-[07-Sep-2024 19:21:07 Europe/Berlin] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\system\update_issue.php on line 134
-[07-Sep-2024 19:23:39 Europe/Berlin] PHP Warning:  Undefined variable $input in C:\xampp\htdocs\system\update_issue.php on line 6
-[07-Sep-2024 19:23:39 Europe/Berlin] Received data: 
-[07-Sep-2024 19:23:39 Europe/Berlin] PHP Warning:  Undefined variable $originalItems in C:\xampp\htdocs\system\update_issue.php on line 7
-[07-Sep-2024 19:23:39 Europe/Berlin] Original items: 
-[07-Sep-2024 19:23:39 Europe/Berlin] PHP Warning:  Undefined variable $itemsToUpdate in C:\xampp\htdocs\system\update_issue.php on line 8
-[07-Sep-2024 19:23:39 Europe/Berlin] Items to update: 
-[07-Sep-2024 19:23:39 Europe/Berlin] PHP Warning:  Undefined variable $originalItems in C:\xampp\htdocs\system\update_issue.php on line 11
-[07-Sep-2024 19:23:39 Europe/Berlin] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\system\update_issue.php on line 11
-[07-Sep-2024 19:23:47 Europe/Berlin] PHP Warning:  Undefined variable $input in C:\xampp\htdocs\system\update_issue.php on line 6
-[07-Sep-2024 19:23:47 Europe/Berlin] Received data: 
-[07-Sep-2024 19:23:47 Europe/Berlin] PHP Warning:  Undefined variable $originalItems in C:\xampp\htdocs\system\update_issue.php on line 7
-[07-Sep-2024 19:23:47 Europe/Berlin] Original items: 
-[07-Sep-2024 19:23:47 Europe/Berlin] PHP Warning:  Undefined variable $itemsToUpdate in C:\xampp\htdocs\system\update_issue.php on line 8
-[07-Sep-2024 19:23:47 Europe/Berlin] Items to update: 
-[07-Sep-2024 19:23:47 Europe/Berlin] PHP Warning:  Undefined variable $originalItems in C:\xampp\htdocs\system\update_issue.php on line 11
-[07-Sep-2024 19:23:47 Europe/Berlin] PHP Warning:  foreach() argument must be of type array|object, null given in C:\xampp\htdocs\system\update_issue.php on line 11
-[07-Sep-2024 19:26:25 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 4
-                    [originalQuantity] => 5
-                )
-
-            [1] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 4
-                    [originalQuantity] => 5
-                )
-
-        )
-
-)
-
-[07-Sep-2024 19:26:25 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 5.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 19:26:25 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 4
-            [originalQuantity] => 5
-        )
-
-)
-
-[07-Sep-2024 19:42:54 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 4
-                    [originalQuantity] => 4
-                )
-
-        )
-
-)
-
-[07-Sep-2024 19:42:54 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 4.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 19:42:54 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 4
-            [originalQuantity] => 4
-        )
-
-)
-
-[07-Sep-2024 19:43:14 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 3
-                    [originalQuantity] => 4
-                )
-
-        )
-
-)
-
-[07-Sep-2024 19:43:14 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 4.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 19:43:14 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 3
-            [originalQuantity] => 4
-        )
-
-)
-
-[07-Sep-2024 20:48:40 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 50
-                    [originalQuantity] => 25
-                )
-
-        )
-
-)
-
-[07-Sep-2024 20:48:40 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 25.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 20:48:40 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 50
-            [originalQuantity] => 25
-        )
-
-)
-
-[07-Sep-2024 20:49:28 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 50
-                )
-
-        )
-
-)
-
-[07-Sep-2024 20:49:28 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 50.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 20:49:28 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 10
-            [originalQuantity] => 50
-        )
-
-)
-
-[07-Sep-2024 20:58:16 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 40
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[07-Sep-2024 20:58:16 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 20:58:16 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 40
-            [originalQuantity] => 10
-        )
-
-)
-
-[07-Sep-2024 20:58:40 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 50
-                    [originalQuantity] => 40
-                )
-
-        )
-
-)
-
-[07-Sep-2024 20:58:40 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 40.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 20:58:40 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 50
-            [originalQuantity] => 40
-        )
-
-)
-
-[07-Sep-2024 20:58:58 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-05
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 5
-                    [originalQuantity] => 50
-                )
-
-        )
-
-)
-
-[07-Sep-2024 20:58:58 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 50.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 20:58:58 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 5
-            [originalQuantity] => 50
-        )
-
-)
-
-[07-Sep-2024 21:02:32 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 20
-                )
-
-        )
-
-)
-
-[07-Sep-2024 21:02:32 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 20.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 21:02:32 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 30
-            [originalQuantity] => 20
-        )
-
-)
-
-[07-Sep-2024 21:03:26 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 40
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[07-Sep-2024 21:03:26 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 30.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 21:03:26 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 40
-            [originalQuantity] => 30
-        )
-
-)
-
-[07-Sep-2024 21:47:30 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 40
-                )
-
-        )
-
-)
-
-[07-Sep-2024 21:47:30 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 40.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 21:47:30 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 10
-            [originalQuantity] => 40
-        )
-
-)
-
-[07-Sep-2024 21:51:41 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 6
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[07-Sep-2024 21:51:41 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => 1
-        )
-
-)
-
-[07-Sep-2024 21:51:41 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 10
-            [originalQuantity] => 10
-        )
-
-)
-
-[08-Sep-2024 07:41:45 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => project
-    [customerId] => 
-    [projectId] => 3
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 10
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[08-Sep-2024 07:41:45 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 07:41:45 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 10
-            [originalQuantity] => 10
-        )
-
-)
-
-[08-Sep-2024 08:01:12 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => project
-    [customerId] => 
-    [projectId] => 3
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 30
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[08-Sep-2024 08:01:12 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 08:01:12 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 30
-            [originalQuantity] => 10
-        )
-
-)
-
-[08-Sep-2024 08:06:18 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 8
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 20
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[08-Sep-2024 08:06:18 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 30.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 08:06:18 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 20
-            [originalQuantity] => 30
-        )
-
-)
-
-[08-Sep-2024 08:06:46 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => project
-    [customerId] => 
-    [projectId] => 3
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 20
-                    [originalQuantity] => 20
-                )
-
-        )
-
-)
-
-[08-Sep-2024 08:06:46 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 20.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 08:06:46 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 20
-            [originalQuantity] => 20
-        )
-
-)
-
-[08-Sep-2024 08:12:26 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => project
-    [customerId] => 
-    [projectId] => 3
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 50
-                    [originalQuantity] => 20
-                )
-
-        )
-
-)
-
-[08-Sep-2024 08:12:26 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 20.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 08:12:26 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 50
-            [originalQuantity] => 20
-        )
-
-)
-
-[08-Sep-2024 08:53:39 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 5
-                    [originalQuantity] => 50
-                )
-
-        )
-
-)
-
-[08-Sep-2024 08:53:39 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 50.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 08:53:39 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 5
-            [originalQuantity] => 50
-        )
-
-)
-
-[2024-09-08 09:11:12] Received transfer data: Array
-(
-    [transfer_date] => 2024-08-27
-    [products] => Array
-        (
-            [0] => Array
-                (
-                    [product_id] => A001
-                    [from_location_id] => 1
-                    [to_location_id] => 2
-                    [quantity] => 10
-                    [unit] => ชิ้น
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:23:41 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 5
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 5
-                    [originalQuantity] => 5
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:23:41 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 5.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 09:23:41 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 5
-            [originalQuantity] => 5
-        )
-
-)
-
-[08-Sep-2024 09:23:51 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-08-30
-    [issueType] => sale
-    [customerId] => 7
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 5
-                    [originalQuantity] => 5
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:23:51 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 5.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 09:23:51 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 5
-            [originalQuantity] => 5
-        )
-
-)
-
-[08-Sep-2024 09:47:36 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-06
-    [issueType] => sale
-    [customerId] => 7
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 40
-                    [originalQuantity] => 30
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:47:36 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 30.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 09:47:36 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 40
-            [originalQuantity] => 30
-        )
-
-)
-
-[2024-09-08 09:48:46] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-03
-    [products] => Array
-        (
-            [0] => Array
-                (
-                    [product_id] => A001
-                    [from_location_id] => 1
-                    [to_location_id] => 2
-                    [quantity] => 30
-                    [unit] => ชิ้น
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:56:12 Europe/Berlin] Received data: Array
-(
-    [issueId] => D670001
-    [issueDate] => 2024-09-06
-    [issueType] => sale
-    [customerId] => 7
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => 1
-                    [quantity] => 40
-                    [originalQuantity] => 40
-                )
-
-            [1] => Array
-                (
-                    [productId] => A002
-                    [locationId] => 1
-                    [quantity] => 0
-                    [originalQuantity] => 0
-                )
-
-        )
-
-)
-
-[08-Sep-2024 09:56:12 Europe/Berlin] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 40.00
-            [location_id] => 1
-        )
-
-)
-
-[08-Sep-2024 09:56:12 Europe/Berlin] Items to update: Array
-(
-    [A001-1] => Array
-        (
-            [productId] => A001
-            [locationId] => 1
-            [quantity] => 40
-            [originalQuantity] => 40
-        )
-
-    [A002-1] => Array
-        (
-            [productId] => A002
-            [locationId] => 1
-            [quantity] => 0
-            [originalQuantity] => 0
-        )
-
-)
-
-[2024-09-18 01:06:01] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-17
-    [products] => Array
-        (
-            [0] => Array
-                (
-                    [product_id] => A001
-                    [from_location_id] => LOC5670001
-                    [to_location_id] => LOC5670002
-                    [quantity] => 5
-                    [unit] => เครื่อง
-                )
-
-        )
-
-)
-
-[2024-09-18 01:08:51] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-18
-    [products] => Array
-        (
-        )
-
-)
-
-[2024-09-18 01:09:01] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-18
-    [products] => Array
-        (
-        )
-
-)
-
-[2024-09-18 01:09:23] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-12
-    [products] => Array
-        (
-        )
-
-)
-
-[2024-09-18 01:13:40] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-18
+[2024-10-02 13:41:51] Fresh inventory data: {"A001":{"LOC5670001":"5.00","LOC5670002":"0.00"}}
+[2024-10-02 13:41:51] Error updating transfer: Insufficient stock for product A001 at location LOC5670001. Available: 0, Required: 5
+[2024-10-02 13:41:51] Transfer data: {"transfer_id":"110","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 13:41:51] Initial inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:41:51] Final inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:44:12] Fresh inventory data: {"A001":{"LOC5670001":5,"LOC5670002":0}}
+[2024-10-02 13:44:12] Error updating transfer: Insufficient stock for product A001 at location LOC5670001. Available: 0, Required: 5
+[2024-10-02 13:44:12] Transfer data: {"transfer_id":"110","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 13:44:12] Initial inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:44:12] Final inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:46:30] Received data: {"transfer_id":"110","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 13:46:30] Fresh inventory data: {"A001":{"LOC5670001":5,"LOC5670002":0}}
+[2024-10-02 13:46:30] Final inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:46:55] Received data: {"transfer_id":"110","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":3,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 13:46:55] Fresh inventory data: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 13:46:55] Final inventory state: {"A001":{"LOC5670001":3,"LOC5670002":2}}
+[2024-10-02 13:49:15] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
     [products] => Array
         (
             [0] => Array
@@ -1386,134 +25,151 @@
                     [from_location_id] => LOC5670002
                     [to_location_id] => LOC5670001
                     [quantity] => 5
-                    [unit] => เครื่อง
+                    [unit] => เครื่องก
                 )
 
         )
 
 )
 
-[18-Sep-2024 01:23:55 Asia/Bangkok] Received data: Array
+[2024-10-02 13:49:27] Received data: {"transfer_id":"111","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 13:49:27] Fresh inventory data: {"A001":{"LOC5670001":5,"LOC5670002":0}}
+[2024-10-02 13:49:27] Final inventory state: {"A001":{"LOC5670001":0,"LOC5670002":5}}
+[2024-10-02 14:39:26] Received transfer data: Array
 (
-    [issueId] => D670002
-    [issueDate] => 2024-09-18
-    [issueType] => sale
-    [customerId] => 8
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => LOC5670001
-                    [quantity] => 10
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[18-Sep-2024 01:23:55 Asia/Bangkok] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => LOC5670001
-        )
-
-)
-
-[18-Sep-2024 01:23:55 Asia/Bangkok] Items to update: Array
-(
-    [A001-LOC5670001] => Array
-        (
-            [productId] => A001
-            [locationId] => LOC5670001
-            [quantity] => 10
-            [originalQuantity] => 10
-        )
-
-)
-
-[18-Sep-2024 01:24:00 Asia/Bangkok] Received data: Array
-(
-    [issueId] => D670002
-    [issueDate] => 2024-09-18
-    [issueType] => sale
-    [customerId] => 8
-    [projectId] => 
-    [items] => Array
-        (
-            [0] => Array
-                (
-                    [productId] => A001
-                    [locationId] => LOC5670001
-                    [quantity] => 10
-                    [originalQuantity] => 10
-                )
-
-        )
-
-)
-
-[18-Sep-2024 01:24:00 Asia/Bangkok] Original items: Array
-(
-    [0] => Array
-        (
-            [product_id] => A001
-            [quantity] => 10.00
-            [location_id] => LOC5670001
-        )
-
-)
-
-[18-Sep-2024 01:24:00 Asia/Bangkok] Items to update: Array
-(
-    [A001-LOC5670001] => Array
-        (
-            [productId] => A001
-            [locationId] => LOC5670001
-            [quantity] => 10
-            [originalQuantity] => 10
-        )
-
-)
-
-[2024-09-22 02:33:52] Received transfer data: Array
-(
-    [transfer_date] => 2024-09-22
+    [transfer_date] => 2024-10-02
     [products] => Array
         (
             [0] => Array
                 (
-                    [product_id] => A003
+                    [product_id] => A001
                     [from_location_id] => LOC5670001
                     [to_location_id] => LOC5670002
-                    [quantity] => 1
-                    [unit] => เครื่อง
+                    [quantity] => 10
+                    [unit] => เครื่องก
                 )
 
         )
 
 )
 
-[2024-09-28 02:15:05] Received transfer data: Array
+[2024-10-02 14:39:47] Received transfer data: Array
 (
-    [transfer_date] => 2024-09-28
+    [transfer_date] => 2024-10-02
     [products] => Array
         (
             [0] => Array
                 (
-                    [product_id] => A003
+                    [product_id] => A001
                     [from_location_id] => LOC5670001
                     [to_location_id] => LOC5670002
-                    [quantity] => 1
-                    [unit] => เครื่อง
+                    [quantity] => 50
+                    [unit] => เครื่องก
                 )
 
         )
 
 )
 
+[2024-10-02 14:40:02] Received data: {"transfer_id":"113","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":10,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 14:40:02] Fresh inventory data: {"A001":{"LOC5670001":0,"LOC5670002":50}}
+[2024-10-02 14:40:02] Final inventory state: {"A001":{"LOC5670001":10,"LOC5670002":40}}
+[2024-10-02 14:47:07] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 5
+                    [unit] => เครื่องก
+                )
+
+        )
+
+)
+
+[2024-10-02 14:47:24] Received data: {"transfer_id":"114","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 14:47:24] Fresh inventory data: {"A001":{"LOC5670002":5,"LOC5670001":5}}
+[2024-10-02 14:47:24] Final inventory state: {"A001":{"LOC5670002":0,"LOC5670001":10}}
+[2024-10-02 14:51:02] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 5
+                    [unit] => เครื่องก
+                )
+
+        )
+
+)
+
+[2024-10-02 14:51:35] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 10
+                    [unit] => เครื่องก
+                )
+
+        )
+
+)
+
+[2024-10-02 14:51:51] Received data: {"transfer_id":"116","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":10,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 14:51:51] Fresh inventory data: {"A001":{"LOC5670001":0,"LOC5670002":10}}
+[2024-10-02 14:51:51] Final inventory state: {"A001":{"LOC5670001":10,"LOC5670002":0}}
+[2024-10-02 14:54:44] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 10
+                    [unit] => เครื่องก
+                )
+
+        )
+
+)
+
+[2024-10-02 14:55:10] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-02
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 10
+                    [unit] => เครื่องก
+                )
+
+        )
+
+)
+
+[2024-10-02 14:55:25] Received data: {"transfer_id":"118","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
+[2024-10-02 14:55:25] Fresh inventory data: {"A001":{"LOC5670001":0,"LOC5670002":10}}
+[2024-10-02 14:55:25] Final inventory state: {"A001":{"LOC5670001":5,"LOC5670002":5}}
