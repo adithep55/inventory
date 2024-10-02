@@ -12,6 +12,18 @@
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .opening-balance {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .product-header {
+            background-color: #e9ecef;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
     <?php require_once '../includes/header.php'; ?>
@@ -20,7 +32,7 @@
     <div class="page-wrapper">
         <div class="content container-fluid">
             <div class="page-header">
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col">
                         <h3 class="page-title">รายงานการเคลื่อนไหวสินค้า</h3>
                         <ul class="breadcrumb">
@@ -74,127 +86,174 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="../assets/js/script.js"></script>
     <script>
-    $(document).ready(function() {
-        $('.select2').select2();
+$(document).ready(function() {
+    $('.select2').select2();
 
-        function createProductTable(productId) {
-            return $('<table>').addClass('table table-striped table-bordered')
-                .attr('id', 'movementTable_' + productId)
-                .append($('<thead>').append($('<tr>')
-                    .append($('<th>').text('วันที่'))
-                    .append($('<th>').text('รับ'))
-                    .append($('<th>').text('เบิก'))
-                    .append($('<th>').text('โอนย้าย'))
-                    .append($('<th>').text('คงเหลือ'))
-                ));
+    function createProductTable(productId, productName) {
+        var $productSection = $('<div>').addClass('mb-4');
+        $productSection.append($('<div>').addClass('product-header').append($('<h4>').text('รายงานสินค้า: ' + productId + ' - ' + productName)));
+        $productSection.append($('<table>').addClass('table table-striped table-bordered')
+            .attr('id', 'movementTable_' + productId)
+            .append($('<thead>').append($('<tr>')
+                .append($('<th>').text('วันที่'))
+                .append($('<th>').text('รายการ'))
+                .append($('<th>').text('รับ'))
+                .append($('<th>').text('เบิก'))
+                .append($('<th>').text('โอนย้าย'))
+                .append($('<th>').text('คงเหลือ'))
+                .append($('<th>').text('ผู้ทำรายการ'))
+            )));
+        return $productSection;
+    }
+
+    function formatNumber(number) {
+        if (number === null || number === undefined || isNaN(number)) {
+            return '';
         }
+        return parseFloat(number).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
 
-        function initializeDataTable(productId) {
-    $('#movementTable_' + productId).DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: {
-            url: '../api/report/get_product_movement.php',
-            type: 'POST',
-            data: function(d) {
-                return {
-                    productId: productId,
-                    startProductId: $('#startProductId').val(),
-                    endProductId: $('#endProductId').val(),
-                    endDate: $('#endDate').val(),
-                    draw: d.draw,
-                    start: d.start,
-                    length: d.length
-                };
-            },
-            dataSrc: function(json) {
-                console.log("Raw API response:", json);
-                if (!json.data) {
-                    console.error("Invalid data structure received from API");
-                    return [];
-                }
-                return json.data;
-            }
-        },
-        columns: [
-            { data: 'date' },
-            { data: 'receive', render: $.fn.dataTable.render.number(',', '.', 2, '') },
-            { data: 'issue', render: $.fn.dataTable.render.number(',', '.', 2, '') },
-            { data: 'transfer', render: $.fn.dataTable.render.number(',', '.', 2, '') },
-            { data: 'balance', render: $.fn.dataTable.render.number(',', '.', 2, '') }
-        ],
-        order: [[0, 'asc']],
-        error: function(xhr, error, thrown) {
-            console.error('DataTables error:', error, thrown);
-        }
-    });
-}
-$('#generateReport').click(function() {
-    var startId = $('#startProductId').val();
-    var endId = $('#endProductId').val();
-    var endDate = $('#endDate').val();
-
-    if (startId && endId && endDate) {
-        $.ajax({
-            url: '../api/get_products.php',
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                console.log("Generate report response:", response);
-                if (response.data && Array.isArray(response.data)) {
-                    $('#productReports').empty();
-                    var filteredProducts = response.data.filter(function(product) {
-                        return product.product_id >= startId && product.product_id <= endId;
+    function initializeDataTable(productId) {
+        $('#movementTable_' + productId).DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: '../api/report/get_product_movement.php',
+                type: 'POST',
+                data: function(d) {
+                    return $.extend({}, d, {
+                        productId: productId,
+                        endDate: $('#endDate').val()
                     });
-                    filteredProducts.forEach(function(product) {
-                        var $productSection = $('<div>').addClass('mb-4');
-                        $productSection.append($('<h4>').text('รายงานสินค้า: ' + product.product_id + ' - ' + (product.name_th || product.name_en)));
-                        $productSection.append(createProductTable(product.product_id));
-                        $('#productReports').append($productSection);
-                        initializeDataTable(product.product_id);
-                    });
-                }
-                 else {
-                    console.error("Invalid product data structure:", response);
+                },
+                dataSrc: function(json) {
+                    console.log("Raw API response:", json);
+                    if (json.error) {
+                        console.error("API Error:", json.error);
+                        return [];
+                    }
+                    if (!json.data) {
+                        console.error("Invalid data structure received from API");
+                        return [];
+                    }
+                    return json.data;
                 }
             },
-            error: function(xhr, status, error) {
-                console.error("Ajax error loading products:", error);
+            columns: [
+                { data: 'date' },
+                { 
+                    data: 'entry_type',
+                    render: function(data, type, row) {
+                        return data === 'opening_balance' ? 'ยอดยกมา' : 'รายการปกติ';
+                    }
+                },
+                { 
+                    data: 'receive',
+                    render: function(data, type, row) {
+                        return row.entry_type === 'opening_balance' ? '' : formatNumber(data);
+                    }
+                },
+                { 
+                    data: 'issue',
+                    render: function(data, type, row) {
+                        return row.entry_type === 'opening_balance' ? '' : formatNumber(data);
+                    }
+                },
+                { 
+                    data: 'transfer',
+                    render: function(data, type, row) {
+                        return row.entry_type === 'opening_balance' ? '' : formatNumber(data);
+                    }
+                },
+                { 
+                    data: 'balance',
+                    render: function(data, type, row) {
+                        return formatNumber(data);
+                    }
+                },
+                { 
+                    data: 'user_name',
+                    render: function(data, type, row) {
+                        return row.entry_type === 'opening_balance' ? '' : (data || '');
+                    }
+                }
+            ],
+            order: [[0, 'asc']],
+            createdRow: function(row, data, dataIndex) {
+                if (data.entry_type === 'opening_balance') {
+                    $(row).addClass('opening-balance');
+                }
+            },
+            error: function(xhr, error, thrown) {
+                console.error('DataTables error:', error, thrown);
             }
         });
-    } else {
-        alert('กรุณาเลือกรหัสสินค้าเริ่มต้น, สิ้นสุด และวันที่สิ้นสุดรายงาน');
     }
-});
 
-// โหลดตัวเลือกสินค้า
-$.ajax({
-    url: '../api/get_products.php',
-    type: 'GET',
-    dataType: 'json',
-    success: function(response) {
-        console.log("Product API response:", response);
-        if (response.data && Array.isArray(response.data)) {
-            var options = '<option value="">เลือกรหัสสินค้า</option>';
-            response.data.forEach(function(product) {
-                var productId = product.product_id || '';
-                var productName = product.name_th || product.name_en || '';
-                options += '<option value="' + productId + '">' + productId + ' - ' + productName + '</option>';
+    $('#generateReport').click(function() {
+        var startId = $('#startProductId').val();
+        var endId = $('#endProductId').val();
+        var endDate = $('#endDate').val();
+
+        if (startId && endId && endDate) {
+            $.ajax({
+                url: '../api/get_products.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log("Generate report response:", response);
+                    if (response.data && Array.isArray(response.data)) {
+                        $('#productReports').empty();
+                        var filteredProducts = response.data.filter(function(product) {
+                            return product.product_id >= startId && product.product_id <= endId;
+                        });
+                        filteredProducts.forEach(function(product) {
+                            var $productSection = createProductTable(product.product_id, product.name_th || product.name_en);
+                            $('#productReports').append($productSection);
+                            initializeDataTable(product.product_id);
+                        });
+                    } else {
+                        console.error("Invalid product data structure:", response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error("Ajax error loading products:", error);
+                }
             });
-            $('#startProductId, #endProductId').html(options);
         } else {
-            console.error("Invalid product data structure:", response);
+            alert('กรุณาเลือกรหัสสินค้าเริ่มต้น, สิ้นสุด และวันที่สิ้นสุดรายงาน');
         }
-    },
-    error: function(xhr, status, error) {
-        console.error("Ajax error loading products:", error);
-    }
-});
-
-        // ตั้งค่าวันที่เริ่มต้นเป็นวันแรกของเดือนปัจจุบัน
-        var today = new Date();
-        $('#endDate').val(today.toISOString().split('T')[0]);
     });
+
+    // โหลดตัวเลือกสินค้า
+    $.ajax({
+        url: '../api/get_products.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log("Product API response:", response);
+            if (response.data && Array.isArray(response.data)) {
+                var options = '<option value="">เลือกรหัสสินค้า</option>';
+                response.data.forEach(function(product) {
+                    var productId = product.product_id || '';
+                    var productName = product.name_th || product.name_en || '';
+                    options += '<option value="' + productId + '">' + productId + ' - ' + productName + '</option>';
+                });
+                $('#startProductId, #endProductId').html(options);
+            } else {
+                console.error("Invalid product data structure:", response);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Ajax error loading products:", error);
+        }
+    });
+
+    // ตั้งค่าวันที่เริ่มต้นเป็นวันสุดท้ายของเดือนปัจจุบัน
+    var today = new Date();
+    var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    $('#endDate').val(lastDayOfMonth.toISOString().split('T')[0]);
+});
     </script>
 </body>
 </html>

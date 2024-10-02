@@ -23,7 +23,15 @@
                             <li><a href="<?php echo base_url(); ?>/views/product_type" <?php echo (basename($_SERVER['PHP_SELF']) == 'product_type.php') ? 'class="active"' : ''; ?>>หมวดหมู่และประเภทสินค้า</a></li>
                         </ul>
                     </li>
-
+                    
+                    <li class="submenu">
+                        <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/quotation1.svg" alt="img"><span>การรับสินค้า</span> <span class="menu-arrow"></span></a>
+                        <ul>
+                            <li><a href="<?php echo base_url(); ?>/views/recieve" <?php echo (basename($_SERVER['PHP_SELF']) == 'recieve.php') ? 'class="active"' : ''; ?>>รับสินค้า</a></li>
+                            <li><a href="<?php echo base_url(); ?>/views/receive_history" <?php echo (basename($_SERVER['PHP_SELF']) == 'receive_history.php' || basename($_SERVER['PHP_SELF']) == 'receive_details.php') ? 'class="active"' : ''; ?>>รายการรับสินค้า</a></li>
+                        </ul>
+                    </li>
+                    
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/expense1.svg" alt="img"><span>การเบิกสินค้า</span> <span class="menu-arrow"></span></a>
                         <ul>
@@ -32,13 +40,6 @@
                         </ul>
                     </li>
 
-                    <li class="submenu">
-                        <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/quotation1.svg" alt="img"><span>การรับสินค้า</span> <span class="menu-arrow"></span></a>
-                        <ul>
-                            <li><a href="<?php echo base_url(); ?>/views/recieve" <?php echo (basename($_SERVER['PHP_SELF']) == 'recieve.php') ? 'class="active"' : ''; ?>>รับสินค้า</a></li>
-                            <li><a href="<?php echo base_url(); ?>/views/receive_history" <?php echo (basename($_SERVER['PHP_SELF']) == 'receive_history.php' || basename($_SERVER['PHP_SELF']) == 'receive_details.php') ? 'class="active"' : ''; ?>>รายการรับสินค้า</a></li>
-                        </ul>
-                    </li>
 
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/product.svg" alt="img"><span>คลังสินค้า</span> <span class="menu-arrow"></span></a>

@@ -173,3 +173,13 @@
 [2024-10-02 14:55:25] Received data: {"transfer_id":"118","transfer_date":"2024-10-02","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e01"}]}
 [2024-10-02 14:55:25] Fresh inventory data: {"A001":{"LOC5670001":0,"LOC5670002":10}}
 [2024-10-02 14:55:25] Final inventory state: {"A001":{"LOC5670001":5,"LOC5670002":5}}
+[2024-10-03 00:27:59] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:28:03] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:29:40] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:30:41] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:44:03] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:44:58] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:45:30] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:45:40] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:45:51] Error in get_product_movement.php: Product ID is required
+[2024-10-03 00:54:22] Error in get_product_movement.php: Product ID is required
