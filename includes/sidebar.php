@@ -31,7 +31,7 @@
                             <li><a href="<?php echo base_url(); ?>/views/receive_history" <?php echo (basename($_SERVER['PHP_SELF']) == 'receive_history.php' || basename($_SERVER['PHP_SELF']) == 'receive_details.php') ? 'class="active"' : ''; ?>>รายการรับสินค้า</a></li>
                         </ul>
                     </li>
-                    
+
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/expense1.svg" alt="img"><span>การเบิกสินค้า</span> <span class="menu-arrow"></span></a>
                         <ul>
@@ -90,8 +90,8 @@
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/users1.svg" alt="img"><span> ผู้ใช้งาน</span> <span class="menu-arrow"></span></a>
                         <ul>
-                            <li><a href="newuser.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'newuser.html') ? 'class="active"' : ''; ?>>New User </a></li>
-                            <li><a href="<?php echo base_url(); ?>/views/userlist" <?php echo (basename($_SERVER['PHP_SELF']) == 'userlist.php') ? 'class="active"' : ''; ?>>Users List</a></li>
+                        <li><a href="<?php echo base_url(); ?>/views/setrole" <?php echo (basename($_SERVER['PHP_SELF']) == 'setrole.php') ? 'class="active"' : ''; ?>>บทบาท</a></li>
+                            <li><a href="<?php echo base_url(); ?>/views/userlist" <?php echo (basename($_SERVER['PHP_SELF']) == 'userlist.php') ? 'class="active"' : ''; ?>>จัดการผู้ใช้</a></li>
                         </ul>
                     </li>
 
