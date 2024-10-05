@@ -1,8 +1,15 @@
 <?php
+
+require_once '../config/connect.php';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../config/connect.php';
+
+if (!isset($_SESSION['UserID'])) {
+    echo json_encode(['status' => 'error', 'message' => 'กรุณาเข้าสู่ระบบก่อนใช้งาน']);
+    exit;
+}
 
 function dd_return($status, $message, $data = null)
 {

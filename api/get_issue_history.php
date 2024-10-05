@@ -1,8 +1,9 @@
 <?php
-
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_issue']);
+
 header('Content-Type: application/json');
-// Ensure all errors are caught and returned as JSON
 function exception_handler($exception)
 {
     http_response_code(500);

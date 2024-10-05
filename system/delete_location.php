@@ -1,7 +1,8 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_inventory']);
 
-// เปิดใช้งาน error reporting
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 error_reporting(E_ALL);

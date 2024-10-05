@@ -275,3 +275,39 @@
 
 [2024-10-05 16:13:32] Received data: null
 [2024-10-05 16:13:32] Missing required data
+[2024-10-05 22:39:30] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-05
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 5
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
+[2024-10-06 00:26:04] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-06
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 1
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+

@@ -1,7 +1,9 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_receiving']);
 
-// Ensure all errors are caught and returned as JSON
+header('Content-Type: application/json');
 function exception_handler($exception) {
     http_response_code(500);
     echo json_encode([
@@ -14,7 +16,7 @@ function exception_handler($exception) {
 }
 set_exception_handler('exception_handler');
 
-header('Content-Type: application/json');
+
 
 try {
     $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;

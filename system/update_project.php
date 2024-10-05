@@ -1,8 +1,11 @@
 <?php
+require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_projects']);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-require_once '../config/connect.php';
 
 function dd_return($status, $message, $data = null) {
     $json = ['status' => $status ? 'success' : 'fail', 'message' => $message];

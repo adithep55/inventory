@@ -1,5 +1,8 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_users']);
+
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -29,14 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bindParam(':role_id', $roleId);
         $stmt->execute();
 
-        // Reset all permissions
-        $stmt = $conn->prepare("UPDATE roles SET 
-            manage_products = 0, manage_receiving = 0, manage_inventory = 0,
-            manage_projects = 0, manage_customers = 0, manage_transfers = 0,
-            manage_reports = 0, manage_users = 0, manage_settings = 0
-            WHERE RoleID = :role_id");
-        $stmt->bindParam(':role_id', $roleId);
-        $stmt->execute();
+// Reset all permissions
+$stmt = $conn->prepare("UPDATE roles SET 
+    manage_products = 0, manage_receiving = 0, manage_issue = 0, manage_inventory = 0,
+    manage_projects = 0, manage_customers = 0, manage_transfers = 0,
+    manage_reports = 0, manage_users = 0, manage_settings = 0
+    WHERE RoleID = :role_id");
+$stmt->bindParam(':role_id', $roleId);
+$stmt->execute();
 
         // Set new permissions
         foreach ($permissions as $permission) {

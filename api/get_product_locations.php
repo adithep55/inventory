@@ -1,8 +1,10 @@
 <?php
+require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_transfers']);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once '../config/connect.php';
-
 header('Content-Type: application/json');
 
 if (!isset($_POST['product_id'])) {

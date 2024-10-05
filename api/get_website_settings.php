@@ -1,16 +1,18 @@
 <?php
+
+require_once '../config/connect.php';
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once '../config/connect.php';
 header('Content-Type: application/json');
 
-// ตรวจสอบการล็อกอิน (แต่ไม่ต้องตรวจสอบสิทธิ์ manage_settings)
+
 if (!isset($_SESSION['UserID'])) {
-    echo json_encode(['status' => 'error', 'message' => 'User not logged in']);
+    echo json_encode(['status' => 'error', 'message' => 'กรุณาเข้าสู่ระบบก่อนใช้งาน']);
     exit;
 }
 
-// ดึงข้อมูลการตั้งค่า
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         $stmt = $conn->query("SELECT setting_key, setting_value FROM website_settings");

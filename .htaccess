@@ -18,3 +18,11 @@ RewriteRule ^(.+)/?$ $1.php [L,QSA,NC]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^inventory/locationInfo/([^/]+)/?$ views/inventory_details.php?id=$1 [L,QSA,NC]
+
+# กำหนดหน้า 404 Custom
+ErrorDocument 404 /error-404.php
+
+# ถ้าไม่พบไฟล์หรือไดเรกทอรี ให้ส่งไปที่ 404.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /error-404.php [L]

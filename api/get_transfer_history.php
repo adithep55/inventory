@@ -2,21 +2,23 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_transfers']);
 
 header('Content-Type: application/json');
 
-// Handle DataTables parameters
+
 $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
 $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
 $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
 $search = isset($_POST['search']['value']) ? '%' . $_POST['search']['value'] . '%' : '%';
 
-// Query to count total records
+
 $countQuery = "SELECT COUNT(DISTINCT h.transfer_header_id) as total FROM h_transfer h";
 $stmt = $conn->query($countQuery);
 $totalRecords = $stmt->fetchColumn();
 
-// Main query with search
+
 $query = "SELECT 
     h.transfer_header_id,
     h.bill_number,
@@ -51,10 +53,10 @@ if ($search !== '%') {
 $query .= " GROUP BY h.transfer_header_id";
 $query .= " ORDER BY h.transfer_date DESC LIMIT $start, $length";
 
-// Prepare statement
+
 $stmt = $conn->prepare($query);
 
-// Execute the query
+
 if (!$stmt->execute($params)) {
     error_log("Query execution failed: " . print_r($stmt->errorInfo(), true));
     echo json_encode(array("error" => "Database query failed"));
@@ -63,7 +65,7 @@ if (!$stmt->execute($params)) {
 
 $transfers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Prepare data for response
+
 $data = array();
 foreach ($transfers as $transfer) {
     $data[] = array(
@@ -88,7 +90,7 @@ foreach ($transfers as $transfer) {
     );
 }
 
-// Query to count filtered records
+
 $filteredQuery = "SELECT COUNT(DISTINCT h.transfer_header_id) FROM h_transfer h
                   JOIN d_transfer d ON h.transfer_header_id = d.transfer_header_id
                   JOIN locations l1 ON h.from_location_id = l1.location_id

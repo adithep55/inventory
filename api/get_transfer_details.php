@@ -1,5 +1,8 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(requiredPermissions: ['manage_transfers']);
+
 
 header('Content-Type: application/json');
 

@@ -1,3 +1,7 @@
+<?php
+// เพิ่มบรรทัดนี้ที่ด้านบนสุดของไฟล์ index.php
+require_once 'config/permission.php';
+?>
 <!DOCTYPE html>
 <html lang="th">
 
@@ -47,7 +51,8 @@
 </style>
 
 <body>
-    <?php require_once 'includes/header.php'; ?>
+<?php require_once 'includes/header.php'; ?>
+
     <?php require_once 'includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
@@ -233,12 +238,20 @@ function loadDashboardData() {
 }
 
 function updateDashboard(data) {
-    $('#total-products').text(data.total_products);
-    $('#total-inventory').text(data.total_inventory);
-    $('#total-issues').text(data.total_issues);
-    $('#total-receives').text(data.total_receives);
+    console.log('Updating dashboard with data:', data);
 
-    createInventoryChart(data.inventory_stats);
+    $('#total-products').text(data.total_products || 0);
+    $('#total-inventory').text(data.total_inventory || 0);
+    $('#total-issues').text(data.total_issues || 0);
+    $('#total-receives').text(data.total_receives || 0);
+
+    if (data.inventory_stats && Array.isArray(data.inventory_stats) && data.inventory_stats.length > 0) {
+        createInventoryChart(data.inventory_stats);
+    } else {
+        console.error('Invalid or missing inventory_stats data');
+        // อาจจะแสดงข้อความแจ้งเตือนให้ผู้ใช้ทราบว่าไม่สามารถแสดงกราฟได้
+    }
+
     updateRecentProductsTable(data.recent_products);
     updateRecentTransactionsTable(data.recent_transactions);
 
@@ -246,14 +259,44 @@ function updateDashboard(data) {
 }
 
 function createInventoryChart(stats) {
+    console.log('Inventory stats:', stats);
+    if (!stats || !Array.isArray(stats) || stats.length === 0) {
+        console.error('Invalid or empty stats data');
+        return;
+    }
+
     var currentYear = new Date().getFullYear();
+    var thaiMonths = [
+        'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.',
+        'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'
+    ];
+    
+    var categories = [];
+    var issueData = [];
+    var receiveData = [];
+    var startYear = parseInt(stats[0].month.split('-')[0]);
+    var endYear = parseInt(stats[stats.length - 1].month.split('-')[0]);
+
+    stats.forEach(item => {
+        const [year, month] = item.month.split('-');
+        const monthIndex = parseInt(month) - 1;
+        const yearThai = parseInt(year) + 543;
+        categories.push(`${thaiMonths[monthIndex]} ${yearThai}`);
+        issueData.push(parseInt(item.issue_quantity) || 0);
+        receiveData.push(parseInt(item.receive_quantity) || 0);
+    });
+
+    var titleText = startYear === endYear 
+        ? `สถิติจำนวนสินค้าที่เบิกและรับปี ${startYear + 543}`
+        : `สถิติจำนวนสินค้าที่เบิกและรับตั้งแต่ ${thaiMonths[parseInt(stats[0].month.split('-')[1]) - 1]} ${startYear + 543} ถึง ${thaiMonths[parseInt(stats[stats.length - 1].month.split('-')[1]) - 1]} ${endYear + 543}`;
+
     var options = {
         series: [{
             name: 'เบิก',
-            data: stats.map(item => item.issue_count)
+            data: issueData
         }, {
             name: 'รับ',
-            data: stats.map(item => item.receive_count)
+            data: receiveData
         }],
         chart: {
             type: 'bar',
@@ -278,18 +321,18 @@ function createInventoryChart(stats) {
             colors: ['transparent']
         },
         title: {
-            text: `สถิติการเบิกและรับสินค้าปี ${currentYear}`,
+            text: titleText,
             align: 'left'
         },
         xaxis: {
-            categories: stats.map(item => item.month),
+            categories: categories,
             title: {
                 text: 'เดือน'
             }
         },
         yaxis: {
             title: {
-                text: 'จำนวนรายการ'
+                text: 'จำนวนสินค้า'
             },
             min: 0,
             forceNiceScale: true,
@@ -305,7 +348,7 @@ function createInventoryChart(stats) {
         tooltip: {
             y: {
                 formatter: function (val) {
-                    return val + " รายการ"
+                    return val + " ชิ้น"
                 }
             }
         },
@@ -316,7 +359,13 @@ function createInventoryChart(stats) {
         colors: ['#008FFB', '#00E396']
     };
 
-    new ApexCharts(document.querySelector("#inventory_chart"), options).render();
+    console.log('Chart options:', options);
+
+    try {
+        new ApexCharts(document.querySelector("#inventory_chart"), options).render();
+    } catch (error) {
+        console.error('Error rendering chart:', error);
+    }
 }
 
 function updateRecentProductsTable(products) {

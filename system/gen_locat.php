@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_inventory']);
 header('Content-Type: application/json');
 
 function generate_location_id() {

@@ -1,5 +1,8 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_customers']);
+
 header('Content-Type: application/json');
 
 function dd_return($status, $message, $data = null) {

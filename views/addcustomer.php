@@ -1,3 +1,8 @@
+<?php
+require_once '../config/permission.php';
+requirePermission(['manage_customers']);
+?>
+
 <!DOCTYPE html>
 <html lang="th">
 <head>

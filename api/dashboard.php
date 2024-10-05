@@ -4,6 +4,11 @@ ini_set('display_errors', 1);
 
 require_once '../config/connect.php';
 
+
+if (!isset($_SESSION['UserID'])) {
+    echo json_encode(['status' => 'error', 'message' => 'กรุณาเข้าสู่ระบบก่อนใช้งาน']);
+    exit;
+}
 function dd_return($status, $message, $data = null) {
     $json = ['status' => $status ? 'success' : 'fail', 'message' => $message];
     if ($data !== null) {
@@ -38,33 +43,51 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $result = dd_q("SELECT COUNT(*) as total FROM h_receive");
         $data['total_receives'] = $result->fetchColumn();
 
-        // 5. สถิติการเบิกและรับสินค้า (12 เดือนล่าสุด)
-        $result = dd_q("
-            SELECT 
-                DATE_FORMAT(t.date, '%Y-%m') as month,
-                SUM(CASE WHEN t.type = 'issue' THEN t.count ELSE 0 END) as issue_count,
-                SUM(CASE WHEN t.type = 'receive' THEN t.count ELSE 0 END) as receive_count
-            FROM (
-                SELECT 
-                    issue_date as date,
-                    'issue' as type,
-                    COUNT(*) as count
-                FROM h_issue
-                WHERE issue_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-                GROUP BY DATE_FORMAT(issue_date, '%Y-%m')
-                UNION ALL
-                SELECT 
-                    received_date as date,
-                    'receive' as type,
-                    COUNT(*) as count
-                FROM h_receive
-                WHERE received_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
-                GROUP BY DATE_FORMAT(received_date, '%Y-%m')
-            ) t
-            GROUP BY DATE_FORMAT(t.date, '%Y-%m')
-            ORDER BY month
-        ");
-        $data['inventory_stats'] = $result->fetchAll(PDO::FETCH_ASSOC);
+      // 5. สถิติการเบิกและรับสินค้า (ตั้งแต่เริ่มใช้งานหรือปีปัจจุบัน)
+$result = dd_q("
+WITH first_record AS (
+    SELECT MIN(date) as start_date
+    FROM (
+        SELECT MIN(issue_date) as date FROM h_issue
+        UNION
+        SELECT MIN(received_date) FROM h_receive
+    ) as first_dates
+),
+date_range AS (
+    SELECT 
+        CASE 
+            WHEN DATEDIFF(CURDATE(), start_date) > 365 THEN DATE_FORMAT(DATE(CONCAT(YEAR(CURDATE()),'-01-01')), '%Y-%m-01')
+            ELSE DATE_FORMAT(start_date, '%Y-%m-01')
+        END as range_start
+    FROM first_record
+)
+SELECT 
+    DATE_FORMAT(t.date, '%Y-%m') as month,
+    SUM(CASE WHEN t.type = 'issue' THEN t.quantity ELSE 0 END) as issue_quantity,
+    SUM(CASE WHEN t.type = 'receive' THEN t.quantity ELSE 0 END) as receive_quantity
+FROM (
+    SELECT 
+        i.issue_date as date,
+        'issue' as type,
+        SUM(d.quantity) as quantity
+    FROM h_issue i
+    JOIN d_issue d ON i.issue_header_id = d.issue_header_id
+    WHERE i.issue_date >= (SELECT range_start FROM date_range)
+    GROUP BY DATE_FORMAT(i.issue_date, '%Y-%m')
+    UNION ALL
+    SELECT 
+        r.received_date as date,
+        'receive' as type,
+        SUM(d.quantity) as quantity
+    FROM h_receive r
+    JOIN d_receive d ON r.receive_header_id = d.receive_header_id
+    WHERE r.received_date >= (SELECT range_start FROM date_range)
+    GROUP BY DATE_FORMAT(r.received_date, '%Y-%m')
+) t
+GROUP BY DATE_FORMAT(t.date, '%Y-%m')
+ORDER BY month ASC
+");
+$data['inventory_stats'] = $result->fetchAll(PDO::FETCH_ASSOC);
 
         // 6. สินค้าที่มีการเคลื่อนไหวล่าสุด (เรียงตามรหัสสินค้า)
         $result = dd_q("

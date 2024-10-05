@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_users']);
 
 header('Content-Type: application/json');
 
@@ -10,6 +12,7 @@ try {
                 RoleName,
                 manage_products,
                 manage_receiving,
+                manage_issue,
                 manage_inventory,
                 manage_projects,
                 manage_customers,
@@ -28,7 +31,7 @@ try {
 
     foreach ($roles as &$role) {
         $permissions = [
-            'manage_products', 'manage_receiving', 'manage_inventory',
+            'manage_products', 'manage_receiving', 'manage_issue', 'manage_inventory',
             'manage_projects', 'manage_customers', 'manage_transfers',
             'manage_reports', 'manage_users', 'manage_settings'
         ];

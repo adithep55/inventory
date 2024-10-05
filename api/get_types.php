@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_products']);
 
 header('Content-Type: application/json');
 

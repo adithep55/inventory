@@ -1,10 +1,14 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require_once '../config/connect.php';
 require_once('../assets/fpdf186/fpdf.php');
+require_once '../config/permission.php';
+requirePermission(['manage_issue']);
 
-define('FPDF_FONTPATH', 'C:/xampp/htdocs/assets/fpdf186/font/');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
+define('FPDF_FONTPATH', '../assets/fpdf186/font/');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     die('Issue ID is required and must not be empty');

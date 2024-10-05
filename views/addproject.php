@@ -1,3 +1,8 @@
+<?php
+require_once '../config/permission.php';
+requirePermission(['manage_projects']);
+?>
+
 <!DOCTYPE html>
 <html lang="th">
 <head>

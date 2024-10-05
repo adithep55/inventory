@@ -1,9 +1,12 @@
 <?php
-session_start();
+require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_transfers']);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-require_once '../config/connect.php';
+
 
 function logError($message) {
     error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, '../error.log');

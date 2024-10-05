@@ -1,3 +1,7 @@
+<?php
+require_once '../config/permission.php';
+requirePermission(['manage_users']);
+?>
 <!DOCTYPE html>
 <html lang="th">
 
@@ -313,6 +317,7 @@ $(document).ready(function() {
     const permissionMap = {
         manage_products: "จัดการสินค้า ",
         manage_receiving: "จัดการการรับสินค้า ",
+        manage_issue: "จัดการการเบิกสินค้า ",
         manage_inventory: "จัดการคลังสินค้า ",
         manage_projects: "จัดการโครงการ ",
         manage_customers: "จัดการลูกค้า ",

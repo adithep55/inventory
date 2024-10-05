@@ -1,6 +1,8 @@
 <?php
 // File: api/report/get_inventory_movements.php
 require_once '../../config/connect.php';
+require_once '../../config/permission.php';
+requirePermission(['manage_reports']);
 
 header('Content-Type: application/json');
 

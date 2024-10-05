@@ -1,7 +1,10 @@
 <?php
+require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_users', 'manage_projects']);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-require_once '../config/connect.php';
 
 header('Content-Type: application/json');
 

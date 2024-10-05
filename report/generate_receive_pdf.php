@@ -1,11 +1,15 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require_once '../config/connect.php';
 require_once('../assets/fpdf186/fpdf.php');
+require_once '../config/permission.php';
+requirePermission(['manage_receiving']);
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 
 // กำหนดเส้นทางของฟอนต์
-define('FPDF_FONTPATH', 'C:/xampp/htdocs/assets/fpdf186/font/');
+define('FPDF_FONTPATH', '../assets/fpdf186/font/');
 
 if (!isset($_GET['receive_id'])) {
     die('Receive ID is required');

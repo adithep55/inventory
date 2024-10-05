@@ -1,3 +1,7 @@
+<?php
+require_once '../config/permission.php';
+requirePermission(['manage_receiving']);
+?>
 <!DOCTYPE html>
 <html lang="th">
 <head>

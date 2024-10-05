@@ -1,16 +1,19 @@
 <?php
-function checkAccess($requiredPermissions = []) {
-    global $conn;
+
+require_once 'connect.php';
+
+function checkPermission($requiredPermissions = []) {
     if (!isset($_SESSION['UserID'])) {
         return false;
     }
-    
+
     $userId = $_SESSION['UserID'];
     $permissionQuery = "SELECT " . implode(", ", $requiredPermissions) . " 
                         FROM users u 
                         JOIN roles r ON u.RoleID = r.RoleID 
                         WHERE u.UserID = :userId";
     
+    global $conn;
     $stmt = $conn->prepare($permissionQuery);
     $stmt->execute([':userId' => $userId]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -28,18 +31,24 @@ function checkAccess($requiredPermissions = []) {
     return true;
 }
 
-// ฟังก์ชันสำหรับเช็คและแสดงข้อความหากไม่มีสิทธิ์
 function requirePermission($requiredPermissions = []) {
-    if (!checkAccess($requiredPermissions)) {
-        // ถ้าเป็น AJAX request
+    if (!checkPermission($requiredPermissions)) {
         if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             header('Content-Type: application/json');
-            echo json_encode(['status' => 'เกิดข้อผิดพลาด', 'message' => 'คุณไม่มีสิทธิ์การเข้าถึง.']);
+            echo json_encode(['status' => 'error', 'message' => 'คุณไม่มีสิทธิ์การเข้าถึง.']);
+            exit;
         } else {
-            // ถ้าเป็น normal request ให้ redirect ไปยังหน้า error
-            header("Location: /error.php?code=403");
+            header("Location: /error-403");
+            exit;
         }
-        exit;
     }
 }
-?>
+
+// สำหรับ API calls
+// function apiRequirePermission($requiredPermissions = []) {
+//     if (!checkPermission($requiredPermissions)) {
+//         header('Content-Type: application/json');
+//         echo json_encode(['status' => 'error', 'message' => 'คุณไม่มีสิทธิ์การเข้าถึง.']);
+//         exit;
+//     }
+// }

@@ -1,5 +1,8 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_transfers']);
+
 
 // ฟังก์ชันสำหรับบันทึก log
 function logError($message) {

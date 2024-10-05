@@ -1,5 +1,7 @@
 <?php
 require_once '../config/connect.php';
+require_once '../config/permission.php';
+requirePermission(['manage_receiving']);
 
 function exception_handler($exception) {
     http_response_code(500);

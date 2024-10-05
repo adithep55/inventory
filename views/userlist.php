@@ -1,3 +1,7 @@
+<?php
+require_once '../config/permission.php';
+requirePermission(['manage_users']);
+?>
 <!DOCTYPE html>
 <html lang="th">
 
