@@ -98,12 +98,7 @@
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/settings.svg" alt="img"><span>ตั้งค่า</span> <span class="menu-arrow"></span></a>
                         <ul>
-                            <li><a href="generalsettings.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'generalsettings.html') ? 'class="active"' : ''; ?>>General Settings</a></li>
-                            <li><a href="emailsettings.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'emailsettings.html') ? 'class="active"' : ''; ?>>Email Settings</a></li>
-                            <li><a href="paymentsettings.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'paymentsettings.html') ? 'class="active"' : ''; ?>>Payment Settings</a></li>
-                            <li><a href="currencysettings.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'currencysettings.html') ? 'class="active"' : ''; ?>>Currency Settings</a></li>
-                            <li><a href="grouppermissions.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'grouppermissions.html') ? 'class="active"' : ''; ?>>Group Permissions</a></li>
-                            <li><a href="taxrates.html" <?php echo (basename($_SERVER['PHP_SELF']) == 'taxrates.html') ? 'class="active"' : ''; ?>>Tax Rates</a></li>
+                        <li><a href="<?php echo base_url(); ?>/views/setting" <?php echo (basename($_SERVER['PHP_SELF']) == 'setting.php') ? 'class="active"' : ''; ?>>ตั้งค่าเว็ปไซต์</a></li>
                         </ul>
                     </li>
                 </ul>
