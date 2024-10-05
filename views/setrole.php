@@ -38,6 +38,24 @@
     color: #fff;
     background-color: #6c757d;
 }
+.permission-container {
+    display: inline-block;
+}
+.permission-summary, .permission-full {
+    display: inline-block;
+}
+.permission-expand {
+    cursor: pointer;
+    margin-left: 5px;
+    background-color: #f0f0f0;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-size: 0.8em;
+}
+.permission-badge {
+    margin-right: 3px;
+}
+
 </style>
 <body>
     <?php require_once '../includes/header.php'; ?>
@@ -221,16 +239,75 @@
     // Initialize DataTable on page load
     initializeDataTable();
     function formatPermissions(row) {
-        if (!row) return "ไม่มีข้อมูล";
-        var permissions = [];
-        for (var key in permissionMap) {
-            if (row[key] == 1) {
-                permissions.push('<span class="permission-badge active">' + permissionMap[key] + '</span>');
-            }
+    if (!row) return "ไม่มีข้อมูล";
+    var permissions = [];
+    for (var key in permissionMap) {
+        if (row[key] == 1) {
+            permissions.push(permissionMap[key]);
         }
-        return permissions.length > 0 ? permissions.join(" ") : '<span class="permission-badge inactive">ไม่มีสิทธิ์</span>';
     }
+    if (permissions.length === 0) {
+        return '<span class="permission-badge inactive">ไม่มีสิทธิ์</span>';
+    }
+    return '<div class="permission-container" data-permissions="' + permissions.join(',') + '">' +
+           '<div class="permission-summary"></div>' +
+           '<button class="permission-expand btn btn-sm btn-light" style="display:none;">+<span class="count"></span> <i class="fas fa-chevron-down"></i></button>' +
+           '<div class="permission-full" style="display:none;"></div>' +
+           '</div>';
+}
 
+// ปรับปรุงฟังก์ชัน updatePermissionDisplay
+function updatePermissionDisplay() {
+    $('.permission-container').each(function() {
+        var container = $(this);
+        var permissions = container.data('permissions').split(',');
+        var summary = container.find('.permission-summary');
+        var expand = container.find('.permission-expand');
+        var full = container.find('.permission-full');
+        var count = expand.find('.count');
+
+        summary.empty();
+        full.empty();
+
+        if (permissions.length <= 2) {
+            permissions.forEach(function(p) {
+                summary.append('<span class="permission-badge active">' + p + '</span> ');
+            });
+            expand.hide();
+        } else {
+            permissions.slice(0, 2).forEach(function(p) {
+                summary.append('<span class="permission-badge active">' + p + '</span> ');
+            });
+            count.text(permissions.length - 2);
+            expand.show();
+            permissions.slice(2).forEach(function(p) {
+                full.append('<span class="permission-badge active">' + p + '</span> ');
+            });
+        }
+    });
+}
+
+$(document).ready(function() {
+    $(document).on('click', '.permission-expand', function(e) {
+        e.preventDefault();
+        var container = $(this).closest('.permission-container');
+        var full = container.find('.permission-full');
+        var icon = $(this).find('i');
+        
+        full.toggle();
+        icon.toggleClass('fa-chevron-down fa-chevron-up');
+        
+        if (full.is(':visible')) {
+            $(this).html('แสดงน้อยลง <i class="fas fa-chevron-up"></i>');
+        } else {
+            var count = container.data('permissions').split(',').length - 2;
+            $(this).html('+' + count + ' <i class="fas fa-chevron-down"></i>');
+        }
+    });
+
+    // เรียกใช้ฟังก์ชันหลังจาก DataTable โหลดข้อมูลเสร็จ
+    roleTable.on('draw', updatePermissionDisplay);
+});
 
     // Permission mapping
     const permissionMap = {
@@ -374,6 +451,7 @@ function initializeAddRolePermissions() {
         badge.removeClass('inactive').addClass('active')
             .find('i').removeClass('fa-plus-circle').addClass('fa-times-circle');
         selectedPermissions.append(badge);
+        ensureSingleIcon(badge);
     });
 
     // Event listener for removing permissions
@@ -383,21 +461,17 @@ function initializeAddRolePermissions() {
         badge.removeClass('active').addClass('inactive')
             .find('i').removeClass('fa-times-circle').addClass('fa-plus-circle');
         availablePermissions.append(badge);
+        ensureSingleIcon(badge);
     });
 }
 
-    // Additional function to prevent multiple icons
-    function preventMultipleIcons() {
-        $('.permission-badge').each(function() {
-            let icons = $(this).find('i');
-            if (icons.length > 1) {
-                icons.slice(1).remove();
-            }
-        });
+function ensureSingleIcon(badge) {
+    let icons = badge.find('i');
+    if (icons.length > 1) {
+        icons.slice(1).remove();
     }
+}
 
-    // Call this function after any badge manipulation
-    setInterval(preventMultipleIcons, 100); // Check every 100ms
 
     // Save role changes
     function saveRoleChanges() {
@@ -435,38 +509,45 @@ function initializeAddRolePermissions() {
 
     // Delete role
     function deleteRole(roleId) {
-        Swal.fire({
-            title: 'ยืนยันการลบ',
-            text: "คุณแน่ใจหรือไม่ที่จะลบบทบาทนี้?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'ใช่, ลบเลย!',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '../system/delete_role.php',
-                    type: 'POST',
-                    data: { id: roleId },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            Swal.fire('ลบสำเร็จ!', response.message, 'success').then(() => {
-                                roleTable.ajax.reload(null, false);
-                            });
-                        } else {
-                            Swal.fire('เกิดข้อผิดพลาด!', response.message, 'error');
+    Swal.fire({
+        title: 'ยืนยันการลบ',
+        text: "คุณแน่ใจหรือไม่ที่จะลบบทบาทนี้?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'ใช่, ลบเลย!',
+        cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '../system/delete_role.php',
+                type: 'POST',
+                data: { id: roleId },
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 'success') {
+                        Swal.fire('ลบสำเร็จ!', response.message, 'success').then(() => {
+                            roleTable.ajax.reload(null, false);
+                        });
+                    } else {
+                        let errorMessage = response.message;
+                        let errorTitle = 'เกิดข้อผิดพลาด!';
+                        
+                        if (response.code === 'ROLE_IN_USE' || response.code === 'INTEGRITY_CONSTRAINT_VIOLATION') {
+                            errorTitle = 'ไม่สามารถลบบทบาทได้';
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถลบบทบาทได้', 'error');
+                        
+                        Swal.fire(errorTitle, errorMessage, 'error');
                     }
-                });
-            }
-        });
-    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถติดต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่อีกครั้ง', 'error');
+                }
+            });
+        }
+    });
+}
 
     // Event listeners
     $(document).on('click', '#saveNewRole', function () {

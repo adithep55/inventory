@@ -1,27 +1,4 @@
-<?php 
-session_start();
-$host = "localhost";
-$db_user = "root";
-$db_pass = "";
-$db = "inventory";
-
-$conn = new PDO("mysql:host=$host;dbname=$db", $db_user, $db_pass);
-$conn->exec("set names utf8mb4");
-$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-function dd_q($str, $arr = []) {
-    global $conn;
-    try {
-        $exec = $conn->prepare($str);
-        $exec->execute($arr);
-    } catch (PDOException $e) {
-        return false;
-    }
-    return $exec;
-}
-
-date_default_timezone_set('Asia/Bangkok');
-
+<?php
 function checkAccess($requiredPermissions = []) {
     global $conn;
     if (!isset($_SESSION['UserID'])) {
@@ -59,8 +36,8 @@ function requirePermission($requiredPermissions = []) {
             header('Content-Type: application/json');
             echo json_encode(['status' => 'เกิดข้อผิดพลาด', 'message' => 'คุณไม่มีสิทธิ์การเข้าถึง.']);
         } else {
-            // ถ้าเป็น normal request
-            echo "คุณไม่มีสิทธิ์เข้าถึงหน้านี้";
+            // ถ้าเป็น normal request ให้ redirect ไปยังหน้า error
+            header("Location: /error.php?code=403");
         }
         exit;
     }

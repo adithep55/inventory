@@ -19,9 +19,7 @@
         <div class="modal-content">
             <div class="modal-header bg-warning">
                 <h5 class="modal-title" id="lowStockModalLabel">สินค้าใกล้หมด</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-2">
                 <div class="table-responsive d-none d-sm-block">
@@ -43,31 +41,28 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">ปิด</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
             </div>
         </div>
     </div>
 </div>
 
-    <script>
-$(document).ready(function () {
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     loadNotifications();
-    setInterval(loadNotifications, 500); 
+    setInterval(loadNotifications, 30000); // ทุก 30 วินาที
 
-    $('#show-low-stock-details').click(function () {
-        $('#lowStockModal').modal('show');
+    document.getElementById('show-low-stock-details').addEventListener('click', function () {
+        var myModal = new bootstrap.Modal(document.getElementById('lowStockModal'));
+        myModal.show();
     });
 
-    $('.close, .btn-secondary').click(function () {
-        $('#lowStockModal').modal('hide');
-    });
-
-    $('#close-notification').click(function() {
+    document.getElementById('close-notification').addEventListener('click', function() {
         dismissNotification();
     });
 
-    $(window).on('resize', function () {
-        if ($('#lowStockModal').hasClass('show')) {
+    window.addEventListener('resize', function () {
+        if (document.getElementById('lowStockModal').classList.contains('show')) {
             updateLowStockModal(window.lowStockProducts);
         }
     });
@@ -75,41 +70,38 @@ $(document).ready(function () {
 
 function loadNotifications() {
     if (isNotificationDismissed()) {
-        $('#low-stock-notification').hide();
+        document.getElementById('low-stock-notification').style.display = 'none';
         return;
     }
 
-    $.ajax({
-        url: '../api/dashboard.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (response) {
-            if (response.status === 'success') {
-                updateNotifications(response.data);
+    fetch('../api/dashboard.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                updateNotifications(data.data);
             } else {
-                console.error('Error:', response.message);
+                console.error('Error:', data.message);
             }
-        },
-        error: function (xhr, status, error) {
-        }
-    });
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 function updateNotifications(data) {
-    $('#low-stock-count').text(data.low_stock_count);
+    document.getElementById('low-stock-count').textContent = data.low_stock_count;
     updateLowStockModal(data.low_stock_products);
     window.lowStockProducts = data.low_stock_products;
 
+    const notification = document.getElementById('low-stock-notification');
     if (data.low_stock_count > 0) {
-        $('#low-stock-notification').fadeIn();
+        notification.style.display = 'block';
     } else {
-        $('#low-stock-notification').fadeOut();
+        notification.style.display = 'none';
     }
 }
 
 function dismissNotification() {
     localStorage.setItem('notificationDismissedAt', Date.now());
-    $('#low-stock-notification').fadeOut();
+    document.getElementById('low-stock-notification').style.display = 'none';
 }
 
 function isNotificationDismissed() {
@@ -117,45 +109,54 @@ function isNotificationDismissed() {
     if (!dismissedAt) return false;
     
     const currentTime = Date.now();
-    const dismissDuration = 5 * 60 * 1000; 
+    const dismissDuration = 5 * 60 * 1000; // 5 นาที
     return (currentTime - dismissedAt) < dismissDuration;
 }
 
-
 function updateLowStockModal(products) {
-    var table = $('#low-stock-table tbody');
-    var list = $('#low-stock-list');
-    table.empty();
-    list.empty();
+    const table = document.querySelector('#low-stock-table tbody');
+    const list = document.getElementById('low-stock-list');
+    table.innerHTML = '';
+    list.innerHTML = '';
 
     products.forEach(function (product) {
-        var isLowStock = parseInt(product.total_quantity) <= parseInt(product.low_level);
-        var status = isLowStock ? 'ต่ำกว่าเกณฑ์' : 'ปกติ';
-        var statusClass = isLowStock ? 'text-danger' : 'text-success';
-        var statusBadge = isLowStock ? '<span class="badge bg-danger">ใกล้หมด</span>' : '<span class="badge bg-success">ปกติ</span>';
+        const isLowStock = parseInt(product.total_quantity) <= parseInt(product.low_level);
+        const status = isLowStock ? 'ต่ำกว่าเกณฑ์' : 'ปกติ';
+        const statusClass = isLowStock ? 'text-danger' : 'text-success';
+        const statusBadge = isLowStock ? '<span class="badge bg-danger">ใกล้หมด</span>' : '<span class="badge bg-success">ปกติ</span>';
 
-        table.append(`
-            <tr>
-                <td>${product.product_id}</td>
-                <td>${product.name_th}</td>
-                <td>${product.total_quantity}</td>
-                <td>${product.low_level}</td>
-                <td>${statusBadge}</td>
-            </tr>
-        `);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${escapeHtml(product.product_id)}</td>
+            <td>${escapeHtml(product.name_th)}</td>
+            <td>${escapeHtml(product.total_quantity)}</td>
+            <td>${escapeHtml(product.low_level)}</td>
+            <td>${statusBadge}</td>
+        `;
+        table.appendChild(tr);
 
-        list.append(`
-            <div class="list-group-item m-1">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">${product.name_th}</h5>
-                    <small class="text-muted">${product.product_id}</small>
-                </div>
-                <p class="mb-1">จำนวนคงเหลือ: <strong>${product.total_quantity}</strong> / ระดับต่ำสุด: ${product.low_level}</p>
-                <small class="${statusClass}">${status}</small>
+        const listItem = document.createElement('div');
+        listItem.className = 'list-group-item m-1';
+        listItem.innerHTML = `
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">${escapeHtml(product.name_th)}</h5>
+                <small class="text-muted">${escapeHtml(product.product_id)}</small>
             </div>
-        `);
+            <p class="mb-1">จำนวนคงเหลือ: <strong>${escapeHtml(product.total_quantity)}</strong> / ระดับต่ำสุด: ${escapeHtml(product.low_level)}</p>
+            <small class="${statusClass}">${status}</small>
+        `;
+        list.appendChild(listItem);
     });
 }
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
 </script>
 
 <style>
