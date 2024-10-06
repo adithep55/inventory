@@ -18,7 +18,14 @@ requirePermission(['manage_issue']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-
+<style>
+    .error-highlight {
+        border: 2px solid red !important;
+    }
+    select.error-highlight + .select2-container .select2-selection {
+        border: 2px solid red !important;
+    }
+</style>
 <body>
     <?php require_once '../includes/header.php'; ?>
     <?php require_once '../includes/sidebar.php'; ?>
@@ -845,59 +852,84 @@ function updateProductSelectionStatus(productId) {
         items: []
     };
 
-    // ตรวจสอบข้อมูลก่อนส่ง
-    if (!formData.issueId || !formData.issueDate || !formData.issueType) {
-        Swal.fire('ข้อผิดพลาด', 'กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
-        return;
+    // เคลียร์ข้อผิดพลาดเดิม
+    $('.error-highlight').removeClass('error-highlight');
+    $('.error-message').remove();
+
+    let errors = [];
+    let isValid = true;
+
+    // ตรวจสอบวันที่เบิก
+    if (!formData.issueDate) {
+        errors.push('กรุณาเลือกวันที่เบิก');
+        $('#issueDate').addClass('error-highlight');
+        isValid = false;
     }
 
-    if (issueType === 'sale' && !formData.customerId) {
-        Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกลูกค้า', 'error');
-        return;
+    // ตรวจสอบประเภทการเบิก
+    if (issueType === 'sale') {
+        if (!$('#customer').val()) {
+            errors.push('กรุณาเลือกลูกค้า');
+            $('#customer').addClass('error-highlight');
+            isValid = false;
+        }
+    } else if (issueType === 'project') {
+        if (!$('#project').val()) {
+            errors.push('กรุณาเลือกโครงการ');
+            $('#project').addClass('error-highlight');
+            isValid = false;
+        }
     }
 
-    if (issueType === 'project' && !formData.projectId) {
-        Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกโครงการ', 'error');
-        return;
-    }
-
-    var isValid = true;
+    // ตรวจสอบรายการสินค้า
+    let hasItems = false;
     $('#issueTable tbody tr').each(function () {
-        const item = {
-            productId: $(this).data('product-id'),
-            locationId: $(this).find('.location-select').val(),
-            quantity: parseInt($(this).find('.quantity').val()),
-            originalQuantity: parseInt($(this).find('.original-quantity').text())
-        };
+        const productId = $(this).data('product-id');
+        const locationSelect = $(this).find('.location-select');
+        const quantityInput = $(this).find('.quantity');
+        const locationId = locationSelect.val();
+        const quantity = parseInt(quantityInput.val());
 
-        if (!item.productId || !item.locationId || isNaN(item.quantity)) {
+        if (!locationId) {
+            errors.push('กรุณาเลือกคลังสินค้าสำหรับสินค้า ' + productId);
+            locationSelect.addClass('error-highlight');
             isValid = false;
-            Swal.fire('ข้อผิดพลาด', 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วน', 'error');
-            return false;
         }
 
-        var maxQuantity = parseInt($(this).find('.quantity').attr('max'));
-        if (item.quantity > maxQuantity) {
+        if (isNaN(quantity) || quantity < 1) {
+            errors.push('จำนวนต้องมากกว่า 0 สำหรับสินค้า ' + productId);
+            quantityInput.addClass('error-highlight');
             isValid = false;
-            Swal.fire('ข้อผิดพลาด', `สินค้า ${item.productId} ในคลัง ${item.locationId} มีจำนวนเกินกว่าที่มีในคลัง`, 'error');
-            return false;
-        }
-        if (!item.productId || !item.locationId || isNaN(item.quantity) || item.quantity < 1) {
-            isValid = false;
-            Swal.fire('ข้อผิดพลาด', 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วนและมีจำนวนอย่างน้อย 1', 'error');
-            return false;
         }
 
-        formData.items.push(item);
+        if (locationId && quantity > 0) {
+            hasItems = true;
+            formData.items.push({
+                productId: productId,
+                locationId: locationId,
+                quantity: quantity,
+                originalQuantity: parseInt($(this).find('.original-quantity').text())
+            });
+        }
     });
 
-    if (!isValid) return;
+    if (!hasItems) {
+        errors.push('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+        isValid = false;
+    }
 
-    if (formData.items.length === 0) {
-        Swal.fire('ข้อผิดพลาด', 'กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ', 'error');
+    if (!isValid) {
+        // แสดง Swal alert
+        Swal.fire({
+            title: 'ข้อผิดพลาด',
+            html: errors.join('<br>'),
+            icon: 'error',
+            confirmButtonText: 'ตกลง'
+        });
         return;
     }
 
+    // ถ้าทุกอย่างถูกต้อง ดำเนินการส่งข้อมูล
     console.log('Sending data:', formData);
 
     // แสดง loading
@@ -911,6 +943,7 @@ function updateProductSelectionStatus(productId) {
         }
     });
 
+    // ส่งข้อมูลไปยังเซิร์ฟเวอร์
     $.ajax({
         url: '../system/update_issue.php',
         type: 'POST',
@@ -1015,6 +1048,23 @@ function updateProductSelectionStatus(productId) {
             }
 
         });
+        $(document).on('change', '.error-highlight', function() {
+        $(this).removeClass('error-highlight');
+    });
+
+    $(document).on('input', '.error-highlight', function() {
+        $(this).removeClass('error-highlight');
+    });
+
+    // สำหรับ Select2 (ถ้าใช้)
+    $(document).on('select2:select', function(e) {
+        $(e.target).removeClass('error-highlight');
+    });
+
+    // สำหรับ location-select และ quantity
+    $(document).on('change', '.location-select, .quantity', function() {
+        $(this).removeClass('error-highlight');
+    });
     </script>
 </body>
 
