@@ -311,3 +311,235 @@
 
 )
 
+[07-Oct-2024 00:50:35 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-07
+    [issueType] => sale
+    [customerId] => 9
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 1
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 100
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[07-Oct-2024 00:50:35 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 1.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 00:50:35 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 1
+            [originalQuantity] => 1
+        )
+
+    [A002-LOC5670001] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 0
+        )
+
+)
+
+[07-Oct-2024 00:51:05 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-07
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 1
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 100
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[07-Oct-2024 00:51:05 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 1.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 00:51:05 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 1
+            [originalQuantity] => 1
+        )
+
+    [A002-LOC5670002] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670002
+            [quantity] => 100
+            [originalQuantity] => 0
+        )
+
+)
+
+[07-Oct-2024 00:51:25 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-07
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 100
+                    [originalQuantity] => 1
+                )
+
+        )
+
+)
+
+[07-Oct-2024 00:51:25 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 1.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 00:51:25 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 100
+            [originalQuantity] => 1
+        )
+
+)
+
+[07-Oct-2024 00:51:52 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-03
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 100
+                    [originalQuantity] => 100
+                )
+
+            [1] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[07-Oct-2024 00:51:52 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 100.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 00:51:52 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 100
+            [originalQuantity] => 100
+        )
+
+    [A003-LOC5670001] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 0
+        )
+
+)
+
