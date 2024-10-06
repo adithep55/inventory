@@ -7,7 +7,6 @@ requirePermission(['manage_issue']);
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
 define('FPDF_FONTPATH', '../assets/fpdf186/font/');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
