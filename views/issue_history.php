@@ -27,10 +27,13 @@ requirePermission(['manage_issue']);
         <div class="content container-fluid">
             <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
-                <div class="row">
-                    <div class="col">
-                        <h3 class="page-title">ประวัติการเบิกสินค้า</h3>
-                    </div>
+                <div class="page-title">
+                    <h4><i class="fas fa-history"></i> การเบิกสินค้า</h4>
+                    <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>/views/issue">เบิกสินค้า</a></li>
+                            <li class="breadcrumb-item active">จัดการประวัติการเบิกสินค้า</li>
+               </ul>
                 </div>
             </div>
 

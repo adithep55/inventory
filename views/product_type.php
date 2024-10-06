@@ -86,11 +86,17 @@ requirePermission(['manage_products']);
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
-            <div class="page-header">
-                <div class="row">
-                    <div class="col">
-                        <h3 class="page-title">จัดการหมวดหมู่และประเภทย่อย</h3>
-                    </div>
+    <div class="page-header">
+                <div class="page-title">
+                    <h4><i class="fas fa-folder-open"></i> หมวดหมู่และประเภทสินค้า</h4>
+                    <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>/views/productlist">รายการสินค้า</a></li>
+                            <li class="breadcrumb-item active">จัดการหมวดหมู่และประเภทสินค้า</li>
+               </ul>
+                </div>
+                <div class="page-btn">
+                    <a href="addproduct" class="btn btn-added"><img src="../assets/img/icons/plus.svg" alt="img" class="me-1">เพิ่มสินค้าใหม่</a>
                 </div>
             </div>
 

@@ -2,21 +2,18 @@
 require_once '../config/connect.php';
 require_once('../assets/fpdf186/fpdf.php');
 require_once '../config/permission.php';
-requirePermission(['manage_transfers']);
+requirePermission(['manage_receiving']);
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 define('FPDF_FONTPATH', '../assets/fpdf186/font/');
 
-if (!isset($_GET['id']) || empty($_GET['id'])) {
-    die('Transfer ID is required and must not be empty');
+if (!isset($_GET['id'])) {
+    die('Receive ID is required');
 }
 
-$transferId = intval($_GET['id']); 
-
-if ($transferId <= 0) {
-    die('Invalid Transfer ID');
-}
+$receiveId = $_GET['id'];
 
 // Fetch website settings
 function getWebsiteSettings($conn) {
@@ -26,35 +23,34 @@ function getWebsiteSettings($conn) {
 
 $settings = getWebsiteSettings($conn);
 
-// Fetch transfer data
+// Query to fetch receive details
 $query = "
 SELECT 
-    ht.transfer_header_id,
-    ht.bill_number,
-    ht.transfer_date,
-    u.fname AS transferer_fname,
-    u.lname AS transferer_lname,
-    l1.location AS from_location,
-    l2.location AS to_location,
-    dt.product_id,
+    hr.receive_header_id,
+    hr.bill_number,
+    hr.received_date,
+    u.fname AS receiver_fname,
+    u.lname AS receiver_lname,
+    d.product_id,
     p.name_th AS product_name,
-    dt.quantity,
-    p.unit
+    d.quantity,
+    p.unit,
+    l.location AS location_name,
+    hr.updated_at
 FROM 
-    h_transfer ht
-JOIN d_transfer dt ON ht.transfer_header_id = dt.transfer_header_id
-JOIN products p ON dt.product_id = p.product_id
-JOIN users u ON ht.user_id = u.UserID
-JOIN locations l1 ON ht.from_location_id = l1.location_id
-JOIN locations l2 ON ht.to_location_id = l2.location_id
-WHERE ht.transfer_header_id = :transfer_id
+    h_receive hr
+JOIN d_receive d ON hr.receive_header_id = d.receive_header_id
+JOIN products p ON d.product_id = p.product_id
+JOIN users u ON hr.user_id = u.UserID
+JOIN locations l ON d.location_id = l.location_id
+WHERE hr.receive_header_id = :receive_id
 ";
 
-$result = dd_q($query, [':transfer_id' => $transferId]);
-$transferData = $result->fetchAll(PDO::FETCH_ASSOC);
+$result = dd_q($query, [':receive_id' => $receiveId]);
+$receiveData = $result->fetchAll(PDO::FETCH_ASSOC);
 
-if (empty($transferData)) {
-    die('Transfer data not found');
+if (empty($receiveData)) {
+    die('Receive data not found');
 }
 
 class PDF extends FPDF
@@ -98,7 +94,7 @@ $pdf->AliasNbPages();
 $pdf->AddPage();
 
 $pdf->SetFont('THSarabunNew', 'B', 20);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'เอกสารการโอนย้ายสินค้า'), 0, 1, 'C');
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'เอกสารการรับสินค้า'), 0, 1, 'C');
 $pdf->SetLineWidth(0.1);
 $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
 $pdf->Ln(5);
@@ -106,34 +102,26 @@ $pdf->Ln(5);
 $pdf->SetFont('THSarabunNew', 'B', 14);
 $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เลขที่เอกสาร:'), 0);
 $pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, $transferData[0]['bill_number'], 0);
+$pdf->Cell(60, 10, $receiveData[0]['bill_number'], 0);
 $pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่โอนย้าย:'), 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่รับสินค้า:'), 0);
 $pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(0, 10, date('d/m/Y', strtotime($transferData[0]['transfer_date'])), 0, 1);
+$pdf->Cell(0, 10, date('d/m/Y', strtotime($receiveData[0]['received_date'])), 0, 1);
+
 $currentDate = date('d/m/Y H:i:s');
 
 $pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ผู้โอนย้าย:'), 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ผู้รับสินค้า:'), 0);
 $pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $transferData[0]['transferer_fname'] . ' ' . $transferData[0]['transferer_lname']), 0);
+$pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $receiveData[0]['receiver_fname'] . ' ' . $receiveData[0]['receiver_lname']), 0);
 $pdf->SetFont('THSarabunNew', 'B', 14);
 $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่พิมพ์เอกสาร:'), 0);
 $pdf->SetFont('THSarabunNew', '', 14);
 $pdf->Cell(0, 10, $currentDate, 0, 1);
 
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'จากคลัง:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $transferData[0]['from_location']), 0);
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ไปยังคลัง:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $transferData[0]['to_location']), 0, 1);
-
 $pdf->Ln(5);
 $pdf->SetFont('THSarabunNew', 'B', 16);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'รายการสินค้าที่โอนย้าย'), 0, 1, 'C');
+$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'รายการสินค้าที่รับ'), 0, 1, 'C');
 $pdf->SetLineWidth(0.1);
 $pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
 $pdf->Ln(2);
@@ -142,33 +130,35 @@ $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('THSarabunNew', 'B', 14);
 $pdf->Cell(15, 10, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
 $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
-$pdf->Cell(75, 10, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
-$pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+$pdf->Cell(65, 10, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
+$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+$pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'สถานที่จัดเก็บ'), 1, 0, 'C', true);
 $pdf->Ln();
 
 $pdf->SetFont('THSarabunNew', '', 14);
 $total = 0;
 $i = 1;
-foreach ($transferData as $item) {
+foreach ($receiveData as $item) {
     $pdf->Cell(15, 10, $i, 1, 0, 'C');
     $pdf->Cell(30, 10, $item['product_id'], 1, 0, 'C');
-    $pdf->Cell(75, 10, iconv('UTF-8', 'cp874', $item['product_name']), 1);
-    $pdf->Cell(30, 10, number_format($item['quantity'], 2), 1, 0, 'R');
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'C');
+    $pdf->Cell(65, 10, iconv('UTF-8', 'cp874', $item['product_name']), 1);
+    $pdf->Cell(25, 10, number_format($item['quantity'], 2), 1, 0, 'R');
+    $pdf->Cell(25, 10, iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'C');
+    $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', $item['location_name']), 1, 0, 'C');
     $pdf->Ln();
     $total += $item['quantity'];
     $i++;
 }
 
 $pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(120, 10, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
-$pdf->Cell(30, 10, number_format($total, 2), 1, 0, 'R', true);
-$pdf->Cell(40, 10, '', 1, 0, 'C', true);
+$pdf->Cell(110, 10, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
+$pdf->Cell(25, 10, number_format($total, 2), 1, 0, 'R', true);
+$pdf->Cell(55, 10, '', 1, 0, 'C', true);
 $pdf->Ln(20);
 
 $pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้โอนย้ายสินค้า'), 0, 0, 'C');
+$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้จัดทำเอกสาร'), 0, 0, 'C');
 $pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้รับสินค้า'), 0, 0, 'C');
 $pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้ตรวจสอบ'), 0, 1, 'C');
 $pdf->Ln(5);
@@ -180,5 +170,5 @@ $pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../......
 $pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 0, 'C');
 $pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 1, 'C');
 
-$pdf->Output('I', 'transfer_report.pdf');
+$pdf->Output('I', 'receive_report.pdf');
 ?>

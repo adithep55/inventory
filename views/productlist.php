@@ -27,11 +27,11 @@ requirePermission(['manage_products']);
             <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="page-title">
-                    <h4>รายการสินค้า</h4>
+                    <h4><i class="fas fa-barcode"></i> รายการสินค้า</h4>
                     <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">จัดการสินค้าของคุณ</li>
-                        </ul>
+               </ul>
                 </div>
                 <div class="page-btn">
                     <a href="addproduct" class="btn btn-added"><img src="../assets/img/icons/plus.svg" alt="img" class="me-1">เพิ่มสินค้าใหม่</a>

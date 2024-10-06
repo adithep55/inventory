@@ -26,11 +26,14 @@ requirePermission(['manage_receiving']);
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
-            <div class="page-header">
-                <div class="row">
-                    <div class="col">
-                        <h3 class="page-title">ประวัติการรับสินค้า</h3>
-                    </div>
+    <div class="page-header">
+                <div class="page-title">
+                    <h4><i class="fas fa-history"></i> การรับสินค้า</h4>
+                    <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>/views/recieve">รับสินค้า</a></li>
+                            <li class="breadcrumb-item active">จัดการประวัติการรับสินค้า</li>
+               </ul>
                 </div>
             </div>
 
@@ -112,6 +115,23 @@ $(document).ready(function () {
             }
         ],
         order: [[1, 'desc']]
+        ,
+            "language": {
+                "emptyTable": "ไม่พบข้อมูลสินค้า",
+                "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                "lengthMenu": "แสดง _MENU_ รายการ",
+                "search": "ค้นหา:",
+                "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                "paginate": {
+                    "first": "หน้าแรก",
+                    "last": "หน้าสุดท้าย",
+                    "next": "ถัดไป",
+                    "previous": "ก่อนหน้า"
+                }
+            }
+
     });
 
     // Handle "Select All" checkbox

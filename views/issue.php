@@ -30,9 +30,9 @@ requirePermission(['manage_issue']);
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">เบิกสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-cart-arrow-down" ></i> เบิกสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">เบิกสินค้า</li>
                         </ul>
                     </div>

@@ -2,7 +2,6 @@
 require_once '../config/connect.php';
 require_once '../config/permission.php';
 requirePermission(['manage_receiving']);
-
 function exception_handler($exception) {
     http_response_code(500);
     echo json_encode([
@@ -29,7 +28,8 @@ try {
                            CASE 
                                WHEN h.is_opening_balance = 1 THEN 'ยอดยกมา'
                                ELSE 'ปกติ'
-                           END AS status
+                           END AS status,
+                           h.updated_at
                     FROM h_receive h
                     JOIN users u ON h.user_id = u.UserID
                     WHERE h.receive_header_id = :receive_id";
@@ -64,6 +64,7 @@ try {
             'full_name' => $headerDetails['fname'] . ' ' . $headerDetails['lname'],
             'status' => $headerDetails['status'],
             'is_opening_balance' => $headerDetails['is_opening_balance'],
+            'updated_at' => $headerDetails['updated_at'],
             'items' => $items
         ]
     ];
