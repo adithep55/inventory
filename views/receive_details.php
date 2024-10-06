@@ -29,10 +29,10 @@ requirePermission(['manage_receiving']);
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">การรับสินค้า</h3>
+                     <h3 class="page-title"><i class="fas fa-edit"></i> การรับสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item"><a href="receive_list.php">รับสินค้า</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>/views/recieve">รับสินค้า</a></li>
                             <li class="breadcrumb-item active">รายละเอียดการรับสินค้า</li>
                         </ul>
                     </div>

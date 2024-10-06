@@ -16,7 +16,11 @@ function exception_handler($exception) {
 }
 set_exception_handler('exception_handler');
 
-
+function formatThaiDate($date) {
+    $date = new DateTime($date);
+    $year = $date->format('Y') + 543;
+    return $date->format('d-m-') . $year;
+}
 
 try {
     $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
@@ -60,8 +64,10 @@ try {
     $stmt->execute();
     $receives = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fetch items for each receive
+    // Fetch items for each receive and format date
     foreach ($receives as &$receive) {
+        $receive['received_date'] = formatThaiDate($receive['received_date']);
+
         $itemQuery = "SELECT p.name_th, d.quantity, p.unit
                       FROM d_receive d
                       JOIN products p ON d.product_id = p.product_id

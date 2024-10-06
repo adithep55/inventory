@@ -4,6 +4,7 @@ require_once '../config/permission.php';
 requirePermission(['manage_issue']);
 
 header('Content-Type: application/json');
+
 function exception_handler($exception)
 {
     http_response_code(500);
@@ -17,7 +18,12 @@ function exception_handler($exception)
 }
 set_exception_handler('exception_handler');
 
-
+function formatFullDate($date)
+{
+    $dateTime = new DateTime($date);
+    $thai_year = (int)$dateTime->format('Y') + 543;
+    return $dateTime->format('d-m-') . $thai_year;
+}
 
 try {
     $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
@@ -84,6 +90,9 @@ JOIN users u ON h.user_id = u.UserID";
             $itemsText .= ' และอื่นๆ';
         }
         $issue['items'] = $itemsText;
+
+        // Format the issue_date
+        $issue['issue_date'] = formatFullDate($issue['issue_date']);
     }
 
     echo json_encode([

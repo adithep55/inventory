@@ -2,6 +2,7 @@
 require_once '../config/connect.php';
 require_once '../config/permission.php';
 requirePermission(['manage_receiving']);
+
 function exception_handler($exception) {
     http_response_code(500);
     echo json_encode([
@@ -16,6 +17,18 @@ set_exception_handler('exception_handler');
 
 header('Content-Type: application/json');
 
+function formatFullDate($date) {
+    $date_parts = explode('-', $date);
+    $thai_year = (int)$date_parts[0] + 543;
+    return $date_parts[2] . '-' . $date_parts[1] . '-' . $thai_year;
+}
+
+function formatFullDateTime($dateTime) {
+    $dateTimeObj = new DateTime($dateTime);
+    $thai_year = (int)$dateTimeObj->format('Y') + 543;
+    return $dateTimeObj->format('d-m-') . $thai_year . ' ' . $dateTimeObj->format('H:i:s');
+}
+
 try {
     if (!isset($_GET['id']) || empty($_GET['id'])) {
         throw new Exception('Receive ID is required');
@@ -23,7 +36,7 @@ try {
 
     $receiveId = intval($_GET['id']);
 
-    $headerQuery = "SELECT h.receive_header_id, h.bill_number, DATE_FORMAT(h.received_date, '%Y-%m-%d') AS formatted_received_date, 
+    $headerQuery = "SELECT h.receive_header_id, h.bill_number, h.received_date, 
                            u.Username AS user_name, u.fname, u.lname, h.is_opening_balance,
                            CASE 
                                WHEN h.is_opening_balance = 1 THEN 'ยอดยกมา'
@@ -59,12 +72,12 @@ try {
         'data' => [
             'receive_header_id' => $headerDetails['receive_header_id'],
             'bill_number' => $headerDetails['bill_number'],
-            'received_date' => $headerDetails['formatted_received_date'],
+            'received_date' => formatFullDate($headerDetails['received_date']),
             'user_name' => $headerDetails['user_name'],
             'full_name' => $headerDetails['fname'] . ' ' . $headerDetails['lname'],
             'status' => $headerDetails['status'],
             'is_opening_balance' => $headerDetails['is_opening_balance'],
-            'updated_at' => $headerDetails['updated_at'],
+            'updated_at' => formatFullDateTime($headerDetails['updated_at']),
             'items' => $items
         ]
     ];

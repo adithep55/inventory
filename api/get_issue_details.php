@@ -12,6 +12,20 @@ if (!isset($_GET['id'])) {
 
 $issueId = intval($_GET['id']);
 
+function formatFullDate($date)
+{
+    $dateTime = new DateTime($date);
+    $thai_year = (int)$dateTime->format('Y') + 543;
+    return $dateTime->format('d-m-') . $thai_year;
+}
+
+function formatFullDateTime($dateTime)
+{
+    $dateTimeObj = new DateTime($dateTime);
+    $thai_year = (int)$dateTimeObj->format('Y') + 543;
+    return $dateTimeObj->format('d-m-') . $thai_year . ' ' . $dateTimeObj->format('H:i:s');
+}
+
 try {
     // Fetch issue header information
     $headerQuery = "SELECT h.bill_number, h.issue_date, h.issue_type,
@@ -37,8 +51,9 @@ try {
         exit;
     }
 
-    // Format the updated_at timestamp
-    $header['updated_at'] = date('Y-m-d H:i:s', strtotime($header['updated_at']));
+    // Format the issue_date and updated_at timestamp
+    $header['issue_date'] = formatFullDate($header['issue_date']);
+    $header['updated_at'] = formatFullDateTime($header['updated_at']);
 
     // Fetch issue items
     $itemsQuery = "SELECT d.product_id, p.name_th as product_name, d.quantity, p.unit, 

@@ -17,7 +17,6 @@ requirePermission(['manage_issue']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
 </head>
 
 <body>
@@ -146,10 +145,9 @@ requirePermission(['manage_issue']);
     <script src="../assets/js/dataTables.bootstrap4.min.js"></script>
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/plugins/select2/js/select2.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="../assets/js/script.js"></script>
-    <script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         .error-highlight {
@@ -286,6 +284,22 @@ function initializeProductTable() {
             { data: 'unit' }
         ],
         order: [[2, 'asc']]
+        ,
+                    "language": {
+                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+                        "emptyTable": "ไม่พบข้อมูลสินค้า",
+                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                        "search": "ค้นหา:",
+                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                        "paginate": {
+                            "first": "หน้าแรก",
+                            "last": "หน้าสุดท้าย",
+                            "next": "ถัดไป",
+                            "previous": "ก่อนหน้า"
+                        }
+                    }
     });
 }
 
@@ -356,8 +370,7 @@ function initializeProductTable() {
         $('<td>').append($('<input>').attr({
             type: 'number',
             class: 'form-control quantity',
-            value: 1,
-            min: 1,
+            value: "",
             max: locationSelect.find('option:first').data('quantity'),
             required: true
         })),
@@ -472,21 +485,21 @@ function initializeProductTable() {
                     isValid = false;
                 } else {
                     $('#issueTable tbody tr').each(function () {
-                        var locationSelect = $(this).find('.location-select');
-                        var quantityInput = $(this).find('.quantity');
+        var locationSelect = $(this).find('.location-select');
+        var quantityInput = $(this).find('.quantity');
 
-                        if (!locationSelect.val()) {
-                            locationSelect.addClass('error-highlight');
-                            errorMessage += 'กรุณาเลือกคลังสินค้าสำหรับทุกรายการ<br>';
-                            isValid = false;
-                        }
+        if (!locationSelect.val()) {
+            locationSelect.addClass('error-highlight');
+            errorMessage += 'กรุณาเลือกคลังสินค้าสำหรับทุกรายการ<br>';
+            isValid = false;
+        }
 
-                        if (!quantityInput.val() || parseInt(quantityInput.val()) < 1) {
-                            quantityInput.addClass('error-highlight');
-                            errorMessage += 'กรุณาระบุจำนวนที่ถูกต้องสำหรับทุกรายการ<br>';
-                            isValid = false;
-                        }
-                    });
+        if (quantityInput.val() === '' || isNaN(parseInt(quantityInput.val())) || parseInt(quantityInput.val()) <= 0) {
+            quantityInput.addClass('error-highlight');
+            errorMessage += 'กรุณาระบุจำนวนที่ถูกต้อง (มากกว่า 0) สำหรับทุกรายการ<br>';
+            isValid = false;
+        }
+    });
                 }
 
                 if (!isValid) {
@@ -566,20 +579,28 @@ function initializeProductTable() {
 
             // ป้องกันการใส่จำนวนที่ไม่ถูกต้องในช่องจำนวน
             $(document).on('input', '.quantity', function () {
-                var max = parseInt($(this).attr('max'));
-                var value = parseInt($(this).val());
-                if (isNaN(value) || value < 1) {
-                    $(this).val(1);
-                } else if (value > max) {
-                    $(this).val(max);
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'เกินจำนวนคงเหลือ',
-                        text: 'จำนวนที่เบิกไม่สามารถเกินจำนวนคงเหลือได้',
-                        confirmButtonText: 'ตกลง'
-                    });
-                }
-            });
+    var max = parseInt($(this).attr('max'));
+    var value = $(this).val();
+
+    if (value === '') {
+        // ให้ค่าว่างได้
+        return;
+    }
+
+    value = parseInt(value);
+
+    if (isNaN(value) || value < 0) {
+        $(this).val('');
+    } else if (value > max) {
+        $(this).val(max);
+        Swal.fire({
+            icon: 'warning',
+            title: 'เกินจำนวนคงเหลือ',
+            text: 'จำนวนที่เบิกไม่สามารถเกินจำนวนคงเหลือได้',
+            confirmButtonText: 'ตกลง'
+        });
+    }
+});
 
             // รีเซ็ตไฮไลท์เมื่อผู้ใช้แก้ไขข้อมูล
             $(document).on('change', '.form-control', function () {
