@@ -510,8 +510,25 @@ $(document).ready(function() {
                         { data: 'unit' }
                     ],
                     order: [[2, 'asc']],
+                    
                     drawCallback: function (settings) {
                         updateAllProductSelectionStatus();
+                    }
+                    ,
+                    "language": {
+                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+                        "emptyTable": "ไม่พบข้อมูลสินค้า",
+                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                        "search": "ค้นหา:",
+                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                        "paginate": {
+                            "first": "หน้าแรก",
+                            "last": "หน้าสุดท้าย",
+                            "next": "ถัดไป",
+                            "previous": "ก่อนหน้า"
+                        }
                     }
                 });
             }
@@ -571,11 +588,11 @@ function addProductToIssueTable(product, isExisting = false) {
             $('<td>').append(locationSelect),
             $('<td>').append($('<input>').attr({
                 type: 'number',
-                class: 'form-control quantity',
-                value: originalQuantity,
-                min: 0,
-                max: maxQuantity,
-                required: true
+        class: 'form-control quantity',
+        value: originalQuantity,
+        min: 1,  // เปลี่ยนจาก 0 เป็น 1
+        max: maxQuantity,
+        required: true
             })),
             $('<td>').addClass('original-quantity').text(originalQuantity),
             $('<td>').text(product.unit),
@@ -627,10 +644,17 @@ $('#issueTable').on('input', '.quantity', function () {
     var row = $(this).closest('tr');
     var productId = row.data('product-id');
     var max = parseInt($(this).attr('max'));
-    var value = parseInt($(this).val());
+    var value = $(this).val();
 
-    if (isNaN(value) || value < 0) {
-        $(this).val(0);
+    if (value === '') {
+        // อนุญาตให้ช่องว่างชั่วคราว
+        return;
+    }
+
+    value = parseInt(value);
+
+    if (isNaN(value) || value < 1) {
+        $(this).val(1);
     } else if (value > max) {
         $(this).val(max);
         Swal.fire({
@@ -643,6 +667,13 @@ $('#issueTable').on('input', '.quantity', function () {
 
     updateAvailableLocations(productId);
 });
+$('#issueTable').on('blur', '.quantity', function () {
+    var value = $(this).val();
+    if (value === '' || parseInt(value) < 1) {
+        $(this).val(1);
+    }
+});
+
 
 function updateAvailableLocations(productId) {
     console.log('Updating available locations for product:', productId);
@@ -849,6 +880,11 @@ function updateProductSelectionStatus(productId) {
         if (item.quantity > maxQuantity) {
             isValid = false;
             Swal.fire('ข้อผิดพลาด', `สินค้า ${item.productId} ในคลัง ${item.locationId} มีจำนวนเกินกว่าที่มีในคลัง`, 'error');
+            return false;
+        }
+        if (!item.productId || !item.locationId || isNaN(item.quantity) || item.quantity < 1) {
+            isValid = false;
+            Swal.fire('ข้อผิดพลาด', 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วนและมีจำนวนอย่างน้อย 1', 'error');
             return false;
         }
 
