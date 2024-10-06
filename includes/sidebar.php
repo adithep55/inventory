@@ -89,7 +89,6 @@
                         <a href="javascript:void(0);"><img src="../assets/img/icons/time.svg" alt="img"><span> รายงาน</span> <span class="menu-arrow"></span></a>
                         <ul>
                             <li><a href="<?php echo base_url();?>/report/product_movement" <?php echo (basename($_SERVER['PHP_SELF']) == 'product_movement.php') ? 'class="active"' : ''; ?>>รายงานสินค้าเคลื่อนไหว</a></li>
-                            <li><a href="<?php echo base_url();?>/report/inventory_summary" <?php echo (basename($_SERVER['PHP_SELF']) == 'inventory_summary.php') ? 'class="active"' : ''; ?>>รายงานสินค้าคงเหลือ</a></li>
                         </ul>
                     </li>
 
