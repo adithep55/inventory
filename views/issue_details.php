@@ -24,8 +24,8 @@ requirePermission(['manage_issue']);
     <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-    <div class="content container-fluid">
-    <?php require_once '../includes/notification.php'; ?>
+        <div class="content container-fluid">
+            <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
@@ -39,25 +39,24 @@ requirePermission(['manage_issue']);
                 </div>
             </div>
 
-           <div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="card-title">
-                        <i class="fas fa-info-circle mr-2"></i> ข้อมูลการเบิกสินค้า
-                    </h4>
-                    <div class="wordset">
-                        <ul class="list-inline mb-0">
-                            <li class="list-inline-item">
-                                <a id="pdfButton" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
-                                    <img src="../assets/img/icons/pdf.svg" alt="PDF">
-                                </a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h4 class="card-title">
+                                    <i class="fas fa-info-circle mr-2"></i> ข้อมูลการเบิกสินค้า
+                                </h4>
+                                <div class="wordset">
+                                    <ul class="list-inline mb-0">
+                                        <li class="list-inline-item">
+                                            <a id="pdfButton" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
+                                                <img src="../assets/img/icons/pdf.svg" alt="PDF">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -68,10 +67,9 @@ requirePermission(['manage_issue']);
                                         <label><i class="fas fa-calendar-alt mr-2"></i>  วันที่เบิกสินค้า</label>
                                         <input type="text" class="form-control" id="issueDate" readonly>
                                     </div>
-
                                     <div class="form-group">
-                                        <label id="customerProjectLabel"></label>
-                                        <input type="text" class="form-control" id="customerProject" readonly>
+                                        <label><i class="fas fa-tags mr-2"></i>  ประเภทการเบิก</label>
+                                        <input type="text" class="form-control" id="issueType" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -80,21 +78,107 @@ requirePermission(['manage_issue']);
                                         <input type="text" class="form-control" id="requesterName" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label><i class="fas fa-tags mr-2"></i>  ประเภทการเบิก</label>
-                                        <input type="text" class="form-control" id="issueType" readonly>
-                                    </div>
-                                    <div class="form-group">
                                         <label><i class="fas fa-clock mr-2"></i>  เวลาอัพเดตล่าสุด</label>
                                         <input type="text" class="form-control" id="updatedAt" readonly>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
                 </div>
             </div>
 
+          <!-- ส่วนข้อมูลลูกค้า -->
+<div class="row" id="customerDetails" style="display: none;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-user mr-2"></i> ข้อมูลลูกค้า</span>
+                    <button id="toggleCustomerDetails" class="btn btn-primary btn-sm">
+                        <i class="fas fa-chevron-down"></i> แสดงข้อมูลเพิ่มเติม
+                    </button>
+                </h4>
+                <div id="customerDetailsContent" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>ชื่อลูกค้า</label>
+                                <input type="text" class="form-control" id="customerName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>ที่อยู่</label>
+                                <textarea class="form-control" id="customerAddress" rows="3" readonly></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>เบอร์โทรศัพท์</label>
+                                <input type="text" class="form-control" id="customerPhone" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>เลขประจำตัวผู้เสียภาษี</label>
+                                <input type="text" class="form-control" id="customerTaxId" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>ผู้ติดต่อ</label>
+                                <input type="text" class="form-control" id="customerContactPerson" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>วงเงินเครดิต</label>
+                                <input type="text" class="form-control" id="customerCreditLimit" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>เงื่อนไขเครดิต</label>
+                                <input type="text" class="form-control" id="customerCreditTerms" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ส่วนข้อมูลโครงการ -->
+<div class="row" id="projectDetails" style="display: none;">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-project-diagram mr-2"></i> ข้อมูลโครงการ</span>
+                    <button id="toggleProjectDetails" class="btn btn-primary btn-sm">
+                        <i class="fas fa-chevron-down"></i> แสดงข้อมูลเพิ่มเติม
+                    </button>
+                </h4>
+                <div id="projectDetailsContent" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>ชื่อโครงการ</label>
+                                <input type="text" class="form-control" id="projectName" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>รายละเอียดโครงการ</label>
+                                <textarea class="form-control" id="projectDescription" rows="3" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>วันที่เริ่มต้น</label>
+                                <input type="text" class="form-control" id="projectStartDate" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>วันที่สิ้นสุด</label>
+                                <input type="text" class="form-control" id="projectEndDate" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
@@ -149,7 +233,7 @@ $(document).ready(function() {
     if (issueId) {
         loadIssueDetails(issueId);
     } else {
-        alert('ไม่พบรหัสการเบิกสินค้า');
+        showAlert('ไม่พบรหัสการเบิกสินค้า', 'error');
     }
 
     // PDF button
@@ -158,7 +242,7 @@ $(document).ready(function() {
         if (issueId) {
             window.open(`../report/generate_issue_report.php?id=${issueId}`, '_blank');
         } else {
-            alert('ไม่พบรหัสการเบิกสินค้า');
+            showAlert('ไม่พบรหัสการเบิกสินค้า', 'error');
         }
     });
 
@@ -172,11 +256,11 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     displayIssueDetails(response.data);
                 } else {
-                    alert('เกิดข้อผิดพลาด: ' + response.message);
+                    showAlert('เกิดข้อผิดพลาด: ' + response.message, 'error');
                 }
             },
             error: function() {
-                alert('ไม่สามารถโหลดข้อมูลได้');
+                showAlert('ไม่สามารถโหลดข้อมูลได้', 'error');
             }
         });
     }
@@ -185,15 +269,30 @@ $(document).ready(function() {
         $('#billNumber').val(data.bill_number);
         $('#issueDate').val(data.issue_date);
         $('#issueType').val(data.issue_type === 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ');
-        $('#requesterName').val(data.user_name);
+        $('#requesterName').val(data.full_name);
         $('#updatedAt').val(data.updated_at);
         
         if (data.issue_type === 'sale') {
-            $('#customerProjectLabel').html('<i class="fas fa-user mr-2"></i>  ลูกค้า');
-            $('#customerProject').val(data.customer_name);
+            $('#customerDetails').show();
+            $('#projectDetails').hide();
+            if (data.customer_details) {
+                $('#customerName').val(data.customer_details.name);
+                $('#customerAddress').val(data.customer_details.address);
+                $('#customerPhone').val(data.customer_details.phone_number);
+                $('#customerTaxId').val(data.customer_details.tax_id);
+                $('#customerContactPerson').val(data.customer_details.contact_person || '-');
+                $('#customerCreditLimit').val(data.customer_details.credit_limit);
+                $('#customerCreditTerms').val(data.customer_details.credit_terms);
+            }
         } else {
-            $('#customerProjectLabel').html('<i class="fas fa-project-diagram mr-2"></i>  โครงการ');
-            $('#customerProject').val(data.project_name);
+            $('#customerDetails').hide();
+            $('#projectDetails').show();
+            if (data.project_details) {
+                $('#projectName').val(data.project_details.project_name);
+                $('#projectDescription').val(data.project_details.project_description);
+                $('#projectStartDate').val(data.project_details.start_date);
+                $('#projectEndDate').val(data.project_details.end_date);
+            }
         }
 
         const itemsTable = $('#issueItemsTable tbody');
@@ -211,7 +310,37 @@ $(document).ready(function() {
             `);
         });
     }
+
+    function showAlert(message, icon) {
+        Swal.fire({
+            text: message,
+            icon: icon,
+            confirmButtonText: 'ตกลง'
+        });
+    }
 });
+ // ฟังก์ชันสำหรับสลับการแสดง/ซ่อนข้อมูล
+ function toggleDetails(contentId, buttonId) {
+        $(`#${contentId}`).slideToggle();
+        var $button = $(`#${buttonId}`);
+        var $icon = $button.find('i');
+        if ($icon.hasClass('fa-chevron-down')) {
+            $icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+            $button.html('<i class="fas fa-chevron-up"></i> ซ่อนข้อมูลเพิ่มเติม');
+        } else {
+            $icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+            $button.html('<i class="fas fa-chevron-down"></i> แสดงข้อมูลเพิ่มเติม');
+        }
+    }
+      // การจัดการการคลิกปุ่มแสดง/ซ่อนข้อมูลลูกค้า
+      $('#toggleCustomerDetails').click(function() {
+        toggleDetails('customerDetailsContent', 'toggleCustomerDetails');
+    });
+
+    // การจัดการการคลิกปุ่มแสดง/ซ่อนข้อมูลโครงการ
+    $('#toggleProjectDetails').click(function() {
+        toggleDetails('projectDetailsContent', 'toggleProjectDetails');
+    });
 </script>
 </body>
 

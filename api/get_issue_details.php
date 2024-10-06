@@ -28,17 +28,11 @@ function formatFullDateTime($dateTime)
 
 try {
     // Fetch issue header information
-    $headerQuery = "SELECT h.bill_number, h.issue_date, h.issue_type,
-                           u.Username as user_name,
-                           h.updated_at,
-                           CASE 
-                               WHEN h.issue_type = 'sale' THEN c.name
-                               ELSE p.project_name
-                           END as customer_project_name
+    $headerQuery = "SELECT h.bill_number, h.issue_date, h.issue_type, h.customer_id, h.project_id,
+                           u.Username as user_name, u.fname, u.lname,
+                           h.updated_at
                     FROM h_issue h
                     JOIN users u ON h.user_id = u.UserID
-                    LEFT JOIN customers c ON h.customer_id = c.customer_id
-                    LEFT JOIN projects p ON h.project_id = p.project_id
                     WHERE h.issue_header_id = :id";
 
     $stmt = $conn->prepare($headerQuery);
@@ -55,17 +49,38 @@ try {
     $header['issue_date'] = formatFullDate($header['issue_date']);
     $header['updated_at'] = formatFullDateTime($header['updated_at']);
 
+    // Fetch customer or project details based on issue type
+    if ($header['issue_type'] === 'sale') {
+        $customerQuery = "SELECT c.name, c.address, c.phone_number, c.tax_id, c.contact_person, c.credit_limit, c.credit_terms
+                          FROM customers c
+                          WHERE c.customer_id = :customer_id";
+        $stmt = $conn->prepare($customerQuery);
+        $stmt->bindParam(':customer_id', $header['customer_id'], PDO::PARAM_INT);
+        $stmt->execute();
+        $customerDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+        $header['customer_details'] = $customerDetails;
+    } else {
+        $projectQuery = "SELECT p.project_name, p.project_description, p.start_date, p.end_date
+                         FROM projects p
+                         WHERE p.project_id = :project_id";
+        $stmt = $conn->prepare($projectQuery);
+        $stmt->bindParam(':project_id', $header['project_id'], PDO::PARAM_INT);
+        $stmt->execute();
+        $projectDetails = $stmt->fetch(PDO::FETCH_ASSOC);
+        $header['project_details'] = $projectDetails;
+    }
+
     // Fetch issue items
     $itemsQuery = "SELECT d.product_id, p.name_th as product_name, d.quantity, p.unit, 
-    l.location_id, l.location as location_name,
-    (SELECT GROUP_CONCAT(CONCAT(l2.location_id, ':', l2.location, ':', COALESCE(i.quantity, 0)) SEPARATOR '|')
-     FROM locations l2
-     LEFT JOIN inventory i ON i.product_id = d.product_id AND i.location_id = l2.location_id
-    ) as all_locations
-    FROM d_issue d
-    JOIN products p ON d.product_id = p.product_id
-    JOIN locations l ON d.location_id = l.location_id
-    WHERE d.issue_header_id = :id";
+                   l.location_id, l.location as location_name,
+                   (SELECT GROUP_CONCAT(CONCAT(l2.location_id, ':', l2.location, ':', COALESCE(i.quantity, 0)) SEPARATOR '|')
+                    FROM locations l2
+                    LEFT JOIN inventory i ON i.product_id = d.product_id AND i.location_id = l2.location_id
+                   ) as all_locations
+                   FROM d_issue d
+                   JOIN products p ON d.product_id = p.product_id
+                   JOIN locations l ON d.location_id = l.location_id
+                   WHERE d.issue_header_id = :id";
 
     $stmt = $conn->prepare($itemsQuery);
     $stmt->bindParam(':id', $issueId, PDO::PARAM_INT);
@@ -96,12 +111,18 @@ try {
             'issue_date' => $header['issue_date'],
             'issue_type' => $header['issue_type'],
             'user_name' => $header['user_name'],
+            'full_name' => $header['fname'] . ' ' . $header['lname'],
             'updated_at' => $header['updated_at'],
-            'customer_name' => $header['issue_type'] === 'sale' ? $header['customer_project_name'] : null,
-            'project_name' => $header['issue_type'] === 'project' ? $header['customer_project_name'] : null,
             'items' => $items
         ]
     ];
+
+    // Add customer or project details to the response
+    if ($header['issue_type'] === 'sale') {
+        $response['data']['customer_details'] = $header['customer_details'];
+    } else {
+        $response['data']['project_details'] = $header['project_details'];
+    }
 
     echo json_encode($response);
 } catch (PDOException $e) {
