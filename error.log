@@ -543,3 +543,964 @@
 
 )
 
+[07-Oct-2024 01:19:26 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670006
+    [issueDate] => 2024-10-07
+    [issueType] => sale
+    [customerId] => 8
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [2] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [3] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 40
+                    [originalQuantity] => 40
+                )
+
+            [4] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 40
+                    [originalQuantity] => 40
+                )
+
+            [5] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [6] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670001
+                    [quantity] => 40
+                    [originalQuantity] => 0
+                )
+
+            [7] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 0
+                )
+
+            [8] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670001
+                    [quantity] => 30
+                    [originalQuantity] => 0
+                )
+
+            [9] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 25
+                    [originalQuantity] => 0
+                )
+
+            [10] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 0
+                )
+
+            [11] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670002
+                    [quantity] => 11
+                    [originalQuantity] => 0
+                )
+
+            [12] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670001
+                    [quantity] => 11
+                    [originalQuantity] => 0
+                )
+
+            [13] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 15
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[07-Oct-2024 01:19:26 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+    [1] => Array
+        (
+            [product_id] => A001
+            [quantity] => 40.00
+            [location_id] => LOC5670002
+        )
+
+    [2] => Array
+        (
+            [product_id] => A002
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+    [3] => Array
+        (
+            [product_id] => A002
+            [quantity] => 40.00
+            [location_id] => LOC5670002
+        )
+
+    [4] => Array
+        (
+            [product_id] => A003
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [5] => Array
+        (
+            [product_id] => A003
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 01:19:26 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A002-LOC5670001] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A003-LOC5670001] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A001-LOC5670002] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670002
+            [quantity] => 40
+            [originalQuantity] => 40
+        )
+
+    [A002-LOC5670002] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670002
+            [quantity] => 40
+            [originalQuantity] => 40
+        )
+
+    [A003-LOC5670002] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [AA005-LOC5670001] => Array
+        (
+            [productId] => AA005
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 0
+        )
+
+    [A011-LOC5670001] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670001
+            [quantity] => 11
+            [originalQuantity] => 0
+        )
+
+    [A004-LOC5670002] => Array
+        (
+            [productId] => A004
+            [locationId] => LOC5670002
+            [quantity] => 15
+            [originalQuantity] => 0
+        )
+
+    [A010-LOC5670001] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 0
+        )
+
+    [A010-LOC5670002] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670002
+            [quantity] => 11
+            [originalQuantity] => 0
+        )
+
+)
+
+[07-Oct-2024 01:20:13 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670006
+    [issueDate] => 2024-10-04
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [2] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 50
+                    [originalQuantity] => 50
+                )
+
+            [3] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 40
+                    [originalQuantity] => 40
+                )
+
+            [4] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 40
+                    [originalQuantity] => 40
+                )
+
+            [5] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [6] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670001
+                    [quantity] => 40
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[07-Oct-2024 01:20:13 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+    [1] => Array
+        (
+            [product_id] => A001
+            [quantity] => 40.00
+            [location_id] => LOC5670002
+        )
+
+    [2] => Array
+        (
+            [product_id] => A002
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+    [3] => Array
+        (
+            [product_id] => A002
+            [quantity] => 40.00
+            [location_id] => LOC5670002
+        )
+
+    [4] => Array
+        (
+            [product_id] => A003
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [5] => Array
+        (
+            [product_id] => A003
+            [quantity] => 50.00
+            [location_id] => LOC5670001
+        )
+
+)
+
+[07-Oct-2024 01:20:13 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A002-LOC5670001] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A003-LOC5670001] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670001
+            [quantity] => 50
+            [originalQuantity] => 50
+        )
+
+    [A001-LOC5670002] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670002
+            [quantity] => 40
+            [originalQuantity] => 40
+        )
+
+    [A002-LOC5670002] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670002
+            [quantity] => 40
+            [originalQuantity] => 40
+        )
+
+    [A003-LOC5670002] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A011-LOC5670001] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670001
+            [quantity] => 40
+            [originalQuantity] => 0
+        )
+
+)
+
+[07-Oct-2024 01:23:31 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670007
+    [issueDate] => 2024-10-02
+    [issueType] => sale
+    [customerId] => 8
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [1] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [2] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [3] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [4] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [5] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [6] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [7] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [8] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [9] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+        )
+
+)
+
+[07-Oct-2024 01:23:31 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [1] => Array
+        (
+            [product_id] => A001
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [2] => Array
+        (
+            [product_id] => A002
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [3] => Array
+        (
+            [product_id] => A003
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [4] => Array
+        (
+            [product_id] => A003
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [5] => Array
+        (
+            [product_id] => A004
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [6] => Array
+        (
+            [product_id] => A004
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [7] => Array
+        (
+            [product_id] => A010
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [8] => Array
+        (
+            [product_id] => A010
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [9] => Array
+        (
+            [product_id] => A011
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [10] => Array
+        (
+            [product_id] => A011
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [11] => Array
+        (
+            [product_id] => AA005
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [12] => Array
+        (
+            [product_id] => AA005
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+)
+
+[07-Oct-2024 01:23:31 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A003-LOC5670001] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A010-LOC5670001] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A011-LOC5670001] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [AA005-LOC5670001] => Array
+        (
+            [productId] => AA005
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A001-LOC5670002] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A002-LOC5670002] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A010-LOC5670002] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A011-LOC5670002] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [AA005-LOC5670002] => Array
+        (
+            [productId] => AA005
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+)
+
+[07-Oct-2024 01:31:41 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670007
+    [issueDate] => 2024-10-07
+    [issueType] => project
+    [customerId] => 
+    [projectId] => 4
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [1] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [2] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [3] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [4] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670001
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [5] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [6] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [7] => Array
+                (
+                    [productId] => A010
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [8] => Array
+                (
+                    [productId] => A011
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [9] => Array
+                (
+                    [productId] => AA005
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+        )
+
+)
+
+[07-Oct-2024 01:31:41 Asia/Bangkok] Original items: Array
+(
+    [0] => Array
+        (
+            [product_id] => A001
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [1] => Array
+        (
+            [product_id] => A001
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [2] => Array
+        (
+            [product_id] => A002
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [3] => Array
+        (
+            [product_id] => A003
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [4] => Array
+        (
+            [product_id] => A010
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [5] => Array
+        (
+            [product_id] => A010
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [6] => Array
+        (
+            [product_id] => A011
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [7] => Array
+        (
+            [product_id] => A011
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+    [8] => Array
+        (
+            [product_id] => AA005
+            [quantity] => 10.00
+            [location_id] => LOC5670001
+        )
+
+    [9] => Array
+        (
+            [product_id] => AA005
+            [quantity] => 10.00
+            [location_id] => LOC5670002
+        )
+
+)
+
+[07-Oct-2024 01:31:41 Asia/Bangkok] Items to update: Array
+(
+    [A001-LOC5670001] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A003-LOC5670001] => Array
+        (
+            [productId] => A003
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A010-LOC5670001] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A011-LOC5670001] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [AA005-LOC5670001] => Array
+        (
+            [productId] => AA005
+            [locationId] => LOC5670001
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A001-LOC5670002] => Array
+        (
+            [productId] => A001
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A002-LOC5670002] => Array
+        (
+            [productId] => A002
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A010-LOC5670002] => Array
+        (
+            [productId] => A010
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [A011-LOC5670002] => Array
+        (
+            [productId] => A011
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+    [AA005-LOC5670002] => Array
+        (
+            [productId] => AA005
+            [locationId] => LOC5670002
+            [quantity] => 10
+            [originalQuantity] => 10
+        )
+
+)
+

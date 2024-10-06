@@ -54,15 +54,7 @@ SELECT
     di.quantity,
     pr.unit,
     l.location AS location_name,
-    i.quantity AS current_quantity,
-    (
-        SELECT hr.bill_number
-        FROM h_receive hr
-        JOIN d_receive dr ON hr.receive_header_id = dr.receive_header_id
-        WHERE dr.product_id = di.product_id
-        ORDER BY hr.received_date DESC
-        LIMIT 1
-    ) AS last_receive_number
+    i.quantity AS current_quantity
 FROM 
     h_issue hi
 JOIN d_issue di ON hi.issue_header_id = di.issue_header_id
@@ -82,6 +74,7 @@ if (empty($issueData)) {
     die('Issue data not found');
 }
 
+
 class PDF extends FPDF
 {
     private $settings;
@@ -99,20 +92,39 @@ class PDF extends FPDF
         $this->SetFont('THSarabunNew', 'B', 18);
         
         $logoPath = isset($this->settings['logo']) ? '../assets/img/' . $this->settings['logo'] : '../assets/img/logo.png';
-        $this->Image($logoPath, 10, 6, 30);
+        $this->Image($logoPath, 5, 6, 30);
         
-        $this->Cell(0, 10, iconv('UTF-8', 'cp874', $this->settings['company_name'] ?? ''), 0, 1, 'C');
-        $this->SetFont('THSarabunNew', '', 14);
+        $this->Cell(0, 5, iconv('UTF-8', 'cp874', $this->settings['company_name'] ?? ''), 0, 1, 'C');
+        $this->SetFont('THSarabunNew', '', 11);
         $this->Cell(0, 7, iconv('UTF-8', 'cp874', $this->settings['company_address'] ?? ''), 0, 1, 'C');
         $this->Cell(0, 7, iconv('UTF-8', 'cp874', $this->settings['company_contact'] ?? ''), 0, 1, 'C');
         $this->Ln(5);
+
+        $this->SetFont('THSarabunNew', 'B', 14);
+        $this->Cell(0, 5, iconv('UTF-8', 'cp874', 'เอกสารเบิกสินค้า'), 0, 1, 'C');
+        $this->SetLineWidth(0.1);
+        $this->Line(10, $this->GetY(), 200, $this->GetY());
+        $this->Ln(5);
+
+        if ($this->PageNo() > 1) {
+            $this->SetFont('THSarabunNew', 'B', 11);
+            $this->SetFillColor(240, 240, 240);
+            $this->Cell(15, 5, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
+            $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
+            $this->Cell(60, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+            $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'คลัง'), 1, 0, 'C', true);
+            $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
+            $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+            $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'คงเหลือ'), 1, 0, 'C', true);
+            $this->Ln();
+        }
     }
 
     function Footer()
     {
         $this->SetY(-15);
         $this->SetFont('THSarabunNew', '', 12);
-        $this->Cell(0, 10, iconv('UTF-8', 'cp874', 'หน้า ').$this->PageNo().'/{nb}', 0, 0, 'C');
+        $this->Cell(0, 5, iconv('UTF-8', 'cp874', 'หน้า ').$this->PageNo().'/{nb}', 0, 0, 'C');
     }
 }
 
@@ -120,131 +132,132 @@ $pdf = new PDF($settings);
 $pdf->AliasNbPages();
 $pdf->AddPage();
 
-$pdf->SetFont('THSarabunNew', 'B', 20);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'เอกสารเบิกสินค้า'), 0, 1, 'C');
-$pdf->SetLineWidth(0.1);
-$pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
-$pdf->Ln(5);
+// ส่วนหัวของเอกสาร
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'เลขที่เอกสาร:'), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(60, 5, $issueData[0]['bill_number'], 0);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่เบิก:'), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(0, 5, date('d/m/Y', strtotime($issueData[0]['issue_date'])), 0, 1);
 
-// Improve layout with a table-like structure
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เลขที่เอกสาร:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, $issueData[0]['bill_number'], 0);
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่เบิก:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(0, 10, date('d/m/Y', strtotime($issueData[0]['issue_date'])), 0, 1);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ผู้เบิกสินค้า:'), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $issueData[0]['issuer_fname'] . ' ' . $issueData[0]['issuer_lname']), 0);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ประเภทการเบิก:'), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(0, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ')), 0, 1);
 
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ผู้เบิกสินค้า:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $issueData[0]['issuer_fname'] . ' ' . $issueData[0]['issuer_lname']), 0);
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ประเภทการเบิก:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ')), 0, 1);
+// ข้อมูลลูกค้าหรือโครงการ
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ลูกค้า:' : 'โครงการ:')), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_project_name']), 0, 1);
 
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ลูกค้า:' : 'โครงการ:')), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_project_name']), 0);
-
-$currentDate = date('d/m/Y H:i:s');
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่พิมพ์เอกสาร:'), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(0, 10, $currentDate, 0, 1);
-
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(40, 10, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ที่อยู่:' : 'รายละเอียด:')), 0);
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->MultiCell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_address_project_description']), 0);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ที่อยู่:' : 'รายละเอียด:')), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->MultiCell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_address_project_description']), 0);
 
 if ($issueData[0]['issue_type'] == 'sale') {
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เบอร์โทร:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_phone'] ?? '-'), 0);
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เลขประจำตัวผู้เสียภาษี:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_tax_id'] ?? '-'), 0, 1);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'เบอร์โทร:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_phone'] ?? '-'), 0);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'เลขประจำตัวผู้เสียภาษี:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_tax_id'] ?? '-'), 0, 1);
 
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'ผู้ติดต่อ:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_contact'] ?? '-'), 0);
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วงเงินเครดิต:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', ($issueData[0]['customer_credit_limit'] !== null ? number_format($issueData[0]['customer_credit_limit'], 2) . ' บาท' : '-')), 0, 1);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ผู้ติดต่อ:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_contact'] ?? '-'), 0);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วงเงินเครดิต:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', ($issueData[0]['customer_credit_limit'] !== null ? number_format($issueData[0]['customer_credit_limit'], 2) . ' บาท' : '-')), 0, 1);
 
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'เงื่อนไขการชำระเงิน:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['customer_credit_terms'] ?? '-'), 0, 1);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'เงื่อนไขการชำระเงิน:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_credit_terms'] ?? '-'), 0, 1);
 } else {
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่เริ่มโครงการ:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(60, 10, iconv('UTF-8', 'cp874', $issueData[0]['project_start_date'] ? date('d/m/Y', strtotime($issueData[0]['project_start_date'])) : '-'), 0);
-    $pdf->SetFont('THSarabunNew', 'B', 14);
-    $pdf->Cell(40, 10, iconv('UTF-8', 'cp874', 'วันที่สิ้นสุดโครงการ:'), 0);
-    $pdf->SetFont('THSarabunNew', '', 14);
-    $pdf->Cell(0, 10, iconv('UTF-8', 'cp874', $issueData[0]['project_end_date'] ? date('d/m/Y', strtotime($issueData[0]['project_end_date'])) : '-'), 0, 1);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่เริ่มโครงการ:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $issueData[0]['project_start_date'] ? date('d/m/Y', strtotime($issueData[0]['project_start_date'])) : '-'), 0);
+    $pdf->SetFont('THSarabunNew', 'B', 11);
+    $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่สิ้นสุดโครงการ:'), 0);
+    $pdf->SetFont('THSarabunNew', '', 11);
+    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['project_end_date'] ? date('d/m/Y', strtotime($issueData[0]['project_end_date'])) : '-'), 0, 1);
 }
 
 $pdf->Ln(5);
-$pdf->SetFont('THSarabunNew', 'B', 16);
-$pdf->Cell(0, 10, iconv('UTF-8', 'cp874', 'รายการสินค้าที่เบิก'), 0, 1, 'C');
-$pdf->SetLineWidth(0.1);
-$pdf->Line(10, $pdf->GetY(), 200, $pdf->GetY());
+$pdf->SetFont('THSarabunNew', 'B', 14);
+$pdf->Cell(0, 5, iconv('UTF-8', 'cp874', 'รายการสินค้าที่เบิก'), 0, 1, 'C');
 $pdf->Ln(2);
 
-// Adjusted column widths
 $pdf->SetFillColor(240, 240, 240);
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(15, 10, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
-$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
-$pdf->Cell(70, 10, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
-$pdf->Cell(30, 10, iconv('UTF-8', 'cp874', 'คลัง'), 1, 0, 'C', true);
-$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
-$pdf->Cell(25, 10, iconv('UTF-8', 'cp874', 'คงเหลือ'), 1, 0, 'C', true);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(15, 5, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
+$pdf->Cell(25, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
+$pdf->Cell(60, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+$pdf->Cell(30, 5, iconv('UTF-8', 'cp874', 'คลัง'), 1, 0, 'C', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', 'คงเหลือ'), 1, 0, 'C', true);
 $pdf->Ln();
 
-$pdf->SetFont('THSarabunNew', '', 14);
+$pdf->SetFont('THSarabunNew', '', 11);
 $total = 0;
 $i = 1;
 foreach ($issueData as $item) {
-    $pdf->Cell(15, 10, $i, 1, 0, 'C');
-    $pdf->Cell(25, 10, $item['product_id'], 1, 0, 'C');
-    $pdf->Cell(70, 10, iconv('UTF-8', 'cp874', $item['product_name']), 1);
-    $pdf->Cell(30, 10, iconv('UTF-8', 'cp874', $item['location_name']), 1, 0, 'C');
-    $pdf->Cell(25, 10, $item['quantity'] . ' ' . iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'R');
-    $pdf->Cell(25, 10, $item['current_quantity'] . ' ' . iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'R');
+    if ($pdf->GetY() > 250) {
+        $pdf->AddPage();
+    }
+    
+    $pdf->Cell(15, 5, $i, 1, 0, 'C');
+    $pdf->Cell(25, 5, $item['product_id'], 1, 0, 'C');
+    $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $item['product_name']), 1);
+    $pdf->Cell(30, 5, iconv('UTF-8', 'cp874', $item['location_name']), 1, 0, 'C');
+    $pdf->Cell(20, 5, number_format($item['quantity'], 2), 1, 0, 'R');
+    $pdf->Cell(20, 5, iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'C');
+    $pdf->Cell(20, 5, number_format($item['current_quantity'], 2), 1, 0, 'R');
     $pdf->Ln();
     $total += $item['quantity'];
     $i++;
 }
 
-$pdf->SetFont('THSarabunNew', 'B', 14);
-$pdf->Cell(140, 10, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
-$pdf->Cell(25, 10, $total, 1, 0, 'R', true);
-$pdf->Cell(25, 10, '', 1, 0, 'C', true);
+$pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(130, 5, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
+$pdf->Cell(20, 5, number_format($total, 2), 1, 0, 'R', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', '-'), 1, 0, 'C', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', '-'), 1, 0, 'C', true);
 $pdf->Ln(20);
 
-$pdf->SetFont('THSarabunNew', '', 14);
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้เบิกสินค้า'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้จ่ายสินค้า'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้อนุมัติ'), 0, 1, 'C');
+// ตรวจสอบว่ามีพื้นที่เพียงพอสำหรับลายเซ็นหรือไม่ ถ้าไม่พอให้ขึ้นหน้าใหม่
+if ($pdf->GetY() > 220) {
+    $pdf->AddPage();
+}
+
+// ส่วนลายเซ็น
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้เบิกสินค้า'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้จ่ายสินค้า'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'ลงชื่อ..................................ผู้อนุมัติ'), 0, 1, 'C');
 $pdf->Ln(5);
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', '(................................................)'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', '(................................................)'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', '(................................................)'), 0, 1, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', '(................................................)'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', '(................................................)'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', '(................................................)'), 0, 1, 'C');
 $pdf->Ln(3);
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 0, 'C');
-$pdf->Cell(63, 10, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 1, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 0, 'C');
+$pdf->Cell(63, 5, iconv('UTF-8', 'cp874', 'วันที่ ........../........../..........'), 0, 1, 'C');
+
 
 $pdf->Output('I', 'issue_report.pdf');
+?>

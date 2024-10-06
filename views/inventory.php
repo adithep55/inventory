@@ -16,7 +16,6 @@ requirePermission(['manage_inventory']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
 </head>
 
 <body>
@@ -69,6 +68,7 @@ requirePermission(['manage_inventory']);
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/plugins/select2/js/select2.min.js"></script>
     <script src="../assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
 $(document).ready(function () {
@@ -99,6 +99,22 @@ $(document).ready(function () {
             }
         ],
         order: [[1, 'asc']]
+        ,
+                    "language": {
+                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+                        "emptyTable": "ไม่พบข้อมูลสินค้า",
+                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                        "search": "ค้นหา:",
+                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                        "paginate": {
+                            "first": "หน้าแรก",
+                            "last": "หน้าสุดท้าย",
+                            "next": "ถัดไป",
+                            "previous": "ก่อนหน้า"
+                        }
+                    }
     });
 });
     </script>

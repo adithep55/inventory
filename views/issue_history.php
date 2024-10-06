@@ -121,6 +121,22 @@ requirePermission(['manage_issue']);
                     }
                 ],
                 order: [[1, 'desc']]
+                ,
+                    "language": {
+                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+                        "emptyTable": "ไม่พบข้อมูลสินค้า",
+                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                        "search": "ค้นหา:",
+                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                        "paginate": {
+                            "first": "หน้าแรก",
+                            "last": "หน้าสุดท้าย",
+                            "next": "ถัดไป",
+                            "previous": "ก่อนหน้า"
+                        }
+                    }
             });
 
             // Handle "Select All" checkbox

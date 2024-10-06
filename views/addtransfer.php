@@ -16,7 +16,7 @@ requirePermission(['manage_transfers']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -108,15 +108,15 @@ requirePermission(['manage_transfers']);
 </div>
 
 <script src="../assets/js/jquery-3.6.0.min.js"></script>
-<script src="../assets/js/feather.min.js"></script>
-<script src="../assets/js/jquery.slimscroll.min.js"></script>
-<script src="../assets/js/jquery.dataTables.min.js"></script>
-<script src="../assets/js/dataTables.bootstrap4.min.js"></script>
-<script src="../assets/js/bootstrap.bundle.min.js"></script>
-<script src="../assets/plugins/select2/js/select2.min.js"></script>
-<script src="../assets/js/script.js"></script>
-<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../assets/js/feather.min.js"></script>
+    <script src="../assets/js/jquery.slimscroll.min.js"></script>
+    <script src="../assets/js/jquery.dataTables.min.js"></script>
+    <script src="../assets/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/plugins/select2/js/select2.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="../assets/plugins/sweetalert/sweetalerts.min.js"></script>
+    <script src="../assets/js/script.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -181,6 +181,22 @@ $(document).ready(function() {
             { "data": "product_category_name" },
             { "data": "unit" }
         ]
+        ,
+                    "language": {
+                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+                        "emptyTable": "ไม่พบข้อมูลสินค้า",
+                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                        "search": "ค้นหา:",
+                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                        "paginate": {
+                            "first": "หน้าแรก",
+                            "last": "หน้าสุดท้าย",
+                            "next": "ถัดไป",
+                            "previous": "ก่อนหน้า"
+                        }
+                    }
     });
 
     function addProductToTransfer(productId, productName, unit) {
