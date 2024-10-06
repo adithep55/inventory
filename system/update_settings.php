@@ -15,9 +15,13 @@ if (!isset($_SESSION['UserID'])) {
 requirePermission(['manage_settings']);
 
 // ฟังก์ชันสำหรับอัปโหลดไฟล์
-function uploadFile($file, $uploadDir) {
-    $fileName = basename($file['name']);
+function uploadFile($file, $uploadDir, $existingFileName = null) {
+    $fileName = $existingFileName ?: basename($file['name']);
     $targetPath = $uploadDir . $fileName;
+    
+    if (file_exists($targetPath)) {
+        unlink($targetPath); // ลบไฟล์เดิมถ้ามีอยู่
+    }
     
     if (move_uploaded_file($file['tmp_name'], $targetPath)) {
         return $fileName;
@@ -42,22 +46,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // อัปโหลดและอัปเดตโลโก้
-        $uploadDir = '../assets/img/';
-        $imageFields = ['logo', 'small_logo'];
-        foreach ($imageFields as $field) {
-            if (isset($_FILES[$field]) && $_FILES[$field]['error'] == 0) {
-                $fileName = uploadFile($_FILES[$field], $uploadDir);
-                if ($fileName) {
-                    $updateStmt->execute([
-                        ':key' => $field,
-                        ':value' => $fileName
-                    ]);
-                } else {
-                    throw new Exception("Failed to upload {$field}");
-                }
-            }
+// อัปโหลดและอัปเดตโลโก้
+$uploadDir = '../assets/img/';
+$imageFields = ['logo', 'small_logo'];
+foreach ($imageFields as $field) {
+    if (isset($_FILES[$field]) && $_FILES[$field]['error'] == 0) {
+        // ดึงชื่อไฟล์เดิมจากฐานข้อมูล
+        $stmt = $conn->prepare("SELECT setting_value FROM website_settings WHERE setting_key = :key");
+        $stmt->execute([':key' => $field]);
+        $existingFileName = $stmt->fetchColumn();
+
+        $fileName = uploadFile($_FILES[$field], $uploadDir, $existingFileName);
+        if ($fileName) {
+            $updateStmt->execute([
+                ':key' => $field,
+                ':value' => $fileName
+            ]);
+        } else {
+            throw new Exception("Failed to upload {$field}");
         }
+    }
+}
 
         // บันทึกข้อมูลผู้ที่ทำการอัปเดต
         $updateStmt->execute([

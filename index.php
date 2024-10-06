@@ -1,5 +1,4 @@
 <?php
-// เพิ่มบรรทัดนี้ที่ด้านบนสุดของไฟล์ index.php
 require_once 'config/permission.php';
 ?>
 <!DOCTYPE html>
@@ -10,7 +9,7 @@ require_once 'config/permission.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>ระบบจัดการสินค้าคงคลัง - Dashboard</title>
 
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/logo-small.png">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet" href="assets/css/dataTables.bootstrap4.min.css">
@@ -57,9 +56,9 @@ require_once 'config/permission.php';
 
     <div class="page-wrapper">
         <div class="content container-fluid">
-    
-<?php require_once 'includes/notification.php'; ?>
 
+    
+        <?php require_once 'includes/notification.php'; ?>
                 <div class="row">
                     <div class="col-lg-3 col-sm-6 col-12">
                         <div class="dash-widget">
@@ -241,7 +240,7 @@ function updateDashboard(data) {
     console.log('Updating dashboard with data:', data);
 
     $('#total-products').text(data.total_products || 0);
-    $('#total-inventory').text(data.total_inventory || 0);
+    $('#total-inventory').text(Math.round(data.total_inventory || 0));
     $('#total-issues').text(data.total_issues || 0);
     $('#total-receives').text(data.total_receives || 0);
 
@@ -249,13 +248,10 @@ function updateDashboard(data) {
         createInventoryChart(data.inventory_stats);
     } else {
         console.error('Invalid or missing inventory_stats data');
-        // อาจจะแสดงข้อความแจ้งเตือนให้ผู้ใช้ทราบว่าไม่สามารถแสดงกราฟได้
     }
 
     updateRecentProductsTable(data.recent_products);
     updateRecentTransactionsTable(data.recent_transactions);
-
-    $('.card.bg-danger')[data.low_stock_count > 0 ? 'show' : 'hide']();
 }
 
 function createInventoryChart(stats) {
@@ -399,8 +395,6 @@ function updateRecentTransactionsTable(transactions) {
         `);
     });
 }
-
-
     </script>
 </body>
 </html>

@@ -1,13 +1,15 @@
-<div class="row">
-    <div class="col-lg-12 col-sm-12 col-12 mb-4">
-        <div class="card bg-danger text-white" id="low-stock-notification" style="display: none;">
-            <div class="card-body">
-                <button id="close-notification" class="btn-close" aria-label="Close"></button>
-                <h4 class="card-title mb-0">
-                    <i class="fas fa-exclamation-triangle"></i> แจ้งเตือน: สินค้าใกล้หมด
-                </h4>
-                <p class="mt-2 mb-0">มีสินค้า <span id="low-stock-count" class="font-weight-bold">0</span> รายการที่ใกล้หมด</p>
-                <button id="show-low-stock-details" class="btn btn-light mt-3">ดูรายละเอียด</button>
+<div id="notification-container" style="display: none;">
+    <div class="row">
+        <div class="col-lg-12 col-sm-12 col-12 mb-4">
+            <div class="card bg-danger text-white" id="low-stock-notification">
+                <div class="card-body">
+                    <button id="close-notification" class="btn-close" aria-label="Close"></button>
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> แจ้งเตือน: สินค้าใกล้หมด
+                    </h4>
+                    <p class="mt-2 mb-0">มีสินค้า <span id="low-stock-count" class="font-weight-bold">0</span> รายการที่ใกล้หมด</p>
+                    <button id="show-low-stock-details" class="btn btn-light mt-3">ดูรายละเอียด</button>
+                </div>
             </div>
         </div>
     </div>
@@ -50,7 +52,11 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     loadNotifications();
-    setInterval(loadNotifications, 30000); // ทุก 30 วินาที
+    const notificationInterval = setInterval(function() {
+        if (!isNotificationDismissed()) {
+            loadNotifications();
+        }
+    }, 30000); // ทุก 30 วินาที
 
     document.getElementById('show-low-stock-details').addEventListener('click', function () {
         var myModal = new bootstrap.Modal(document.getElementById('lowStockModal'));
@@ -60,17 +66,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('close-notification').addEventListener('click', function() {
         dismissNotification();
     });
-
-    window.addEventListener('resize', function () {
-        if (document.getElementById('lowStockModal').classList.contains('show')) {
-            updateLowStockModal(window.lowStockProducts);
-        }
-    });
 });
 
 function loadNotifications() {
     if (isNotificationDismissed()) {
-        document.getElementById('low-stock-notification').style.display = 'none';
+        hideNotification();
         return;
     }
 
@@ -87,21 +87,25 @@ function loadNotifications() {
 }
 
 function updateNotifications(data) {
-    document.getElementById('low-stock-count').textContent = data.low_stock_count;
-    updateLowStockModal(data.low_stock_products);
-    window.lowStockProducts = data.low_stock_products;
-
-    const notification = document.getElementById('low-stock-notification');
-    if (data.low_stock_count > 0) {
-        notification.style.display = 'block';
+    const container = document.getElementById('notification-container');
+    const countElement = document.getElementById('low-stock-count');
+    
+    if (data.low_stock_count > 0 && !isNotificationDismissed()) {
+        countElement.textContent = data.low_stock_count;
+        container.style.display = 'block';
+        updateLowStockModal(data.low_stock_products);
     } else {
-        notification.style.display = 'none';
+        hideNotification();
     }
 }
 
 function dismissNotification() {
     localStorage.setItem('notificationDismissedAt', Date.now());
-    document.getElementById('low-stock-notification').style.display = 'none';
+    hideNotification();
+}
+
+function hideNotification() {
+    document.getElementById('notification-container').style.display = 'none';
 }
 
 function isNotificationDismissed() {
@@ -156,7 +160,7 @@ function escapeHtml(unsafe) {
          .replace(/>/g, "&gt;")
          .replace(/"/g, "&quot;")
          .replace(/'/g, "&#039;");
- }
+}
 </script>
 
 <style>

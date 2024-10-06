@@ -1,8 +1,5 @@
 <?php
-session_start();
-if (!isset($_SESSION['UserID'])) {
-    exit;
-}  
+require_once '../config/permission.php';
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -33,7 +30,7 @@ if (!isset($_SESSION['UserID'])) {
                     <div class="col">
                         <h3 class="page-title">โปรไฟล์</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">โปรไฟล์ผู้ใช้</li>
                         </ul>
                     </div>

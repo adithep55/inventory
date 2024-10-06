@@ -8,7 +8,7 @@ requirePermission(['manage_inventory']);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>รายละเอียดสินค้า</title>
-
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/logo-small.png">
     <base href="/">
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/animate.css">

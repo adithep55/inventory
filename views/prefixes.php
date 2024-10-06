@@ -8,6 +8,7 @@ requirePermission(['manage_customers']);
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>จัดการคำนำหน้า</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/logo-small.png">
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/animate.css">
     <link rel="stylesheet" href="../assets/css/dataTables.bootstrap4.min.css">
