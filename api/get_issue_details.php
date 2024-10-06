@@ -122,6 +122,8 @@ try {
         $response['data']['customer_details'] = $header['customer_details'];
     } else {
         $response['data']['project_details'] = $header['project_details'];
+        // Add project name to the response
+        $response['data']['project_name'] = $header['project_details']['project_name'];
     }
 
     echo json_encode($response);

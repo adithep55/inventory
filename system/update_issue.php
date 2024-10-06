@@ -54,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         $conn->beginTransaction();
-
+    
         if (empty($issueId)) {
             throw new Exception("ไม่พบรหัสรายการเบิก");
         }
-
+    
         // อัปเดตข้อมูลหลักของการเบิกสินค้า
         $stmt = dd_q("UPDATE h_issue SET issue_date = ?, issue_type = ?, customer_id = ?, project_id = ? WHERE bill_number = ?", [
             $issueDate,
@@ -70,35 +70,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!$stmt) {
             throw new Exception("ไม่สามารถอัปเดตข้อมูลหลักของการเบิกสินค้าได้");
         }
-
+    
         // ดึงข้อมูลรายการเดิม
         $stmt = dd_q("SELECT product_id, quantity, location_id FROM d_issue WHERE issue_header_id = (SELECT issue_header_id FROM h_issue WHERE bill_number = ?)", [$issueId]);
         $originalItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        error_log("Original items: " . print_r($originalItems, true));
-
+    
         // สร้าง array เพื่อเก็บรายการที่จะอัปเดต
         $itemsToUpdate = [];
         foreach ($items as $item) {
             $key = $item['productId'] . '-' . $item['locationId'];
             $itemsToUpdate[$key] = $item;
         }
-        error_log("Items to update: " . print_r($itemsToUpdate, true));
-
+    
         // สร้าง array เพื่อเก็บรายการเดิม
         $originalItemMap = [];
         foreach ($originalItems as $item) {
             $key = $item['product_id'] . '-' . $item['location_id'];
             $originalItemMap[$key] = $item;
         }
-
+    
         // อัปเดตรายการสินค้า
-        foreach ($originalItems as $originalItem) {
-            $key = $originalItem['product_id'] . '-' . $originalItem['location_id'];
-
-            if (isset($itemsToUpdate[$key])) {
-                $newItem = $itemsToUpdate[$key];
+        foreach ($itemsToUpdate as $key => $newItem) {
+            if (isset($originalItemMap[$key])) {
+                // รายการที่มีอยู่แล้ว
+                $originalItem = $originalItemMap[$key];
                 $quantityDiff = $newItem['quantity'] - $originalItem['quantity'];
-
+    
                 if ($quantityDiff != 0) {
                     // ตรวจสอบจำนวนคงเหลือในคลัง
                     $stmt = dd_q("SELECT quantity FROM inventory WHERE product_id = ? AND location_id = ?", [
@@ -106,15 +103,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         $originalItem['location_id']
                     ]);
                     $inventoryItem = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
                     if (!$inventoryItem || $inventoryItem['quantity'] < $quantityDiff) {
                         throw new Exception("สินค้า {$originalItem['product_id']} มีไม่เพียงพอในคลังสำหรับการเบิกเพิ่ม");
                     }
-
+    
                     if (!updateInventory($conn, $originalItem['product_id'], $originalItem['location_id'], $quantityDiff, $userId)) {
                         throw new Exception("ไม่สามารถปรับปรุงข้อมูลคงคลังของสินค้า {$originalItem['product_id']} ได้");
                     }
-
+    
                     $stmt = dd_q("UPDATE d_issue SET quantity = ? WHERE issue_header_id = (SELECT issue_header_id FROM h_issue WHERE bill_number = ?) AND product_id = ? AND location_id = ?", [
                         $newItem['quantity'],
                         $issueId,
@@ -125,10 +122,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         throw new Exception("ไม่สามารถอัปเดตรายการสินค้า {$originalItem['product_id']} ได้");
                     }
                 }
-
-                unset($itemsToUpdate[$key]);
             } else {
-                // ถ้าไม่มีในรายการใหม่ ให้ลบออก
+                // รายการใหม่
+                $stmt = dd_q("INSERT INTO d_issue (issue_header_id, product_id, location_id, quantity, user_id) VALUES ((SELECT issue_header_id FROM h_issue WHERE bill_number = ?), ?, ?, ?, ?)", [
+                    $issueId,
+                    $newItem['productId'],
+                    $newItem['locationId'],
+                    $newItem['quantity'],
+                    $userId
+                ]);
+                if (!$stmt) {
+                    throw new Exception("ไม่สามารถเพิ่มรายการสินค้าใหม่ {$newItem['productId']} ได้");
+                }
+    
+                if (!updateInventory($conn, $newItem['productId'], $newItem['locationId'], $newItem['quantity'], $userId)) {
+                    throw new Exception("ไม่สามารถปรับปรุงข้อมูลคงคลังของสินค้า {$newItem['productId']} ได้");
+                }
+            }
+        }
+    
+        // ลบรายการที่ไม่มีในข้อมูลใหม่
+        foreach ($originalItemMap as $key => $originalItem) {
+            if (!isset($itemsToUpdate[$key])) {
                 $stmt = dd_q("DELETE FROM d_issue WHERE issue_header_id = (SELECT issue_header_id FROM h_issue WHERE bill_number = ?) AND product_id = ? AND location_id = ?", [
                     $issueId,
                     $originalItem['product_id'],
@@ -137,24 +152,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (!$stmt) {
                     throw new Exception("ไม่สามารถลบรายการสินค้า {$originalItem['product_id']} ได้");
                 }
-
+    
                 // คืนสินค้ากลับเข้าคลัง
                 if (!updateInventory($conn, $originalItem['product_id'], $originalItem['location_id'], -$originalItem['quantity'], $userId)) {
                     throw new Exception("ไม่สามารถปรับปรุงข้อมูลคงคลังของสินค้า {$originalItem['product_id']} ได้");
                 }
             }
         }
-
+    
         // ตรวจสอบว่ายังมีรายการสินค้าเหลืออยู่หรือไม่
         $stmt = dd_q("SELECT COUNT(*) as count FROM d_issue WHERE issue_header_id = (SELECT issue_header_id FROM h_issue WHERE bill_number = ?)", [$issueId]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result['count'] == 0) {
             throw new Exception("ไม่สามารถลบทุกรายการสินค้าได้ ต้องมีอย่างน้อย 1 รายการ");
         }
-
+    
         $conn->commit();
         dd_return(true, "อัปเดตข้อมูลการเบิกสินค้าเรียบร้อยแล้ว");
-
+    
     } catch (Exception $e) {
         $conn->rollBack();
         dd_return(false, $e->getMessage());

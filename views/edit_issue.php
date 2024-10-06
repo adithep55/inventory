@@ -177,7 +177,7 @@ requirePermission(['manage_issue']);
             $(this).val(maxDate.toISOString().split('T')[0]);
             Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเลือกวันที่ในอนาคตได้', 'error');
         }
-        updateFormStatus();  // เพิ่มฟังก์ชันนี้หากคุณต้องการอัปเดตสถานะฟอร์มเมื่อมีการเปลี่ยนแปลงวันที่
+        updateFormStatus();
     });
 
     let availableLocations = [];
@@ -200,30 +200,30 @@ requirePermission(['manage_issue']);
         });
     }
 
-            function loadIssueData(id) {
-                return fetch(`../api/get_issue_details.php?id=${id}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('API Response:', data); // เพิ่ม log เพื่อตรวจสอบข้อมูลที่ได้รับ
-                        if (data.status === 'error') {
-                            throw new Error(data.message || 'Unknown error occurred');
-                        }
-                        if (!data.data) {
-                            throw new Error('No data returned from API');
-                        }
-                        originalIssueData = JSON.parse(JSON.stringify(data.data)); // กำหนดค่า originalIssueData
-                        return data.data;
-                    })
-                    .catch(error => {
-                        console.error('Error in loadIssueData:', error);
-                        throw error;
-                    });
-            }
+    function loadIssueData(id) {
+        return fetch(`../api/get_issue_details.php?id=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('API Response:', data);
+                if (data.status === 'error') {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+                if (!data.data) {
+                    throw new Error('No data returned from API');
+                }
+                originalIssueData = JSON.parse(JSON.stringify(data.data));
+                return data.data;
+            })
+            .catch(error => {
+                console.error('Error in loadIssueData:', error);
+                throw error;
+            });
+    }
 
             // เรียกใช้ฟังก์ชัน
             loadIssueData(issueId)
@@ -271,7 +271,16 @@ requirePermission(['manage_issue']);
 
     $('#issueId').val(data.bill_number || '');
     $('#billNumber').val(data.bill_number || '');
-    $('#issueDate').val(data.issue_date || '');
+
+    // แปลงวันที่จากรูปแบบ dd-mm-yyyy เป็น yyyy-mm-dd สำหรับ input type="date"
+    if (data.issue_date) {
+        let parts = data.issue_date.split('-');
+        if (parts.length === 3) {
+            let year = parseInt(parts[2]) - 543; // แปลงปี พ.ศ. เป็น ค.ศ.
+            $('#issueDate').val(`${year}-${parts[1]}-${parts[0]}`);
+        }
+    }
+
     $('#issueType').val(data.issue_type || '');
 
     updateSections(data.issue_type);
@@ -280,18 +289,35 @@ requirePermission(['manage_issue']);
         loadCustomerData().then(() => {
             setTimeout(() => {
                 const customerSelect = $('#customer');
-                customerSelect.val(customerSelect.find('option:contains("' + data.customer_name + '")').val());
-                if (!customerSelect.val()) {
-                    console.warn('Customer not found in list, adding it manually');
-                    customerSelect.append($('<option>').val(data.customer_name).text(data.customer_name));
-                    customerSelect.val(data.customer_name);
+                if (data.customer_details && data.customer_details.name) {
+                    let customerOption = customerSelect.find(`option:contains("${data.customer_details.name}")`);
+                    if (customerOption.length) {
+                        customerSelect.val(customerOption.val()).trigger('change');
+                    } else {
+                        console.warn('Customer not found in list, adding it manually');
+                        let newOption = $('<option>').val(data.customer_details.customer_id || 'temp_id').text(data.customer_details.name);
+                        customerSelect.append(newOption);
+                        customerSelect.val(newOption.val()).trigger('change');
+                    }
                 }
-                customerSelect.trigger('change');
             }, 100);
         });
     } else if (data.issue_type === 'project') {
         loadProjectData().then(() => {
-            $('#project').val(data.project_id || '').trigger('change');
+            setTimeout(() => {
+                const projectSelect = $('#project');
+                if (data.project_name) {
+                    let projectOption = projectSelect.find(`option:contains("${data.project_name}")`);
+                    if (projectOption.length) {
+                        projectSelect.val(projectOption.val()).trigger('change');
+                    } else {
+                        console.warn('Project not found in list, adding it manually');
+                        let newOption = $('<option>').val(data.project_details.project_id || 'temp_id').text(data.project_name);
+                        projectSelect.append(newOption);
+                        projectSelect.val(newOption.val()).trigger('change');
+                    }
+                }
+            }, 100);
         });
     }
 

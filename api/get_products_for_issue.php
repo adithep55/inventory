@@ -24,21 +24,30 @@ try {
     GROUP_CONCAT(CONCAT(l.location_id, ':', l.location, ':', COALESCE(i.quantity, 0)) SEPARATOR '|') as locations
     FROM products p
     CROSS JOIN locations l
-    LEFT JOIN inventory i ON p.product_id = i.product_id AND l.location_id = i.location_id";
+    LEFT JOIN inventory i ON p.product_id = i.product_id AND l.location_id = i.location_id
+    WHERE EXISTS (
+        SELECT 1 FROM inventory i2
+        WHERE i2.product_id = p.product_id AND i2.quantity > 0
+    )";
     $params = [];
 
     // เพิ่มเงื่อนไขการค้นหา
     if (!empty($search)) {
-        $query .= " WHERE p.product_id LIKE :search OR p.name_th LIKE :search OR p.name_en LIKE :search";
+        $query .= " AND (p.product_id LIKE :search OR p.name_th LIKE :search OR p.name_en LIKE :search)";
         $params[':search'] = "%$search%";
     }
 
     $query .= " GROUP BY p.product_id";
 
     // Query สำหรับนับจำนวนทั้งหมด
-    $countQuery = "SELECT COUNT(DISTINCT p.product_id) FROM products p";
+    $countQuery = "SELECT COUNT(DISTINCT p.product_id) 
+                   FROM products p
+                   WHERE EXISTS (
+                       SELECT 1 FROM inventory i
+                       WHERE i.product_id = p.product_id AND i.quantity > 0
+                   )";
     if (!empty($search)) {
-        $countQuery .= " WHERE p.product_id LIKE :search OR p.name_th LIKE :search OR p.name_en LIKE :search";
+        $countQuery .= " AND (p.product_id LIKE :search OR p.name_th LIKE :search OR p.name_en LIKE :search)";
     }
     $stmt = $conn->prepare($countQuery);
     if ($stmt === false) {
@@ -80,11 +89,13 @@ try {
             if (count($locationData) == 3) {
                 list($id, $name, $quantity) = $locationData;
                 $quantity = (int)$quantity;
-                $product['locations'][] = [
-                    'id' => $id,
-                    'name' => $name,
-                    'quantity' => $quantity
-                ];
+                if ($quantity > 0) {  // เพิ่มเงื่อนไขนี้เพื่อแสดงเฉพาะคลังที่มีสินค้า
+                    $product['locations'][] = [
+                        'id' => $id,
+                        'name' => $name,
+                        'quantity' => $quantity
+                    ];
+                }
             }
         }
         unset($product['img']);
