@@ -10,15 +10,15 @@ requirePermission(['manage_receiving']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>บันทึกการรับสินค้า</title>
     
-<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-<link rel="shortcut icon" type="image/x-icon" href="../assets/img/logo-small.png">
-<link rel="stylesheet" href="../assets/css/animate.css">
-<link rel="stylesheet" href="../assets/plugins/select2/css/select2.min.css">
-<link rel="stylesheet" href="../assets/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
-<link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
-<link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/logo-small.png">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/animate.css">
+    <link rel="stylesheet" href="../assets/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="../assets/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
+    <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
 </head>
 
 <body>
@@ -122,7 +122,6 @@ requirePermission(['manage_receiving']);
     <script src="../assets/plugins/sweetalert/sweetalert2.all.min.js"></script>
     <script src="../assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="../assets/js/script.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
     <script>
 $(document).ready(function() {
         $('.select2').select2();
@@ -201,6 +200,22 @@ $(document).ready(function() {
                 { data: 'unit' }
             ],
             order: [[2, 'asc']]
+            ,
+            "language": {
+                "emptyTable": "ไม่พบข้อมูลสินค้า",
+                "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+                "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+                "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+                "lengthMenu": "แสดง _MENU_ รายการ",
+                "search": "ค้นหา:",
+                "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+                "paginate": {
+                    "first": "หน้าแรก",
+                    "last": "หน้าสุดท้าย",
+                    "next": "ถัดไป",
+                    "previous": "ก่อนหน้า"
+                }
+            }
         });
     }
 
@@ -379,11 +394,11 @@ $(document).ready(function() {
                     isValid = false;
                 }
                 
-                if (!quantityInput.val() || parseInt(quantityInput.val()) < 1) {
-                    quantityInput.addClass('error-highlight');
-                    errorMessage += 'กรุณาระบุจำนวนที่ถูกต้องสำหรับทุกรายการ<br>';
-                    isValid = false;
-                }
+                if (!quantityInput.val() || isNaN(quantityInput.val()) || parseFloat(quantityInput.val()) <= 0) {
+                quantityInput.addClass('error-highlight');
+                errorMessage += 'กรุณาระบุจำนวนที่ถูกต้อง (มากกว่า 0) สำหรับทุกรายการ<br>';
+                isValid = false;
+            }
             });
         }
 
@@ -447,11 +462,11 @@ $(document).ready(function() {
             }
         });
     });
-
+    $(document).off('input', '.quantity');
     $(document).on('input', '.quantity', function() {
-        var value = parseInt($(this).val());
-        if (isNaN(value) || value < 1) {
-            $(this).val(1);
+        var value = $(this).val();
+        if (value !== "" && (isNaN(value) || parseFloat(value) <= 0)) {
+            $(this).val("");
         }
     });
 
