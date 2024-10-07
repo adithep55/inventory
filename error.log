@@ -2019,3 +2019,138 @@
 
 )
 
+[2024-10-08 00:45:54] Received transfer data: Array
+(
+    [transfer_date] => 2024-02-05
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 30
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
+[2024-10-08 00:47:33] Received transfer data: Array
+(
+    [transfer_date] => 2024-03-10
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670002
+                    [to_location_id] => LOC5670001
+                    [quantity] => 10
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
+[2024-10-08 00:48:24] Received data: {"transfer_id":"150","transfer_date":"2024-03-10","products":[{"product_id":"A001","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":10,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07"}]}
+[2024-10-08 00:48:24] Fresh inventory data: {"A001":{"LOC5670001":60,"LOC5670002":20}}
+[2024-10-08 00:48:24] Final inventory state: {"A001":{"LOC5670001":70,"LOC5670002":10}}
+[2024-10-08 00:50:10] Received transfer data: Array
+(
+    [transfer_date] => 2024-03-10
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670002
+                    [to_location_id] => LOC5670001
+                    [quantity] => 10
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
+[2024-10-08 00:53:05] Received transfer data: Array
+(
+    [transfer_date] => 2024-03-10
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A002
+                    [from_location_id] => LOC5670002
+                    [to_location_id] => LOC5670001
+                    [quantity] => 10
+                    [unit] => ตัว
+                )
+
+        )
+
+)
+
+[2024-10-08 00:54:23] Received data: {"transfer_id":"149","transfer_date":"2024-02-05","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":30,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07"}]}
+[2024-10-08 00:54:23] Fresh inventory data: {"A001":{"LOC5670001":60,"LOC5670002":20}}
+[2024-10-08 00:54:23] Final inventory state: {"A001":{"LOC5670001":30,"LOC5670002":50}}
+[2024-10-08 00:55:44] Received data: {"transfer_id":"149","transfer_date":"2024-02-05","products":[{"product_id":"A001","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":30,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07"}]}
+[2024-10-08 00:55:44] Fresh inventory data: {"A001":{"LOC5670001":30,"LOC5670002":50}}
+[2024-10-08 00:55:44] Final inventory state: {"A001":{"LOC5670001":0,"LOC5670002":80}}
+[2024-10-08 00:57:52] Received transfer data: Array
+(
+    [transfer_date] => 2024-02-05
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 30
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
+[2024-10-08 00:59:49] Received transfer data: Array
+(
+    [transfer_date] => 2024-03-10
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A002
+                    [from_location_id] => LOC5670002
+                    [to_location_id] => LOC5670001
+                    [quantity] => 10
+                    [unit] => ตัว
+                )
+
+        )
+
+)
+
+[2024-10-08 01:01:27] Received transfer data: Array
+(
+    [transfer_date] => 2024-04-15
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A003
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 8
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+

@@ -50,7 +50,7 @@ if ($search !== '%') {
 }
 
 $query .= " GROUP BY p.product_id
-           ORDER BY p.name_th ASC
+           ORDER BY p.product_id ASC
            LIMIT $start, $length";
 
 // Prepare statement

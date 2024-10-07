@@ -101,8 +101,11 @@ requirePermission(['manage_reports']);
                                         placeholder="วันที่สิ้นสุดรายงาน">
                                 </div>
                                 <div class="col-md-3 m-1">
-                                    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
-                                </div>
+    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
+</div>
+<div class="col-md-3 m-1">
+    <button id="generatePdfReport" class="btn btn-secondary">สร้าง PDF Report</button>
+</div>
                             </div>
                             <div id="productReports"></div>
                         </div>
@@ -237,7 +240,22 @@ requirePermission(['manage_reports']);
                     }
                 });
             }
+            $('#generatePdfReport').click(function() {
+    var startId = $('#startProductId').val();
+    var endId = $('#endProductId').val();
+    var endDate = $('#endDate').val();
 
+    if (startId && endId && endDate) {
+        window.open('generate_movement_report.php?startProductId=' + startId + '&endProductId=' + endId + '&endDate=' + endDate, '_blank');
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+            text: 'กรุณาเลือกรหัสสินค้าเริ่มต้น, รหัสสินค้าสิ้นสุด และวันที่สิ้นสุดรายงาน',
+            confirmButtonText: 'ตกลง'
+        });
+    }
+});
 
             $('#generateReport').click(function () {
                 var startId = $('#startProductId').val();
