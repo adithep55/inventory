@@ -147,11 +147,14 @@ $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ผู้เบิกสินค้�
 $pdf->SetFont('THSarabunNew', '', 11);
 $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $issueData[0]['issuer_fname'] . ' ' . $issueData[0]['issuer_lname']), 0);
 $pdf->SetFont('THSarabunNew', 'B', 11);
+$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่พิมพ์เอกสาร:'), 0);
+$pdf->SetFont('THSarabunNew', '', 11);
+$pdf->Cell(0, 5, date('d/m/Y H:i:s'), 0, 1);
+
+$pdf->SetFont('THSarabunNew', 'B', 11);
 $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ประเภทการเบิก:'), 0);
 $pdf->SetFont('THSarabunNew', '', 11);
-$pdf->Cell(0, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ')), 0, 1);
-
-// ข้อมูลลูกค้าหรือโครงการ
+$pdf->Cell(60, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'เบิกเพื่อขาย' : 'เบิกเพื่อโครงการ')), 0);
 $pdf->SetFont('THSarabunNew', 'B', 11);
 $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', ($issueData[0]['issue_type'] == 'sale' ? 'ลูกค้า:' : 'โครงการ:')), 0);
 $pdf->SetFont('THSarabunNew', '', 11);
