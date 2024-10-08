@@ -7,9 +7,9 @@ ini_set('display_errors', 1);
 
 function dd_return($status, $message)
 {
-    $json = ['status' => $status ? 'success' : 'fail', 'message' => $message];
-    http_response_code($status ? 200 : 400);
-    die(json_encode($json));
+    header('Content-Type: application/json');
+    echo json_encode(['status' => $status ? 'success' : 'fail', 'message' => $message]);
+    exit;
 }
 
 header('Content-Type: application/json; charset=utf-8;');
