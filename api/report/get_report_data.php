@@ -1,0 +1,67 @@
+<?php
+    require_once '../../config/connect.php';
+    require_once '../../config/permission.php';
+requirePermission(['manage_reports']);
+
+// ตั้งค่า header เป็น JSON และป้องกันการแสดงผล HTML
+header('Content-Type: application/json');
+error_reporting(0);
+ini_set('display_errors', 0);
+
+try {
+    $reportType = $_GET['reportType'] ?? '';
+    $startId = $_GET['startId'] ?? '';
+    $endId = $_GET['endId'] ?? '';
+    $categoryId = $_GET['categoryId'] ?? '';
+    $typeId = $_GET['typeId'] ?? '';
+    $endDate = $_GET['endDate'] ?? '';
+
+    $query = "SELECT p.product_id, p.name_th, p.name_en
+              FROM products p
+              JOIN product_cate pc ON p.product_type_id = pc.category_id
+              JOIN product_types pt ON pc.product_category_id = pt.type_id
+              WHERE 1=1";
+
+    $params = [];
+
+    if ($reportType === 'product') {
+        // สลับ startId และ endId ถ้า startId มากกว่า endId
+        if ($startId > $endId) {
+            $temp = $startId;
+            $startId = $endId;
+            $endId = $temp;
+        }
+        $query .= " AND p.product_id BETWEEN :startId AND :endId";
+        $params[':startId'] = $startId;
+        $params[':endId'] = $endId;
+    } elseif ($reportType === 'category') {
+        $query .= " AND pt.type_id = :categoryId";
+        $params[':categoryId'] = $categoryId;
+        if ($typeId) {
+            $query .= " AND pc.category_id = :typeId";
+            $params[':typeId'] = $typeId;
+        }
+    }
+
+if ($reportType === 'product') {
+    // สลับ startId และ endId ถ้า startId มากกว่า endId
+    if ($startId > $endId) {
+        $temp = $startId;
+        $startId = $endId;
+        $endId = $temp;
+    }
+    $query .= " AND p.product_id BETWEEN :startId AND :endId";
+    $params[':startId'] = $startId;
+    $params[':endId'] = $endId;
+}
+    $query .= " ORDER BY p.product_id";
+
+    $stmt = dd_q($query, $params);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(['data' => $products]);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['error' => $e->getMessage()]);
+}
+?>

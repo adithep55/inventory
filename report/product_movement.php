@@ -87,25 +87,41 @@ requirePermission(['manage_reports']);
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-md-3 m-1">
+                                    <select id="reportType" class="form-control select2">
+                                        <option value="">เลือกวิธีการรายงาน</option>
+                                        <option value="product">ตามรหัสสินค้า</option>
+                                        <option value="category">ตามหมวดหมู่</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 m-1" id="startProductDiv" style="display:none;">
                                     <select id="startProductId" class="form-control select2">
                                         <option value="">เลือกรหัสสินค้าเริ่มต้น</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 m-1">
+                                <div class="col-md-3 m-1" id="endProductDiv" style="display:none;">
                                     <select id="endProductId" class="form-control select2">
                                         <option value="">เลือกรหัสสินค้าสิ้นสุด</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3 m-1">
-                                    <input type="date" id="endDate" class="form-control"
-                                        placeholder="วันที่สิ้นสุดรายงาน">
+                                <div class="col-md-3 m-1" id="categoryDiv" style="display:none;">
+                                    <select id="category_id" class="form-control select2">
+                                        <option value="">เลือกหมวดหมู่</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 m-1" id="typeDiv" style="display:none;">
+                                    <select id="type_id" class="form-control select2">
+                                        <option value="">เลือกประเภทย่อย (ไม่บังคับ)</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-3 m-1">
-    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
-</div>
-<div class="col-md-3 m-1">
-    <button id="generatePdfReport" class="btn btn-secondary">สร้าง PDF Report</button>
-</div>
+                                    <input type="date" id="endDate" class="form-control" placeholder="วันที่สิ้นสุดรายงาน">
+                                </div>
+                                <div class="col-md-3 m-1">
+                                    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
+                                </div>
+                                <div class="col-md-3 m-1">
+                                    <button id="generatePdfReport" class="btn btn-secondary">สร้าง PDF Report</button>
+                                </div>
                             </div>
                             <div id="productReports"></div>
                         </div>
@@ -114,6 +130,7 @@ requirePermission(['manage_reports']);
             </div>
         </div>
     </div>
+
 
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/feather.min.js"></script>
@@ -240,96 +257,69 @@ requirePermission(['manage_reports']);
                     }
                 });
             }
-            $('#generatePdfReport').click(function() {
-    var startId = $('#startProductId').val();
-    var endId = $('#endProductId').val();
-    var endDate = $('#endDate').val();
+            
+            $('#reportType').change(function() {
+        var reportType = $(this).val();
+        $('#startProductDiv, #endProductDiv, #categoryDiv, #typeDiv').hide();
+        $('#startProductId, #endProductId, #category_id, #type_id').val('').trigger('change');
 
-    if (startId && endId && endDate) {
-        window.open('generate_movement_report.php?startProductId=' + startId + '&endProductId=' + endId + '&endDate=' + endDate, '_blank');
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-            text: 'กรุณาเลือกรหัสสินค้าเริ่มต้น, รหัสสินค้าสิ้นสุด และวันที่สิ้นสุดรายงาน',
-            confirmButtonText: 'ตกลง'
+        if (reportType === 'product') {
+            $('#startProductDiv, #endProductDiv').show();
+            loadProducts();
+        } else if (reportType === 'category') {
+            $('#categoryDiv').show();
+            loadTypes();
+        }
+    });
+
+    function loadTypes() {
+        $.ajax({
+            url: '../api/get_types.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var options = '<option value="">เลือกหมวดหมู่หลัก</option>';
+                $.each(data, function (index, type) {
+                    options += '<option value="' + type.type_id + '">' + type.name + '</option>';
+                });
+                $('#category_id').html(options);
+            }
         });
     }
-});
 
-            $('#generateReport').click(function () {
-                var startId = $('#startProductId').val();
-                var endId = $('#endProductId').val();
-                var endDate = $('#endDate').val();
+    $('#category_id').change(function() {
+        var typeId = $(this).val();
+        if (typeId) {
+            $('#typeDiv').show();
+            loadCategories(typeId);
+        } else {
+            $('#typeDiv').hide();
+            $('#type_id').val('').trigger('change');
+        }
+    });
 
-                // Reset error highlighting
-                $('.form-control, .select2-container').removeClass('error-highlight');
+    function loadCategories(typeId) {
+        $.ajax({
+            url: '../api/get_categories.php',
+            type: 'GET',
+            data: { type_id: typeId },
+            dataType: 'json',
+            success: function (data) {
+                var options = '<option value="">เลือกประเภทย่อย (ไม่บังคับ)</option>';
+                $.each(data, function (index, category) {
+                    options += '<option value="' + category.category_id + '">' + category.name + '</option>';
+                });
+                $('#type_id').html(options);
+            }
+        });
+    }
 
-                var isValid = true;
-                var errorMessage = '';
-
-                if (!startId) {
-                    $('#startProductId').next('.select2-container').addClass('error-highlight');
-                    errorMessage += 'กรุณาเลือกรหัสสินค้าเริ่มต้น<br>';
-                    isValid = false;
-                }
-
-                if (!endId) {
-                    $('#endProductId').next('.select2-container').addClass('error-highlight');
-                    errorMessage += 'กรุณาเลือกรหัสสินค้าสิ้นสุด<br>';
-                    isValid = false;
-                }
-
-                if (!endDate) {
-                    $('#endDate').addClass('error-highlight');
-                    errorMessage += 'กรุณาเลือกวันที่สิ้นสุดรายงาน<br>';
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                        html: errorMessage,
-                        confirmButtonText: 'ตกลง'
-                    });
-                    return;
-                }
-                if (startId && endId && endDate) {
-                    $.ajax({
-                        url: '../api/get_products.php',
-                        type: 'GET',
-                        dataType: 'json',
-                        success: function (response) {
-                            console.log("Generate report response:", response);
-                            if (response.data && Array.isArray(response.data)) {
-                                $('#productReports').empty();
-                                var filteredProducts = response.data.filter(function (product) {
-                                    return product.product_id >= startId && product.product_id <= endId;
-                                });
-                                filteredProducts.forEach(function (product) {
-                                    var $productSection = createProductTable(product.product_id, product.name_th || product.name_en);
-                                    $('#productReports').append($productSection);
-                                    initializeDataTable(product.product_id);
-                                });
-                            } else {
-                                console.error("Invalid product data structure:", response);
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.error("Ajax error loading products:", error);
-                        }
-                    });
-                }
-            });
-
-            // โหลดตัวเลือกสินค้า
+        function loadProducts() {
             $.ajax({
                 url: '../api/get_products.php',
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
-                    console.log("Product API response:", response);
                     if (response.data && Array.isArray(response.data)) {
                         var options = '<option value="">เลือกรหัสสินค้า</option>';
                         response.data.forEach(function (product) {
@@ -338,28 +328,109 @@ requirePermission(['manage_reports']);
                             options += '<option value="' + productId + '">' + productId + ' - ' + productName + '</option>';
                         });
                         $('#startProductId, #endProductId').html(options);
-                    } else {
-                        console.error("Invalid product data structure:", response);
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error("Ajax error loading products:", error);
                 }
             });
+        }
 
-            // ตั้งค่าวันที่เริ่มต้นเป็นวันสุดท้ายของเดือนปัจจุบัน
-            var today = new Date();
-            var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-            $('#endDate').val(lastDayOfMonth.toISOString().split('T')[0]);
-            // รีเซ็ต highlight สำหรับ input ปกติและ Select2
-            $(document).on('change', '.form-control', function () {
-                $(this).removeClass('error-highlight');
-            });
+        $('#generateReport').click(function () {
+            var reportType = $('#reportType').val();
+            var startId = $('#startProductId').val();
+            var endId = $('#endProductId').val();
+            var categoryId = $('#category_id').val();
+            var typeId = $('#type_id').val();
+            var endDate = $('#endDate').val();
 
-            $(document).on('select2:select', '.select2', function (e) {
-                $(this).next('.select2-container').removeClass('error-highlight');
-            });
+            if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
+                (reportType === 'category' && !categoryId)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                    text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
+                    confirmButtonText: 'ตกลง'
+                });
+                return;
+            }
+
+            var data = {
+                reportType: reportType,
+                startId: startId,
+                endId: endId,
+                categoryId: categoryId,
+                typeId: typeId,
+                endDate: endDate
+            };
+
+            $.ajax({
+        url: '../api/report/get_report_data.php',
+        type: 'GET',
+        data: data,
+        dataType: 'json',
+        success: function (response) {
+            if (response.data && Array.isArray(response.data)) {
+                $('#productReports').empty();
+                var products = response.data;
+                
+                // เรียงลำดับสินค้าตามการเลือกของผู้ใช้
+                if (reportType === 'product' && startId > endId) {
+                    products.reverse();
+                }
+                
+                products.forEach(function (product) {
+                    var $productSection = createProductTable(product.product_id, product.name_th || product.name_en);
+                    $('#productReports').append($productSection);
+                    initializeDataTable(product.product_id);
+                });
+            } else {
+                console.error("Invalid data structure:", response);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Ajax error:", error);
+            console.log("Response Text:", xhr.responseText);
+        }
+    });
+});
+
+        $('#generatePdfReport').click(function() {
+            var reportType = $('#reportType').val();
+            var startId = $('#startProductId').val();
+            var endId = $('#endProductId').val();
+            var categoryId = $('#category_id').val();
+            var typeId = $('#type_id').val();
+            var endDate = $('#endDate').val();
+
+            if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
+                (reportType === 'category' && !categoryId)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                    text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
+                    confirmButtonText: 'ตกลง'
+                });
+                return;
+            }
+
+            var url = 'generate_movement_report.php?reportType=' + reportType +
+                      '&endDate=' + endDate;
+            
+            if (reportType === 'product') {
+                url += '&startProductId=' + startId + '&endProductId=' + endId;
+            } else if (reportType === 'category') {
+                url += '&categoryId=' + categoryId;
+                if (typeId) {
+                    url += '&typeId=' + typeId;
+                }
+            }
+            
+            window.open(url, '_blank');
         });
+
+        // ตั้งค่าวันที่เริ่มต้นเป็นวันสุดท้ายของเดือนปัจจุบัน
+        var today = new Date();
+        var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        $('#endDate').val(lastDayOfMonth.toISOString().split('T')[0]);
+    });
     </script>
 </body>
 </html>
