@@ -163,20 +163,29 @@ $(document).ready(function() {
             Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลได้', 'error');
         });
 
-        function populateForm(data) {
-    $('#receiveId').val(data.receive_header_id);
-    $('#billNumber').val(data.bill_number);
-    $('#receiveDate').val(data.received_date);
-    $('#receiveType').val(data.is_opening_balance == 1 ? 'opening' : 'normal');
+    function populateForm(data) {
+        $('#receiveId').val(data.receive_header_id);
+        $('#billNumber').val(data.bill_number);
+        
+        // แปลงวันที่จากรูปแบบ DD-MM-YYYY เป็น YYYY-MM-DD
+        const dateParts = data.received_date.split('-');
+        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        $('#receiveDate').val(formattedDate);
+        
+        // เก็บค่าวันที่เดิมไว้เพื่อใช้ในการเปรียบเทียบการเปลี่ยนแปลง
+        $('#receiveDate').data('original', formattedDate);
+        
+        $('#receiveType').val(data.is_opening_balance == 1 ? 'opening' : 'normal');
 
-    const tbody = $('#receiveItemsTable tbody');
-    tbody.empty();
-    data.items.forEach(function(item) {
-        addItemRow(item);
-    });
-    $('#receiveItemsTable').data('original-row-count', data.items.length);
-    updateFormStatus();
-}
+        const tbody = $('#receiveItemsTable tbody');
+        tbody.empty();
+        data.items.forEach(function(item) {
+            addItemRow(item);
+        });
+        $('#receiveItemsTable').data('original-row-count', data.items.length);
+        updateFormStatus();
+    }
+
 
 function addItemRow(item) {
         if (!productLocationSelections[item.product_id]) {
@@ -276,74 +285,135 @@ function addItemRow(item) {
         });
     }
     $('#addNewItem').on('click', function() {
-    Swal.fire({
-        title: 'เพิ่มสินค้าใหม่',
-        html:
-            '<select id="newProductId" class="swal2-input">' +
-            '<option value="">กำลังโหลดข้อมูล...</option>' +
-            '</select>' +
-            '<select id="newLocationId" class="swal2-input">' +
-            '<option value="">กำลังโหลดข้อมูล...</option>' +
-            '</select>',
-        focusConfirm: false,
-        didOpen: () => {
-            populateProductDropdown();
-            populateLocationDropdown();
-        },
-        preConfirm: () => {
-            return {
-                productId: document.getElementById('newProductId').value,
-                locationId: document.getElementById('newLocationId').value,
-                quantity: 0  // กำหนดค่า default เป็น 0
-            }
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            addNewItemToTable(result.value);
-        }
-    });
-});
-
-    function populateProductDropdown() {
-        $.ajax({
-            url: '../api/get_products.php',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                draw: 1,
-                start: 0,
-                length: 1000,
-                search: { value: '' }
+        Swal.fire({
+            title: 'เพิ่มสินค้าใหม่',
+            html:
+                '<div class="input-group mb-3">' +
+                    '<input type="text" id="productSearch" class="form-control" placeholder="ค้นหาสินค้า">' +
+                    '<div class="input-group-append">' +
+                        '<button class="btn btn-outline-secondary" type="button" id="searchBtn"><i class="fas fa-search"></i></button>' +
+                    '</div>' +
+                '</div>' +
+                '<select id="newProductId" class="swal2-input">' +
+                    '<option value="">เลือกสินค้า</option>' +
+                '</select>' +
+                '<div class="input-group mb-3">' +
+                    '<input type="text" id="locationFilter" class="form-control" placeholder="ค้นหาคลังสินค้า">' +
+                    '<div class="input-group-append">' +
+                        '<button class="btn btn-outline-secondary" type="button" id="locationSearchBtn"><i class="fas fa-search"></i></button>' +
+                    '</div>' +
+                '</div>' +
+                '<select id="newLocationId" class="swal2-input">' +
+                    '<option value="">เลือกคลังสินค้า</option>' +
+                '</select>',
+            focusConfirm: false,
+            didOpen: () => {
+                populateProductDropdown();
+                populateLocationDropdown();
+                setupProductSearch();
+                setupLocationFilter();
+                document.getElementById('newProductId').style.display = 'block';
+                document.getElementById('newLocationId').style.display = 'block';
             },
-            success: function(response) {
-                if (response && Array.isArray(response.data)) {
-                    const select = $('#newProductId');
-                    select.empty();
-                    select.append($('<option>').val('').text('เลือกสินค้า'));
-                    response.data.forEach(function(product) {
-                        const option = $('<option>')
-                            .val(product.product_id)
-                            .text(product.name_th + ' (' + product.product_id + ')');
-                        
-                        if (productSelectionCount[product.product_id] >= availableLocations.length) {
-                            option.prop('disabled', true);
-                        }
-                        
-                        select.append(option);
-                    });
-                } else {
-                    console.error('Invalid response from get_products.php:', response);
-                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้', 'error');
+            preConfirm: () => {
+                return {
+                    productId: document.getElementById('newProductId').value,
+                    locationId: document.getElementById('newLocationId').value,
+                    quantity: 0
                 }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX error:', status, error);
-                Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                addNewItemToTable(result.value);
+            }
+        });
+    });
+
+function setupProductSearch() {
+    const searchInput = document.getElementById('productSearch');
+    const productSelect = document.getElementById('newProductId');
+    const searchBtn = document.getElementById('searchBtn');
+
+    // Show all products immediately
+    productSelect.style.display = 'block';
+
+    function filterProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        Array.from(productSelect.options).forEach(option => {
+            if (option.value === "") return; // Skip the "เลือกสินค้า" option
+            const productText = option.text.toLowerCase();
+            if (productText.includes(searchTerm)) {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
             }
         });
     }
 
-    function populateLocationDropdown() {
+    searchInput.addEventListener('input', filterProducts);
+    searchBtn.addEventListener('click', filterProducts);
+
+    // Update input when a product is selected
+    productSelect.addEventListener('change', () => {
+        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        searchInput.value = selectedOption.text;
+    });
+}
+
+function populateProductDropdown() {
+    $.ajax({
+        url: '../api/get_products.php',
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            draw: 1,
+            start: 0,
+            length: 1000,
+            search: { value: '' }
+        },
+        success: function(response) {
+            if (response && Array.isArray(response.data)) {
+                const select = $('#newProductId');
+                select.empty();
+                select.append($('<option>').val('').text('เลือกสินค้า'));
+                response.data.forEach(function(product) {
+                    const option = $('<option>')
+                        .val(product.product_id)
+                        .text(product.product_id + ' - ' + product.name_th);
+                    
+                    if (productSelectionCount[product.product_id] >= availableLocations.length) {
+                        option.prop('disabled', true);
+                    }
+                    
+                    select.append(option);
+                });
+                
+                // Make sure the select is visible
+                select.show();
+            } else {
+                console.error('Invalid response from get_products.php:', response);
+                Swal.fire('ข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลสินค้าได้', 'error');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX error:', status, error);
+            Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+        }
+    });
+}
+function setupLocationFilter() {
+        const filterInput = document.getElementById('locationFilter');
+        const locationSelect = document.getElementById('newLocationId');
+
+        filterInput.addEventListener('input', function() {
+            const filterText = this.value.toLowerCase();
+            Array.from(locationSelect.options).forEach(option => {
+                const shouldShow = option.text.toLowerCase().includes(filterText);
+                option.style.display = shouldShow ? '' : 'none';
+            });
+        });
+    }
+function populateLocationDropdown() {
         const select = $('#newLocationId');
         select.empty();
         select.append($('<option>').val('').text('เลือกคลังสินค้า'));
@@ -477,29 +547,30 @@ function addItemRow(item) {
             hasChanges = true;
         }
 
-       // ตรวจสอบการเปลี่ยนแปลงในรายการสินค้า
-    const originalRowCount = $('#receiveItemsTable').data('original-row-count') || 0;
-    const currentRowCount = $('#receiveItemsTable tbody tr').length;
-    
-    if (originalRowCount !== currentRowCount) {
-        hasChanges = true;
-    } else {
-        $('#receiveItemsTable tbody tr').each(function() {
-            const row = $(this);
-            const originalQuantity = parseFloat(row.find('td:eq(3)').text());
-            const newQuantity = parseFloat(row.find('.new-quantity').val());
-            const originalLocation = row.find('.location-select').data('original');
-            const newLocation = row.find('.location-select').val();
+        // ตรวจสอบการเปลี่ยนแปลงในรายการสินค้า
+        const originalRowCount = $('#receiveItemsTable').data('original-row-count') || 0;
+        const currentRowCount = $('#receiveItemsTable tbody tr').length;
+        
+        if (originalRowCount !== currentRowCount) {
+            hasChanges = true;
+        } else {
+            $('#receiveItemsTable tbody tr').each(function() {
+                const row = $(this);
+                const originalQuantity = parseFloat(row.find('td:eq(3)').text());
+                const newQuantity = parseFloat(row.find('.new-quantity').val());
+                const originalLocation = row.find('.location-select').data('original');
+                const newLocation = row.find('.location-select').val();
 
-            if (originalQuantity !== newQuantity || originalLocation != newLocation) {
-                hasChanges = true;
-                return false; 
-            }
-        });
+                if (originalQuantity !== newQuantity || originalLocation != newLocation) {
+                    hasChanges = true;
+                    return false; 
+                }
+            });
+        }
+
+        $('button[type="submit"]').prop('disabled', !hasChanges);
     }
 
-    $('button[type="submit"]').prop('disabled', !hasChanges);
-}
     function updateProductSelectionStatus(productId) {
         const option = $(`#newProductId option[value="${productId}"]`);
         if (productSelectionCount[productId] >= availableLocations.length) {
