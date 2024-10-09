@@ -131,8 +131,7 @@ requirePermission(['manage_issue']);
                                 <div class="row mt-3">
                                     <div class="col-md-12">
                                         <button type="submit" class="btn btn-primary">บันทึกการแก้ไข</button>
-                                        <button type="button" class="btn btn-secondary"
-                                            onclick="history.back()">ยกเลิก</button>
+                                        <button type="button" class="btn btn-secondary" id="cancelButton">ยกเลิก</button>
                                     </div>
                                 </div>
                             </form>

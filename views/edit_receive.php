@@ -88,7 +88,7 @@ requirePermission(['manage_receiving']);
                                     <div class="col-md-12">
                                         <button type="button" class="btn btn-primary" id="addNewItem">เพิ่มสินค้าใหม่</button>
                                         <button type="submit" class="btn btn-success">บันทึกการแก้ไข</button>
-                                        <button type="button" class="btn btn-secondary" onclick="history.back()">ยกเลิก</button>
+                                        <button type="button" class="btn btn-secondary" id="cancelButton">ยกเลิก</button>
                                     </div>
                                 </div>
                             </form>
@@ -352,12 +352,6 @@ function setupProductSearch() {
 
     searchInput.addEventListener('input', filterProducts);
     searchBtn.addEventListener('click', filterProducts);
-
-    // Update input when a product is selected
-    productSelect.addEventListener('change', () => {
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
-        searchInput.value = selectedOption.text;
-    });
 }
 
 function populateProductDropdown() {
@@ -418,7 +412,7 @@ function populateLocationDropdown() {
         select.empty();
         select.append($('<option>').val('').text('เลือกคลังสินค้า'));
         availableLocations.forEach(function(location) {
-            select.append($('<option>').val(location.location_id).text(location.location));
+            select.append($('<option>').val(location.location_id).text(location.location + ' - ' + location.location_id));
         });
     }
 
