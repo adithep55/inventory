@@ -754,49 +754,35 @@ $('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () 
 updateProductSelectionStatus(productId);
 }
 
-function removeProductFromIssueTable(productId) {
-    var removedRow = $('#issueTable tbody').find(`tr[data-product-id="${productId}"]:last`);
-    var removedLocationId = removedRow.find('.location-select').val();
+function removeProductFromIssueTable($row) {
+    var productId = $row.attr('data-product-id');
+    var removedLocationId = $row.find('.location-select').val();
 
-    if (removedLocationId) {
+    if (removedLocationId && productLocationSelections[productId]) {
         productLocationSelections[productId].delete(removedLocationId);
     }
 
-    removedRow.remove();
+    $row.remove();
 
     if (productSelectionCount[productId]) {
         productSelectionCount[productId]--;
     }
 
     // ตรวจสอบว่ายังมีรายการของสินค้านี้เหลืออยู่หรือไม่
-    var remainingRows = $('#issueTable tbody').find(`tr[data-product-id="${productId}"]`).length;
+    var remainingRows = $('#issueTable tbody tr[data-product-id="' + productId + '"]').length;
     if (remainingRows === 0) {
-        // ถ้าไม่มีรายการเหลืออยู่ ให้รีเซ็ต productSelectionCount และ productLocationSelections
         delete productSelectionCount[productId];
         delete productLocationSelections[productId];
     }
 
-updateProductSelectionStatus(productId);
+    updateProductSelectionStatus(productId);
     updateAvailableLocations(productId);
-    updateAllProductSelectionStatus();
-
-    $('#issueTable tbody tr').each(function () {
-        updateAvailableLocations($(this).data('product-id'));
-    });
-
-    updateFormStatus();
 }
-$('#issueTable').on('click', '.remove-row', function () {
-    var row = $(this).closest('tr');
-    var productId = row.data('product-id');
-    removeProductFromIssueTable(productId);
-    updateAllProductSelectionStatus(); // เพิ่มบรรทัดนี้
-});
 
 $('#issueTable').on('click', '.remove-row', function () {
-    var row = $(this).closest('tr');
-    var productId = row.data('product-id');
-    var quantity = parseInt(row.find('.quantity').val());
+    var $row = $(this).closest('tr');
+    var productId = $row.attr('data-product-id');
+    var quantity = parseInt($row.find('.quantity').val());
 
     if (quantity > 0) {
         Swal.fire({
@@ -810,11 +796,13 @@ $('#issueTable').on('click', '.remove-row', function () {
             cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if (result.isConfirmed) {
-                removeProductFromIssueTable(productId);
+                removeProductFromIssueTable($row);
+                updateAllProductSelectionStatus();
             }
         });
     } else {
-        removeProductFromIssueTable(productId);
+        removeProductFromIssueTable($row);
+        updateAllProductSelectionStatus();
     }
 });
 
