@@ -103,77 +103,98 @@ class PDF extends FPDF
             $this->AddPage($this->CurOrientation);
         }
     }
-
     function ProductTable($product, $movements, $openingBalance)
     {
         $this->SetFont('THSarabunNew', 'B', 12);
         $this->Cell(0, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า: ' . $product['product_id'] . ' - ' . ($product['name_th'] ?? $product['name_en'])), 0, 1);
         $this->Ln(2);
+    
+      // Table header
+    $this->SetFillColor(240, 240, 240);
+    $this->SetFont('THSarabunNew', 'B', 11);
+    $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'วันที่'), 1, 0, 'C', true);
+    $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'ตำแหน่ง'), 1, 0, 'C', true);
+    $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รายการ'), 1, 0, 'C', true);
+    $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รับ'), 1, 0, 'C', true);
+    $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'เบิก'), 1, 0, 'C', true);
+    $this->Cell(35, 5, iconv('UTF-8', 'cp874', 'โอนย้าย'), 1, 0, 'C', true);  // ปรับความกว้างเป็น 35
+    $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'คงเหลือ'), 1, 0, 'C', true);
+    $this->Cell(10, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 1, 'C', true);
 
-        // Table header
-        $this->SetFillColor(240, 240, 240);
-        $this->SetFont('THSarabunNew', 'B', 11);
-        $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'วันที่'), 1, 0, 'C', true);
-        $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'รายการ'), 1, 0, 'C', true);
-        $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รับ'), 1, 0, 'C', true);
-        $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'เบิก'), 1, 0, 'C', true);
-        $this->Cell(50, 5, iconv('UTF-8', 'cp874', 'โอนย้าย'), 1, 0, 'C', true);
-        $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'คงเหลือ'), 1, 0, 'C', true);
-        $this->Cell(15, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 1, 'C', true);
-
+    
         $this->SetFont('THSarabunNew', '', 11);
         $runningBalance = $openingBalance;
-
-        // Opening balance row
-        $this->Cell(20, 5, formatThaiDate($this->startDate), 1, 0, 'C');
-        $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'ยอดยกมา'), 1, 0, 'C');
-        $this->Cell(25, 5, '-', 1, 0, 'C');
-        $this->Cell(25, 5, '-', 1, 0, 'C');
-        $this->Cell(50, 5, '-', 1, 0, 'C');
-        $this->Cell(25, 5, number_format($openingBalance, 2), 1, 0, 'R');
-        $this->Cell(15, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
-
-        foreach ($movements as $movement) {
-            $this->CheckPageBreak(5);
-            
-            $quantity = floatval($movement['quantity']);
-            $transferText = '';
-            
-            $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
-            
-            switch($movement['type']) {
-                case 'receive':
-                    $runningBalance += $quantity;
-                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'รับสินค้า'), 1, 0, 'C');
-                    $this->Cell(25, 5, number_format($quantity, 2), 1, 0, 'R');
-                    $this->Cell(25, 5, '-', 1, 0, 'C');
-                    $this->Cell(50, 5, '-', 1, 0, 'C');
-                    break;
-                case 'issue':
-                    $runningBalance -= $quantity;
-                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'เบิกสินค้า'), 1, 0, 'C');
-                    $this->Cell(25, 5, '-', 1, 0, 'C');
-                    $this->Cell(25, 5, number_format($quantity, 2), 1, 0, 'R');
-                    $this->Cell(50, 5, '-', 1, 0, 'C');
-                    break;
-                case 'transfer':
-                    $fromLocation = $this->locations[$movement['from_location']] ?? 'ไม่ทราบ';
-                    $toLocation = $this->locations[$movement['to_location']] ?? 'ไม่ทราบ';
-                    $transferText = $quantity . ' (' . $fromLocation . ' → ' . $toLocation . ')';
-                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'โอนย้าย'), 1, 0, 'C');
-                    $this->Cell(25, 5, '-', 1, 0, 'C');
-                    $this->Cell(25, 5, '-', 1, 0, 'C');
-                    $this->Cell(50, 5, iconv('UTF-8', 'cp874', $transferText), 1, 0, 'C');
-                    break;
-            }
-
-            $this->Cell(25, 5, number_format($runningBalance, 2), 1, 0, 'R');
-            $this->Cell(15, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
+        $totalReceive = 0;
+        $totalIssue = 0;
+    
+       // Opening balance row
+       $this->Cell(20, 5, formatThaiDate($this->startDate), 1, 0, 'C');
+       $this->Cell(25, 5, iconv('UTF-8', 'cp874', '-'), 1, 0, 'C');
+       $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'ยอดยกมา'), 1, 0, 'C');
+       $this->Cell(25, 5, '-', 1, 0, 'C');
+       $this->Cell(25, 5, '-', 1, 0, 'C');
+       $this->Cell(35, 5, '-', 1, 0, 'C');
+       $this->Cell(25, 5, number_format($openingBalance, 2), 1, 0, 'R');
+       $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
+    
+    foreach ($movements as $movement) {
+        $this->CheckPageBreak(5);
+        
+        $quantity = floatval($movement['quantity']);
+        $transferText = '';
+        
+        $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
+        
+        $location = '-';
+        switch($movement['type']) {
+            case 'receive':
+                $runningBalance += $quantity;
+                $totalReceive += $quantity;
+                $location = $this->locations[$movement['to_location']] ?? '-';
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', $location), 1, 0, 'C');
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รับสินค้า'), 1, 0, 'C');
+                $this->Cell(25, 5, number_format($quantity, 2), 1, 0, 'R');
+                $this->Cell(25, 5, '-', 1, 0, 'C');
+                $this->Cell(35, 5, '-', 1, 0, 'C');  // ปรับความกว้างเป็น 35
+                break;
+            case 'issue':
+                $runningBalance -= $quantity;
+                $totalIssue += $quantity;
+                $location = $this->locations[$movement['from_location']] ?? '-';
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', $location), 1, 0, 'C');
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'เบิกสินค้า'), 1, 0, 'C');
+                $this->Cell(25, 5, '-', 1, 0, 'C');
+                $this->Cell(25, 5, number_format($quantity, 2), 1, 0, 'R');
+                $this->Cell(35, 5, '-', 1, 0, 'C');  // ปรับความกว้างเป็น 35
+                break;
+            case 'transfer':
+                $fromLocation = $this->locations[$movement['from_location']] ?? '-';
+                $toLocation = $this->locations[$movement['to_location']] ?? '-';
+                $transferText = $fromLocation . ' -> ' . $toLocation;
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', $fromLocation), 1, 0, 'C');
+                $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'โอนย้าย'), 1, 0, 'C');
+                $this->Cell(25, 5, '-', 1, 0, 'C');
+                $this->Cell(25, 5, '-', 1, 0, 'C');
+                $this->Cell(35, 5, iconv('UTF-8', 'cp874', $transferText), 1, 0, 'C');  // ปรับความกว้างเป็น 35
+                break;
         }
 
-        $this->Ln(5);
+        $this->Cell(25, 5, number_format($runningBalance, 2), 1, 0, 'R');
+        $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
     }
+    
+      // Total row
+    $this->SetFont('THSarabunNew', 'B', 11);
+    $this->Cell(70, 5, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R');
+    $this->Cell(25, 5, number_format($totalReceive, 2), 1, 0, 'R');
+    $this->Cell(25, 5, number_format($totalIssue, 2), 1, 0, 'R');
+    $this->Cell(35, 5, '-', 1, 0, 'C');  // ปรับความกว้างเป็น 35
+    $this->Cell(25, 5, number_format($runningBalance, 2), 1, 0, 'R');
+    $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
+
+    $this->Ln(5);
 }
+}   
 
 $pdf = new PDF($settings);
 $pdf->startDate = $startDate;

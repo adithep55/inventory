@@ -3,11 +3,9 @@ require_once '../../config/connect.php';
 require_once '../../config/permission.php';
 requirePermission(['manage_reports']);
 
+header('Content-Type: application/json');
 error_reporting(0);
 ini_set('display_errors', 1);
-
-
-header('Content-Type: application/json');
 
 function logMessage($message) {
     error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, '../../debug.log');
@@ -32,9 +30,11 @@ try {
 
     logMessage("Processing report for Product ID: $productId, End Date: $endDate, Start Date: $startDate");
 
-    // Calculate opening balance
+    // ดึงข้อมูลยอดยกมาแยกตามตำแหน่ง
     $openingBalanceQuery = "
     SELECT 
+        l.location_id,
+        l.location AS location_name,
         COALESCE(SUM(
             CASE 
                 WHEN type = 'receive' THEN quantity
@@ -44,55 +44,60 @@ try {
                 ELSE 0
             END
         ), 0) AS opening_balance
-    FROM (
-        SELECT 'receive' as type, dr.quantity
+    FROM locations l
+    LEFT JOIN (
+        SELECT 'receive' as type, dr.quantity, dr.location_id
         FROM d_receive dr
         JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
         WHERE dr.product_id = :productId AND hr.received_date < :startDate
 
         UNION ALL
 
-        SELECT 'issue' as type, di.quantity
+        SELECT 'issue' as type, di.quantity, di.location_id
         FROM d_issue di
         JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
         WHERE di.product_id = :productId AND hi.issue_date < :startDate
 
         UNION ALL
 
-        SELECT 
-            CASE 
-                WHEN ht.from_location_id = l.location_id THEN 'transfer_out'
-                WHEN ht.to_location_id = l.location_id THEN 'transfer_in'
-            END as type,
-            dt.quantity
+        SELECT 'transfer_out' as type, dt.quantity, ht.from_location_id AS location_id
         FROM d_transfer dt
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
-        CROSS JOIN locations l
         WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
-    ) AS combined_movements
+
+        UNION ALL
+
+        SELECT 'transfer_in' as type, dt.quantity, ht.to_location_id AS location_id
+        FROM d_transfer dt
+        JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
+        WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
+    ) AS combined_movements ON l.location_id = combined_movements.location_id
+    GROUP BY l.location_id, l.location
     ";
 
     $stmt = dd_q($openingBalanceQuery, [':productId' => $productId, ':startDate' => $startDate]);
-    $openingBalance = $stmt->fetchColumn() ?: 0;
+    $openingBalances = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    logMessage("Opening Balance: " . $openingBalance);
+    logMessage("Opening Balances: " . json_encode($openingBalances));
     
+    // ดึงข้อมูลการเคลื่อนไหวแยกตามตำแหน่ง
     $movementsQuery = "
     SELECT 
         DATE(movement_date) as date,
         type,
-        SUM(quantity) as quantity,
+        quantity,
         from_location,
-        to_location
+        to_location,
+        location_id
     FROM (
-        SELECT hr.received_date as movement_date, 'receive' as type, dr.quantity, NULL as from_location, dr.location_id as to_location
+        SELECT hr.received_date as movement_date, 'receive' as type, dr.quantity, NULL as from_location, dr.location_id as to_location, dr.location_id
         FROM d_receive dr
         JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
         WHERE dr.product_id = :productId AND hr.received_date BETWEEN :startDate AND :endDate
 
         UNION ALL
 
-        SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location
+        SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location, di.location_id
         FROM d_issue di
         JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
         WHERE di.product_id = :productId AND hi.issue_date BETWEEN :startDate AND :endDate
@@ -101,16 +106,29 @@ try {
 
         SELECT 
             ht.transfer_date as movement_date, 
-            'transfer' as type,
+            'transfer_out' as type,
             dt.quantity, 
             ht.from_location_id as from_location,
-            ht.to_location_id as to_location
+            ht.to_location_id as to_location,
+            ht.from_location_id as location_id
+        FROM d_transfer dt
+        JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
+        WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
+
+        UNION ALL
+
+        SELECT 
+            ht.transfer_date as movement_date, 
+            'transfer_in' as type,
+            dt.quantity, 
+            ht.from_location_id as from_location,
+            ht.to_location_id as to_location,
+            ht.to_location_id as location_id
         FROM d_transfer dt
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
     ) AS combined_movements
-    GROUP BY DATE(movement_date), type, from_location, to_location
-    ORDER BY DATE(movement_date), type
+    ORDER BY date, type
     ";
 
     $stmt = dd_q($movementsQuery, [':productId' => $productId, ':startDate' => $startDate, ':endDate' => $endDate]);
@@ -123,54 +141,105 @@ try {
     $stmt = dd_q($locationsQuery);
     $locations = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// ดึงข้อมูลหน่วยของสินค้า
-$productUnitQuery = "SELECT unit FROM products WHERE product_id = :productId";
-$stmt = dd_q($productUnitQuery, [':productId' => $productId]);
-$productUnit = $stmt->fetchColumn();
+    // ดึงข้อมูลหน่วยของสินค้า
+    $productUnitQuery = "SELECT unit FROM products WHERE product_id = :productId";
+    $stmt = dd_q($productUnitQuery, [':productId' => $productId]);
+    $productUnit = $stmt->fetchColumn();
 
+    $processedMovements = [];
+    $runningBalances = array_column($openingBalances, 'opening_balance', 'location_id');
+    $totalBalance = 0;
 
-   $processedMovements = [];
-    $runningBalance = $openingBalance;
-
-    foreach ($movements as $movement) {
-        $quantity = floatval($movement['quantity']);
-        $transferText = '';
-        
-        switch($movement['type']) {
-            case 'receive':
-                $runningBalance += $quantity;
-                break;
-            case 'issue':
-                $runningBalance -= $quantity;
-                break;
-            case 'transfer':
-                $fromLocation = $locations[$movement['from_location']] ?? 'ไม่ทราบ';
-                $toLocation = $locations[$movement['to_location']] ?? 'ไม่ทราบ';
-                $transferText = $quantity . ' (' . $fromLocation . ' --> ' . $toLocation . ')';
-                break;
-        }
-
-        $processedMovements[] = [
-            'date' => formatThaiDate($movement['date']),
-            'receive' => $movement['type'] == 'receive' ? $quantity : 0,
-            'issue' => $movement['type'] == 'issue' ? $quantity : 0,
-            'transfer' => $transferText,
-            'balance' => $runningBalance,
-            'unit' => $productUnit,
-            'entry_type' => 'transaction'
-        ];
-    }
-
-    array_unshift($processedMovements, [
-        'date' => formatThaiDate($startDate),
+ // เพิ่มยอดยกมาสำหรับแต่ละตำแหน่ง
+ foreach ($openingBalances as $balance) {
+    $balanceValue = floatval($balance['opening_balance']);
+    $totalBalance += $balanceValue;
+    $processedMovements[] = [
+        'date' => '',
+        'location' => 'รวมทั้งสิ้น',
         'receive' => null,
         'issue' => null,
         'transfer' => null,
-        'balance' => floatval($openingBalance),
+        'balance' => $totalBalance,
         'unit' => $productUnit,
-        'entry_type' => 'opening_balance'
-    ]);
+        'entry_type' => 'total'
+    ];
+}
 
+foreach ($movements as $movement) {
+    $quantity = floatval($movement['quantity']);
+    $locationId = $movement['location_id'];
+    $locationName = $locations[$locationId] ?? 'ไม่ทราบ';
+    
+    switch($movement['type']) {
+        case 'receive':
+            $runningBalances[$locationId] += $quantity;
+            $totalBalance += $quantity;
+            $processedMovements[] = [
+                'date' => formatThaiDate($movement['date']),
+                'location' => $locationName,
+                'receive' => $quantity,
+                'issue' => null,
+                'transfer' => null,
+                'balance' => $runningBalances[$locationId],
+                'unit' => $productUnit,
+                'entry_type' => 'transaction'
+            ];
+            break;
+        case 'issue':
+            $runningBalances[$locationId] -= $quantity;
+            $totalBalance -= $quantity;
+            $processedMovements[] = [
+                'date' => formatThaiDate($movement['date']),
+                'location' => $locationName,
+                'receive' => null,
+                'issue' => $quantity,
+                'transfer' => null,
+                'balance' => $runningBalances[$locationId],
+                'unit' => $productUnit,
+                'entry_type' => 'transaction'
+            ];
+            break;
+        case 'transfer_out':
+            $runningBalances[$locationId] -= $quantity;
+            $toLocation = $locations[$movement['to_location']] ?? 'ไม่ทราบ';
+            $processedMovements[] = [
+                'date' => formatThaiDate($movement['date']),
+                'location' => $locationName,
+                'receive' => null,
+                'issue' => null,
+                'transfer' => "- $quantity (ไปยัง $toLocation)",
+                'balance' => $runningBalances[$locationId],
+                'unit' => $productUnit,
+                'entry_type' => 'transaction'
+            ];
+            break;
+        case 'transfer_in':
+            $runningBalances[$locationId] += $quantity;
+            $fromLocation = $locations[$movement['from_location']] ?? 'ไม่ทราบ';
+            $processedMovements[] = [
+                'date' => formatThaiDate($movement['date']),
+                'location' => $locationName,
+                'receive' => null,
+                'issue' => null,
+                'transfer' => "+ $quantity (จาก $fromLocation)",
+                'balance' => $runningBalances[$locationId],
+                'unit' => $productUnit,
+                'entry_type' => 'transaction'
+            ];
+            break;
+    }
+}
+$processedMovements[] = [
+    'date' => '',
+    'location' => 'รวมทั้งสิ้น',
+    'receive' => null,
+    'issue' => null,
+    'transfer' => null,
+    'balance' => $totalBalance,
+    'unit' => $productUnit,
+    'entry_type' => 'total'
+];
     logMessage("Final processed movements: " . json_encode($processedMovements));
 
     $response = [

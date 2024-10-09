@@ -173,91 +173,106 @@ requirePermission(['manage_reports']);
                 return parseFloat(number).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             }
 
-            function initializeDataTable(productId) {
-                $('#movementTable_' + productId).DataTable({
-                    processing: true,
-                    serverSide: true,
-                    responsive: true,
-                    ajax: {
-                        url: '../api/report/get_product_movement.php',
-                        type: 'POST',
-                        data: function (d) {
-                            return {
-                                productId: productId,
-                                endDate: $('#endDate').val(),
-                                draw: d.draw,
-                                start: d.start,
-                                length: d.length,
-                                search: d.search ? d.search.value : null,
-                                order: d.order ? d.order[0] : null
-                            };
-                        },
-                        dataSrc: function (json) {
-                            console.log("Raw API response:", json);
-                            if (json.error) {
-                                console.error("API Error:", json.error);
-                                return [];
-                            }
-                            if (!json.data) {
-                                console.error("Invalid data structure received from API");
-                                return [];
-                            }
-                            return json.data;
-                        }
-                    },
-                    columns: [
-                        { data: 'date', responsivePriority: 1 },
-                        {
-                            data: 'entry_type',
-                            render: function (data, type, row) {
-                                return data === 'opening_balance' ? 'ยอดยกมา' : 'รายการปกติ';
-                            },
-                            responsivePriority: 2
-                        },
-                        {
-                            data: 'receive',
-                            render: function (data, type, row) {
-                                return row.entry_type === 'opening_balance' ? '' : formatNumber(data);
-                            },
-                            responsivePriority: 3
-                        },
-                        {
-                            data: 'issue',
-                            render: function (data, type, row) {
-                                return row.entry_type === 'opening_balance' ? '' : formatNumber(data);
-                            },
-                            responsivePriority: 4
-                        },
-                        {
-                            data: 'transfer',
-                            render: function (data, type, row) {
-                                return row.entry_type === 'opening_balance' ? '' : data;
-                            },
-                            responsivePriority: 5
-                        },
-                        {
-                            data: 'balance',
-                            render: function (data, type, row) {
-                                return formatNumber(data) + ' ' + row.unit;
-                            },
-                            responsivePriority: 2
-                        }
-                    ],
-                    order: [[0, 'asc']],
-                    createdRow: function (row, data, dataIndex) {
-                        if (data.entry_type === 'opening_balance') {
-                            $(row).addClass('opening-balance');
-                        }
-                    },
-                    language: {
-                        url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json'
-                    },
-                    error: function (xhr, error, thrown) {
-                        console.error('DataTables error:', error, thrown);
-                    }
-                });
+            function initializeDataTable(productId, data) {
+    // Filter out the total row from the main data
+    var mainData = data.filter(function(row) {
+        return row.entry_type !== 'total';
+    });
+
+    // Find the total row
+    var totalRow = data.find(function(row) {
+        return row.entry_type === 'total';
+    });
+
+    $('#movementTable_' + productId).DataTable({
+        data: mainData,
+        responsive: true,
+        columns: [
+            { data: 'date', responsivePriority: 1 },
+            { data: 'location', responsivePriority: 2 },
+            { 
+                data: 'entry_type', 
+                render: function (data, type, row) {
+                    if (data === 'opening_balance') return 'ยอดยกมา';
+                    return 'รายการปกติ';
+                },
+                responsivePriority: 3
+            },
+            { 
+                data: 'receive', 
+                render: function (data, type, row) {
+                    return formatNumber(data);
+                },
+                responsivePriority: 4
+            },
+            { 
+                data: 'issue', 
+                render: function (data, type, row) {
+                    return formatNumber(data);
+                },
+                responsivePriority: 5
+            },
+            { data: 'transfer', responsivePriority: 6 },
+            { 
+                data: 'balance', 
+                render: function (data, type, row) {
+                    return formatNumber(data) + ' ' + row.unit;
+                },
+                responsivePriority: 2
             }
-            
+        ],
+        order: [[0, 'asc'], [1, 'asc']],
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json'
+        },
+        drawCallback: function (settings) {
+            var api = this.api();
+            var footer = $(api.table().footer());
+            if (footer.length === 0) {
+                footer = $('<tfoot>').appendTo(api.table().node());
+            }
+            if (totalRow) {
+                footer.html('<tr><td colspan="6" style="text-align: right;">รวมทั้งสิ้น</td><td style="text-align: right;">' + formatNumber(totalRow.balance) + ' ' + totalRow.unit + '</td></tr>');
+            }
+        }
+    });
+}
+
+function formatNumber(number) {
+    if (number === null || number === undefined || isNaN(number)) {
+        return '';
+    }
+    return parseFloat(number).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+}
+function displayReport(results, products) {
+    $('#productReports').empty();
+    results.forEach(function(result, index) {
+        var product = products[index];
+        var $productSection = $('<div>').addClass('mb-4');
+        $productSection.append($('<div>').addClass('product-header').append($('<h4>').text('รายงานสินค้า: ' + product.product_id + ' - ' + (product.name_th || product.name_en))));
+
+        var $table = $('<table>').addClass('table table-striped table-bordered responsive nowrap')
+            .attr('id', 'movementTable_' + product.product_id)
+            .attr('width', '100%');
+
+        var $thead = $('<thead>').append($('<tr>')
+            .append($('<th>').text('วันที่'))
+            .append($('<th>').text('ตำแหน่ง'))
+            .append($('<th>').text('รายการ'))
+            .append($('<th>').text('รับ'))
+            .append($('<th>').text('เบิก'))
+            .append($('<th>').text('โอนย้าย'))
+            .append($('<th>').text('คงเหลือ'))
+        );
+
+        $table.append($thead);
+        $productSection.append($table);
+        $('#productReports').append($productSection);
+
+        initializeDataTable(product.product_id, result.data);
+    });
+}
+
             $('#reportType').change(function() {
         var reportType = $(this).val();
         $('#startProductDiv, #endProductDiv, #categoryDiv, #typeDiv').hide();
@@ -334,97 +349,119 @@ requirePermission(['manage_reports']);
         }
 
         $('#generateReport').click(function () {
-            var reportType = $('#reportType').val();
-            var startId = $('#startProductId').val();
-            var endId = $('#endProductId').val();
-            var categoryId = $('#category_id').val();
-            var typeId = $('#type_id').val();
-            var endDate = $('#endDate').val();
+    var reportType = $('#reportType').val();
+    var startId = $('#startProductId').val();
+    var endId = $('#endProductId').val();
+    var categoryId = $('#category_id').val();
+    var typeId = $('#type_id').val();
+    var endDate = $('#endDate').val();
 
-            if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
-                (reportType === 'category' && !categoryId)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                    text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
-                    confirmButtonText: 'ตกลง'
-                });
-                return;
-            }
+    if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
+        (reportType === 'category' && !categoryId)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+            text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
+            confirmButtonText: 'ตกลง'
+        });
+        return;
+    }
 
-            var data = {
-                reportType: reportType,
-                startId: startId,
-                endId: endId,
-                categoryId: categoryId,
-                typeId: typeId,
-                endDate: endDate
-            };
 
-            $.ajax({
+    $.ajax({
         url: '../api/report/get_report_data.php',
         type: 'GET',
-        data: data,
+        data: {
+            reportType: reportType,
+            startId: startId,
+            endId: endId,
+            categoryId: categoryId,
+            typeId: typeId
+        },
         dataType: 'json',
         success: function (response) {
-            if (response.data && Array.isArray(response.data)) {
-                $('#productReports').empty();
-                var products = response.data;
-                
-                // เรียงลำดับสินค้าตามการเลือกของผู้ใช้
-                if (reportType === 'product' && startId > endId) {
-                    products.reverse();
-                }
-                
-                products.forEach(function (product) {
-                    var $productSection = createProductTable(product.product_id, product.name_th || product.name_en);
-                    $('#productReports').append($productSection);
-                    initializeDataTable(product.product_id);
+            if (response.error) {
+                console.error("Error:", response.error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: response.error,
+                    confirmButtonText: 'ตกลง'
                 });
             } else {
-                console.error("Invalid data structure:", response);
+                // เรียก API ที่สองสำหรับแต่ละสินค้า
+                var products = response.data;
+                var promises = [];
+                
+                products.forEach(function(product) {
+                    promises.push(
+                        $.ajax({
+                            url: '../api/report/get_product_movement.php',
+                            type: 'POST',
+                            data: {
+                                productId: product.product_id,
+                                endDate: endDate
+                            },
+                            dataType: 'json'
+                        })
+                    );
+                });
+
+                // รอให้ทุก request เสร็จสิ้น
+                $.when.apply($, promises).then(function() {
+                    var results = [];
+                    for (var i = 0; i < arguments.length; i++) {
+                        results.push(arguments[i][0]);
+                    }
+                    displayReport(results, products);
+                });
             }
         },
         error: function (xhr, status, error) {
             console.error("Ajax error:", error);
-            console.log("Response Text:", xhr.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ',
+                text: 'กรุณาลองใหม่อีกครั้ง',
+                confirmButtonText: 'ตกลง'
+            });
         }
     });
 });
 
-        $('#generatePdfReport').click(function() {
-            var reportType = $('#reportType').val();
-            var startId = $('#startProductId').val();
-            var endId = $('#endProductId').val();
-            var categoryId = $('#category_id').val();
-            var typeId = $('#type_id').val();
-            var endDate = $('#endDate').val();
+    $('#generatePdfReport').click(function() {
+        var reportType = $('#reportType').val();
+        var startId = $('#startProductId').val();
+        var endId = $('#endProductId').val();
+        var categoryId = $('#category_id').val();
+        var typeId = $('#type_id').val();
+        var endDate = $('#endDate').val();
 
-            if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
-                (reportType === 'category' && !categoryId)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
-                    text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
-                    confirmButtonText: 'ตกลง'
-                });
-                return;
-            }
+        if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
+            (reportType === 'category' && !categoryId)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'กรุณากรอกข้อมูลให้ครบถ้วน',
+                text: 'กรุณาเลือกวิธีการรายงานและกรอกข้อมูลที่จำเป็น',
+                confirmButtonText: 'ตกลง'
+            });
+            return;
+        }
 
-            var url = 'generate_movement_report.php?reportType=' + reportType +
-                      '&endDate=' + endDate;
-            
-            if (reportType === 'product') {
-                url += '&startProductId=' + startId + '&endProductId=' + endId;
-            } else if (reportType === 'category') {
-                url += '&categoryId=' + categoryId;
-                if (typeId) {
-                    url += '&typeId=' + typeId;
-                }
+        var url = 'generate_movement_report.php?reportType=' + reportType +
+                  '&endDate=' + endDate;
+        
+        if (reportType === 'product') {
+            url += '&startProductId=' + startId + '&endProductId=' + endId;
+        } else if (reportType === 'category') {
+            url += '&categoryId=' + categoryId;
+            if (typeId) {
+                url += '&typeId=' + typeId;
             }
-            
-            window.open(url, '_blank');
-        });
+        }
+        
+        window.open(url, '_blank');
+    });
 
         // ตั้งค่าวันที่เริ่มต้นเป็นวันสุดท้ายของเดือนปัจจุบัน
         var today = new Date();
