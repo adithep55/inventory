@@ -37,13 +37,14 @@ requirePermission(['manage_inventory']);
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
-            <div class="page-header">
+    <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">รายละเอียดสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-box	"></i> คลังสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="inventory">คลังสินค้า</a></li>
-                            <li class="breadcrumb-item active">รายละเอียดสินค้า</li>
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>/views/inventory">คลังสินค้า</a></li>
+                            <li class="breadcrumb-item active">สินค้าและตำแหน่งบนคลังสินค้า</li>
                         </ul>
                     </div>
                 </div>

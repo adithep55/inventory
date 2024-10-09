@@ -25,13 +25,18 @@ requirePermission(['manage_inventory']);
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
-            <div class="page-header">
+    <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">คลังสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-box	"></i> คลังสินค้า</h3>
+                        <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item active">คลังสินค้า</li>
+                        </ul>
                     </div>
                 </div>
             </div>
+
 
             <div class="row">
                 <div class="col-md-12">
@@ -93,7 +98,7 @@ $(document).ready(function () {
             {
                 data: null,
                 render: function (data, type, row) {
-                    var url = '/inventory/locationInfo/' + encodeURIComponent(row.product_id);
+                    var url = '/inventory/locationInfo/' + row.product_id;
                     return '<a href="' + url + '" style="height: 100%;"><img src="../assets/img/icons/eye.svg" ></a>';
                 }
             }

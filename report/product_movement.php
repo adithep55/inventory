@@ -174,18 +174,22 @@ requirePermission(['manage_reports']);
             }
 
             function initializeDataTable(productId, data) {
-    // Filter out the total row from the main data
-    var mainData = data.filter(function(row) {
-        return row.entry_type !== 'total';
+    // แยกข้อมูลยอดยกมา รายการปกติ และยอดรวม
+    var openingBalances = data.filter(function(row) {
+        return row.entry_type === 'opening_balance';
     });
-
-    // Find the total row
+    var mainData = data.filter(function(row) {
+        return row.entry_type !== 'opening_balance' && row.entry_type !== 'total';
+    });
     var totalRow = data.find(function(row) {
         return row.entry_type === 'total';
     });
 
+    // สร้างข้อมูลสำหรับแสดงในตาราง
+    var tableData = openingBalances.concat(mainData);
+
     $('#movementTable_' + productId).DataTable({
-        data: mainData,
+        data: tableData,
         responsive: true,
         columns: [
             { data: 'date', responsivePriority: 1 },
@@ -233,6 +237,11 @@ requirePermission(['manage_reports']);
             }
             if (totalRow) {
                 footer.html('<tr><td colspan="6" style="text-align: right;">รวมทั้งสิ้น</td><td style="text-align: right;">' + formatNumber(totalRow.balance) + ' ' + totalRow.unit + '</td></tr>');
+            }
+        },
+        createdRow: function(row, data, dataIndex) {
+            if (data.entry_type === 'opening_balance') {
+                $(row).addClass('opening-balance');
             }
         }
     });
