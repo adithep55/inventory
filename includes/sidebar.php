@@ -68,7 +68,7 @@
                         <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/users1.svg" alt="img"><span>ลูกค้า</span> <span class="menu-arrow"></span></a>
                         <ul>
                             <li><a href="<?php echo base_url(); ?>/views/customers" <?php echo (basename($_SERVER['PHP_SELF']) == 'customers.php') ? 'class="active"' : ''; ?>>การจัดการลูกค้า</a></li>
-                            <li><a href="<?php echo base_url(); ?>/views/custumers_type" <?php echo (basename($_SERVER['PHP_SELF']) == 'custumers_type.php') ? 'class="active"' : ''; ?>>ประเภทลูกค้า</a></li>
+                            <li><a href="<?php echo base_url(); ?>/views/customers_type" <?php echo (basename($_SERVER['PHP_SELF']) == 'customers_type.php') ? 'class="active"' : ''; ?>>ประเภทลูกค้า</a></li>
                             <li><a href="<?php echo base_url(); ?>/views/prefixes" <?php echo (basename($_SERVER['PHP_SELF']) == 'prefixes.php') ? 'class="active"' : ''; ?>>คำนำหน้า</a></li>
                         </ul>
                     </li>

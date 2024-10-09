@@ -58,17 +58,21 @@ requirePermission(['manage_inventory']);
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
-                <div class="row">
-                    <div class="col">
-                        <h3 class="page-title">จัดการตำแหน่งคลังสินค้า</h3>
-                    </div>
+            <div class="row">
+                <div class="col">
+                    <h3 class="page-title"><i class="fas fa-map-marker"></i> ตำแหน่งคลังสินค้า</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                        <li class="breadcrumb-item active">จัดการตำแหน่งคลังสินค้า</li>
+                    </ul>
                 </div>
             </div>
+        </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">เพิ่มตำแหน่งคลังสินค้าใหม่</h4>
+                            <h4 class="card-title"><i class="fas fa-plus-circle"></i> เพิ่มตำแหน่งคลังสินค้าใหม่</h4>
                             <div class="card-body">
                                 <form id="addLocationForm">
                                     <label for="locationId" class="location-id-label">รหัสคลัง</label>
@@ -102,7 +106,7 @@ requirePermission(['manage_inventory']);
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">รายการตำแหน่งคลังสินค้า</h4>
+                                <h4 class="card-title"><i class="fas fa-list"></i> รายการตำแหน่งคลังสินค้า</h4>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">

@@ -27,10 +27,10 @@ requirePermission(['manage_customers']);
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">แก้ไขข้อมูลลูกค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-edit"></i> แก้ไขข้อมูลลูกค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item"><a href="customerlist.php">รายการลูกค้า</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>/views/customers">รายการลูกค้า</a></li>
                             <li class="breadcrumb-item active">แก้ไขข้อมูลลูกค้า</li>
                         </ul>
                     </div>

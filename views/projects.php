@@ -24,15 +24,15 @@ requirePermission(['manage_projects']);
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
-            <div class="page-header">
-                <div class="page-title">
-                    <h4>จัดการโครงการ</h4>
-                    <h6>ดูและจัดการโครงการของคุณ</h6>
-                </div>
-                <div class="page-btn">
-                    <a href="#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add_project">
-                        <img src="../assets/img/icons/plus.svg" alt="img" class="me-1">เพิ่มโครงการใหม่
-                    </a>
+    <div class="page-header">
+                <div class="row">
+                    <div class="col">
+                        <h3 class="page-title"><i class="fas fa-project-diagram"></i> โครงการ</h3>
+                        <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item active">จัดการโครงการ</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="card">

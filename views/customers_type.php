@@ -26,9 +26,9 @@ requirePermission(['manage_customers']);
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">ประเภทลูกค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-users"></i> ประเภทลูกค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">จัดการประเภทลูกค้า</li>
                         </ul>
                     </div>
@@ -41,8 +41,10 @@ requirePermission(['manage_customers']);
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">ประเภทลูกค้า</h4>
+                            <h4 class="card-title"><i class="fas fa-bars"></i> ประเภทลูกค้า</h4>
+                            <div class="page-btn">
                             <button class="btn btn-primary float-right" onclick="showAddCustomerTypeModal()">เพิ่มประเภทลูกค้า</button>
+                </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
