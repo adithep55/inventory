@@ -241,6 +241,7 @@ function initializeProductTable() {
     }
     productSelectionCount = {};
     productLocationSelections = {};
+    $('#issueTable tbody').empty(); // เพิ่มบรรทัดนี้เพื่อล้างข้อมูลในตาราง issueTable
     productTable = $('#productTable').DataTable({
         processing: true,
         serverSide: true,
@@ -299,7 +300,12 @@ function initializeProductTable() {
                             "next": "ถัดไป",
                             "previous": "ก่อนหน้า"
                         }
-                    }
+                    }, 
+        drawCallback: function() {
+            // รีเซ็ตสถานะของ checkbox ทุกครั้งที่วาดตารางใหม่
+            $('.product-select').prop('checked', false).prop('disabled', false);
+        }
+                    
     });
 }
 
@@ -312,126 +318,131 @@ function initializeProductTable() {
             });
 
             $('#productTable').on('change', '.product-select', function () {
-                var row = $(this).closest('tr');
-                var data = productTable.row(row).data();
-                if (this.checked) {
-                    if (!productSelectionCount[data.product_id]) {
-                        productSelectionCount[data.product_id] = 0;
-                    }
-                    productSelectionCount[data.product_id]++;
-                    addProductToIssueTable(data);
-                } else {
-                    productSelectionCount[data.product_id]--;
-                    removeProductFromIssueTable(data.product_id);
-                }
-                updateProductSelectionStatus(data.product_id);
-            });
+    var row = $(this).closest('tr');
+    var data = productTable.row(row).data();
+    if (this.checked) {
+        addProductToIssueTable(data);
+        // ทำให้ checkbox กลับมาเป็นสถานะไม่ถูกเลือกทันที
+        setTimeout(() => {
+            $(this).prop('checked', false);
+        }, 0);
+    }
+    updateProductSelectionStatus(data.product_id);
+});
 
-            function updateProductSelectionStatus(productId) {
+function removeAllProductFromIssueTable(productId) {
+    $('#issueTable tbody tr[data-product-id="' + productId + '"]').remove();
+    updateAvailableLocations(productId);
+    updateProductSelectionStatus(productId);
+}
+
+$('#issueTable').on('click', '.remove-row', function () {
+    var row = $(this).closest('tr');
+    var productId = row.data('product-id');
+    removeProductFromIssueTable(productId);
+});
+function updateProductSelectionStatus(productId) {
     var row = productTable.row(function (idx, data, node) {
         return data.product_id === productId;
     });
     if (row.length) {
         var data = row.data();
         var checkbox = $(row.node()).find('.product-select');
+        var rowCount = $('#issueTable tbody tr[data-product-id="' + productId + '"]').length;
         var availableLocations = data.locations.filter(location => parseInt(location.quantity) > 0).length;
-        if (productSelectionCount[productId] >= availableLocations) {
+        
+        // ตรวจสอบว่ายังมีคลังสินค้าให้เลือกหรือไม่
+        if (rowCount >= availableLocations) {
             checkbox.prop('disabled', true);
         } else {
             checkbox.prop('disabled', false);
         }
-        productTable.cell(row, 0).invalidate().draw(false);
+        // ไม่ต้องตั้งค่า checked ที่นี่ เพราะเราต้องการให้มันไม่ถูกเลือกเสมอ
+        checkbox.prop('checked', false);
     }
 }
+var availableLocations = {}; // เก็บคลังสินค้าที่สามารถเลือกได้สำหรับแต่ละสินค้า
+function addProductToIssueTable(product) {
+        if (!availableLocations[product.product_id]) {
+            availableLocations[product.product_id] = product.locations.filter(location => parseInt(location.quantity) > 0);
+        }
 
-            function addProductToIssueTable(product) {
-    if (!productLocationSelections[product.product_id]) {
-        productLocationSelections[product.product_id] = [];
-    }
-
-    var locationSelect = $('<select class="form-control location-select">').append(
-        $('<option>').val('').text('เลือกคลังสินค้า')
-    );
-
-    product.locations.forEach(function (location) {
-    if (parseInt(location.quantity) > 0) {  // แสดงเฉพาะคลังที่มีสินค้า
-        locationSelect.append($('<option>')
-            .val(location.id)
-            .text(location.name + ' (คงเหลือ: ' + location.quantity + ')')
-            .data('quantity', location.quantity)
+        var locationSelect = $('<select class="form-control location-select">').append(
+            $('<option>').val('').text('เลือกคลังสินค้า')
         );
+
+        availableLocations[product.product_id].forEach(function (location) {
+            locationSelect.append($('<option>')
+                .val(location.id)
+                .text(location.name + ' (คงเหลือ: ' + location.quantity + ')')
+                .data('quantity', location.quantity)
+            );
+        });
+
+        var newRow = $('<tr>').attr('data-product-id', product.product_id).append(
+            $('<td>').text(product.product_id),
+            $('<td>').text(product.name_th),
+            $('<td>').append(locationSelect),
+            $('<td>').append($('<input>').attr({
+                type: 'number',
+                class: 'form-control quantity',
+                value: "",
+                max: "",
+                required: true
+            })),
+            $('<td>').text(product.unit),
+            $('<td>').append($('<button>').attr({
+                type: 'button',
+                class: 'btn btn-danger btn-sm remove-row'
+            }).text('ลบ'))
+        );
+
+        $('#issueTable tbody').append(newRow);
+        updateAvailableLocations(product.product_id);
     }
-});
 
-    var newRow = $('<tr>').attr('data-product-id', product.product_id).append(
-        $('<td>').text(product.product_id),
-        $('<td>').text(product.name_th),
-        $('<td>').append(locationSelect),
-        $('<td>').append($('<input>').attr({
-            type: 'number',
-            class: 'form-control quantity',
-            value: "",
-            max: locationSelect.find('option:first').data('quantity'),
-            required: true
-        })),
-        $('<td>').text(product.unit),
-        $('<td>').append($('<button>').attr({
-            type: 'button',
-            class: 'btn btn-danger btn-sm remove-row'
-        }).text('ลบ'))
-    );
+    $('#issueTable').on('change', '.location-select', function () {
+        var row = $(this).closest('tr');
+        var productId = row.data('product-id');
+        var selectedLocationId = $(this).val();
 
-    $('#issueTable tbody').append(newRow);
-}
+        var maxQuantity = $(this).find(':selected').data('quantity');
+        var quantityInput = row.find('.quantity');
+        quantityInput.attr('max', maxQuantity);
+        if (parseInt(quantityInput.val()) > maxQuantity) {
+            quantityInput.val(maxQuantity);
+        }
 
-            $('#issueTable').on('change', '.location-select', function () {
-                var row = $(this).closest('tr');
-                var productId = row.data('product-id');
-                var selectedLocationId = $(this).val();
+        updateAvailableLocations(productId);
+    });
 
-                if (selectedLocationId) {
-                    if (!productLocationSelections[productId]) {
-                        productLocationSelections[productId] = [];
-                    }
-                    productLocationSelections[productId].push(parseInt(selectedLocationId));
+    function updateAvailableLocations(productId) {
+        var selectedLocations = [];
+        $('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () {
+            var locationId = $(this).find('.location-select').val();
+            if (locationId) {
+                selectedLocations.push(locationId);
+            }
+        });
+
+        $('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () {
+            var locationSelect = $(this).find('.location-select');
+            var currentLocationId = locationSelect.val();
+
+            locationSelect.find('option').each(function () {
+                var optionLocationId = $(this).val();
+                if (optionLocationId && optionLocationId !== currentLocationId) {
+                    $(this).prop('disabled', selectedLocations.includes(optionLocationId));
                 }
-
-                var maxQuantity = $(this).find(':selected').data('quantity');
-                var quantityInput = row.find('.quantity');
-                quantityInput.attr('max', maxQuantity);
-                if (parseInt(quantityInput.val()) > maxQuantity) {
-                    quantityInput.val(maxQuantity);
-                }
-
-                updateAvailableLocations(productId);
             });
+        });
+    }
 
-            function updateAvailableLocations(productId) {
-                $('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () {
-                    var locationSelect = $(this).find('.location-select');
-                    var currentLocationId = locationSelect.val();
-
-                    locationSelect.find('option').each(function () {
-                        var optionLocationId = $(this).val();
-                        if (optionLocationId && optionLocationId !== currentLocationId) {
-                            $(this).prop('disabled', productLocationSelections[productId].includes(parseInt(optionLocationId)));
-                        }
-                    });
-                });
-            }
-
-            function removeProductFromIssueTable(productId) {
-                var removedRow = $('#issueTable tbody').find(`tr[data-product-id="${productId}"]:last`);
-                var removedLocationId = removedRow.find('.location-select').val();
-
-                if (removedLocationId) {
-                    productLocationSelections[productId] = productLocationSelections[productId].filter(id => id !== parseInt(removedLocationId));
-                }
-
-                removedRow.remove();
-                updateProductSelectionStatus(productId);
-                updateAvailableLocations(productId);
-            }
+    function removeProductFromIssueTable(productId) {
+    $('#issueTable tbody tr[data-product-id="' + productId + '"]').remove();
+    updateAvailableLocations(productId);
+    updateProductSelectionStatus(productId);
+}
 
             $('#issueTable').on('click', '.remove-row', function () {
                 var row = $(this).closest('tr');

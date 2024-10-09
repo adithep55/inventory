@@ -47,59 +47,7 @@ if (isset($_SESSION['UserID'])) {
 
 
 $(document).ready(function () {
-    // ซ่อน userInfoContainer เมื่อโหลดหน้า
-    $("#userInfoContainer").hide();
 
-    // ฟังก์ชันแสดงข้อมูลผู้ใช้
-    function showUserInfo(message, isError) {
-        var $userInfo = $("#userInfo");
-        if (isError) {
-            $userInfo.val(message).addClass('error');
-        } else {
-            $userInfo.val("ยินดีต้อนรับ🤗 : " + message).removeClass('error');
-        }
-        $("#userInfoContainer").show();
-    }
-
-    // ฟังก์ชันซ่อนข้อมูลผู้ใช้
-    function hideUserInfo() {
-        $("#userInfoContainer").hide();
-        $("#userInfo").val("");
-    }
-
-    // ตรวจสอบข้อมูลผู้ใช้เมื่อออกจากช่อง username
-    $("#user").on('blur', function () {
-        var username = $(this).val().trim();
-        if (username) {
-            $.ajax({
-                type: 'GET',
-                url: 'system/login.php',
-                data: { action: 'getUserInfo', username: username },
-                dataType: 'json',
-                success: function (result) {
-                    if (result.status == "success") {
-                        showUserInfo(result.message.fname + " " + result.message.lname, false);
-                    } else {
-                        showUserInfo("❌ ไม่พบผู้ใช้", true);
-                    }
-                },
-                error: function () {
-                    showUserInfo("❌ เกิดข้อผิดพลาดในการตรวจสอบผู้ใช้", true);
-                }
-            });
-        } else {
-            hideUserInfo();
-        }
-    });
-
-    // ซ่อนข้อมูลผู้ใช้เมื่อมีการพิมพ์ใหม่
-    $("#user").on('input', function () {
-        if ($(this).val().trim() === "") {
-            hideUserInfo();
-        }
-    });
-
-    // ฟังก์ชันทำการ login
     function performLogin() {
         var formData = new FormData();
         formData.append('user', $("#user").val());

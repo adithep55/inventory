@@ -14,17 +14,6 @@ function dd_return($status, $message)
 
 header('Content-Type: application/json; charset=utf-8;');
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET['action']) && $_GET['action'] == 'getUserInfo') {
-    $username = $_GET['username'];
-    $q = dd_q("SELECT fname, lname FROM `users` WHERE Username = ?", [$username]);
-    if ($q->rowCount() == 1) {
-        $user = $q->fetch(PDO::FETCH_ASSOC);
-        dd_return(true, $user);
-    } else {
-        dd_return(false, "ไม่พบผู้ใช้");
-    }
-}
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_SESSION['UserID'])) {
         $username = $_POST['user'];
