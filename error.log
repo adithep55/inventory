@@ -2190,3 +2190,40 @@
 
 )
 
+[10-Oct-2024 02:10:11 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670005
+    [issueDate] => 2024-10-10
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 70
+                    [originalQuantity] => 2
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 5
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+

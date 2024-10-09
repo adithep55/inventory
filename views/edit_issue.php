@@ -559,7 +559,7 @@ $(document).ready(function() {
 
 function addProductToIssueTable(product, isExisting = false) {
     if (!productLocationSelections[product.product_id]) {
-        productLocationSelections[product.product_id] = {};
+        productLocationSelections[product.product_id] = new Set();
     }
 
     var locationSelect = $('<select class="form-control location-select">').append(
@@ -571,19 +571,22 @@ function addProductToIssueTable(product, isExisting = false) {
     var maxQuantity = product.locations.reduce((sum, location) => sum + parseInt(location.quantity), 0) + originalQuantity;
 
     product.locations.forEach(function (location) {
-        var originalQuantity = parseInt(location.quantity);
-        var currentQuantity = originalQuantity;
-        if (isExisting && location.id == product.location_id) {
-            currentQuantity += parseInt(product.quantity);
-            selectedLocationId = location.id;
+        if (!productLocationSelections[product.product_id].has(location.id)) {
+            var originalQuantity = parseInt(location.quantity);
+            var currentQuantity = originalQuantity;
+            if (isExisting && location.id == product.location_id) {
+                currentQuantity += parseInt(product.quantity);
+                selectedLocationId = location.id;
+            }
+            locationSelect.append($('<option>')
+                .val(location.id)
+                .text(location.name + ' (คงเหลือ: ' + currentQuantity + ')')
+                .data('originalQuantity', originalQuantity)
+                .data('currentQuantity', currentQuantity)
+            );
         }
-        locationSelect.append($('<option>')
-            .val(location.id)
-            .text(location.name + ' (คงเหลือ: ' + currentQuantity + ')')
-            .data('originalQuantity', originalQuantity)
-            .data('currentQuantity', currentQuantity)
-        );
     });
+
 
     var newRow = $('<tr>')
         .attr('data-product-id', product.product_id)
@@ -594,11 +597,11 @@ function addProductToIssueTable(product, isExisting = false) {
             $('<td>').append(locationSelect),
             $('<td>').append($('<input>').attr({
                 type: 'number',
-        class: 'form-control quantity',
-        value: originalQuantity,
-        min: 1,  // เปลี่ยนจาก 0 เป็น 1
-        max: maxQuantity,
-        required: true
+                class: 'form-control quantity',
+                value: originalQuantity,
+                min: 1,
+                max: maxQuantity,
+                required: true
             })),
             $('<td>').addClass('original-quantity').text(originalQuantity),
             $('<td>').text(product.unit),
@@ -608,40 +611,38 @@ function addProductToIssueTable(product, isExisting = false) {
             }).text('ลบ'))
         );
 
-    $('#issueTable tbody').append(newRow);
+        $('#issueTable tbody').append(newRow);
 
-    if (selectedLocationId) {
-        locationSelect.val(selectedLocationId).trigger('change');
-        productLocationSelections[product.product_id][selectedLocationId] = true;
-    }
-
-    if (isExisting) {
-        productSelectionCount[product.product_id] = (productSelectionCount[product.product_id] || 0) + 1;
-    }
-
-    updateAvailableLocations(product.product_id);
-    updateProductSelectionStatus(product.product_id);
-    updateFormStatus();
+if (selectedLocationId) {
+    locationSelect.val(selectedLocationId).trigger('change');
+    productLocationSelections[product.product_id].add(selectedLocationId);
 }
+
+if (isExisting) {
+    productSelectionCount[product.product_id] = (productSelectionCount[product.product_id] || 0) + 1;
+}
+
+updateAvailableLocations(product.product_id);
+updateProductSelectionStatus(product.product_id);
+updateFormStatus();
+}
+
 
 
 
 $('#issueTable').on('change', '.location-select', function () {
     var row = $(this).closest('tr');
     var productId = row.data('product-id');
-    var quantityInput = row.find('.quantity');
-    var originalQuantityCell = row.find('.original-quantity');
-    var selectedOption = $(this).find(':selected');
-    var maxQuantity = 0;
-    $(this).find('option').each(function() {
-        maxQuantity += parseInt($(this).data('originalQuantity')) || 0;
-    });
-    var originalQuantity = parseInt(originalQuantityCell.text());
+    var newLocationId = $(this).val();
+    var oldLocationId = row.attr('data-location-id');
 
-    quantityInput.attr('max', maxQuantity);
-    if (parseInt(quantityInput.val()) > maxQuantity) {
-        quantityInput.val(maxQuantity);
+    if (oldLocationId) {
+        productLocationSelections[productId].delete(oldLocationId);
     }
+    if (newLocationId) {
+        productLocationSelections[productId].add(newLocationId);
+    }
+    row.attr('data-location-id', newLocationId);
 
     updateAvailableLocations(productId);
 });
@@ -701,67 +702,61 @@ function updateAvailableLocations(productId) {
 
     var totalQuantity = product.locations.reduce((sum, location) => sum + parseInt(location.quantity), 0);
 
-    $('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () {
-        var locationSelect = $(this).find('.location-select');
-        var quantityInput = $(this).find('.quantity');
-        var currentLocationId = locationSelect.val();
-        var isExisting = true;
-        var originalQuantity = parseInt($(this).find('.original-quantity').text()) || 0;
+$('#issueTable tbody tr[data-product-id="' + productId + '"]').each(function () {
+    var locationSelect = $(this).find('.location-select');
+    var quantityInput = $(this).find('.quantity');
+    var currentLocationId = locationSelect.val();
+    var isExisting = true;
+    var originalQuantity = parseInt($(this).find('.original-quantity').text()) || 0;
 
-        var maxQuantity = totalQuantity + originalQuantity;
+    var maxQuantity = totalQuantity + originalQuantity;
 
-        locationSelect.find('option').each(function () {
-            var optionLocationId = $(this).val();
-            if (optionLocationId) {
-                var locationData = product.locations.find(loc => loc.id == optionLocationId);
-                if (locationData) {
-                    var locationOriginalQuantity = parseInt(locationData.quantity);
-                    var currentQuantity = locationOriginalQuantity;
-                    if (isExisting && optionLocationId == currentLocationId) {
-                        currentQuantity += originalQuantity;
-                    }
-                    $(this).text(locationData.name + ' (คงเหลือ: ' + currentQuantity + ')');
-                    $(this).data('originalQuantity', locationOriginalQuantity);
-                    $(this).data('currentQuantity', currentQuantity);
-                }
+    locationSelect.find('option').not(':first').remove(); // Remove all options except the first (placeholder)
+
+    product.locations.forEach(function(location) {
+        if (!productLocationSelections[productId].has(location.id) || location.id == currentLocationId) {
+            var locationOriginalQuantity = parseInt(location.quantity);
+            var currentQuantity = locationOriginalQuantity;
+            if (isExisting && location.id == currentLocationId) {
+                currentQuantity += originalQuantity;
             }
-        });
-
-        quantityInput.attr('max', maxQuantity);
-        var currentValue = parseInt(quantityInput.val()) || 0;
-        if (currentValue > maxQuantity) {
-            quantityInput.val(maxQuantity);
-            Swal.fire({
-                icon: 'warning',
-                title: 'เกินจำนวนคงเหลือ',
-                text: 'จำนวนที่เบิกไม่สามารถเกินจำนวนคงเหลือรวมในทุกคลังได้',
-                confirmButtonText: 'ตกลง'
-            });
+            locationSelect.append($('<option>')
+                .val(location.id)
+                .text(location.name + ' (คงเหลือ: ' + currentQuantity + ')')
+                .data('originalQuantity', locationOriginalQuantity)
+                .data('currentQuantity', currentQuantity)
+            );
         }
-
-        console.log('Updated row:', {
-            productId: productId,
-            maxQuantity: maxQuantity,
-            currentLocationId: currentLocationId
-        });
     });
 
-    // ย้าย updateProductSelectionStatus ไปที่นี่
-    updateProductSelectionStatus(productId);
+    locationSelect.val(currentLocationId);
+
+    quantityInput.attr('max', maxQuantity);
+    var currentValue = parseInt(quantityInput.val()) || 0;
+    if (currentValue > maxQuantity) {
+        quantityInput.val(maxQuantity);
+        Swal.fire({
+            icon: 'warning',
+            title: 'เกินจำนวนคงเหลือ',
+            text: 'จำนวนที่เบิกไม่สามารถเกินจำนวนคงเหลือรวมในทุกคลังได้',
+            confirmButtonText: 'ตกลง'
+        });
+    }
+});
+
+updateProductSelectionStatus(productId);
 }
+
 function removeProductFromIssueTable(productId) {
     var removedRow = $('#issueTable tbody').find(`tr[data-product-id="${productId}"]:last`);
     var removedLocationId = removedRow.find('.location-select').val();
 
     if (removedLocationId) {
-        if (productLocationSelections[productId]) {
-            delete productLocationSelections[productId][removedLocationId];
-        }
+        productLocationSelections[productId].delete(removedLocationId);
     }
 
     removedRow.remove();
 
-    // ลดจำนวนการเลือกสินค้า
     if (productSelectionCount[productId]) {
         productSelectionCount[productId]--;
     }
@@ -773,7 +768,6 @@ function removeProductFromIssueTable(productId) {
         updateAvailableLocations($(this).data('product-id'));
     });
 
-    // อัพเดทสถานะฟอร์ม
     updateFormStatus();
 }
 
@@ -1011,8 +1005,6 @@ function updateProductSelectionStatus(productId) {
                     });
                 }
             });
-
-
 
 
             function checkFormChanges() {
