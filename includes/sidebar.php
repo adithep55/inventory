@@ -78,8 +78,8 @@
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="<?php echo base_url(); ?>/assets/img/icons/transfer1.svg" alt="img"><span>โอนย้ายสินค้า</span> <span class="menu-arrow"></span></a>
                         <ul>
+                        <li><a href="<?php echo base_url(); ?>/views/addtransfer" <?php echo (basename($_SERVER['PHP_SELF']) == 'addtransfer.php') ? 'class="active"' : ''; ?>>ย้ายสินค้า</a></li>
                             <li><a href="<?php echo base_url(); ?>/views/transfer_history" <?php echo (basename($_SERVER['PHP_SELF']) == 'transfer_history.php' || basename($_SERVER['PHP_SELF']) == 'transfer_details.php') ? 'class="active"' : ''; ?>>รายการย้ายสินค้า</a></li>
-                            <li><a href="<?php echo base_url(); ?>/views/addtransfer" <?php echo (basename($_SERVER['PHP_SELF']) == 'addtransfer.php') ? 'class="active"' : ''; ?>>ย้ายสินค้า</a></li>
                         </ul>
                     </li>
 
