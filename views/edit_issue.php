@@ -347,11 +347,16 @@ requirePermission(['manage_issue']);
 }
 
 
-            function updateAllProductSelectionStatus() {
-                for (var productId in productSelectionCount) {
-                    updateProductSelectionStatus(productId);
-                }
-            }
+function updateAllProductSelectionStatus() {
+    if (productTable && productTable.rows && typeof productTable.rows().data === 'function') {
+        productTable.rows().data().each(function (rowData) {
+            updateProductSelectionStatus(rowData.product_id);
+        });
+    }
+}
+function resetAllCheckboxes() {
+    $('#productTable').find('input[type="checkbox"]').prop('checked', false).prop('disabled', false);
+}
             function updateProductTableQuantity(productId, quantity) {
     productTable.rows().every(function(rowIdx, tableLoop, rowLoop) {
         var data = this.data();
@@ -474,10 +479,11 @@ $(document).ready(function() {
     });
 });
 
-            function initializeProductTable() {
-                if ($.fn.DataTable.isDataTable('#productTable')) {
-                    $('#productTable').DataTable().destroy();
-                }
+function initializeProductTable() {
+    if ($.fn.DataTable.isDataTable('#productTable')) {
+        $('#productTable').DataTable().destroy();
+    }
+    $('#productTable tbody').empty();
 
                 productTable = $('#productTable').DataTable({
                     processing: true,
@@ -517,10 +523,10 @@ $(document).ready(function() {
                     ],
                     order: [[2, 'asc']],
                     
-                    drawCallback: function (settings) {
-                        updateAllProductSelectionStatus();
-                    }
-                    ,
+                    drawCallback: function(settings) {
+            resetAllCheckboxes();
+            updateAllProductSelectionStatus();
+        },
                     "language": {
                         "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
                         "emptyTable": "ไม่พบข้อมูลสินค้า",
@@ -548,10 +554,11 @@ $(document).ready(function() {
         }
         productSelectionCount[data.product_id]++;
         addProductToIssueTable(data);
-    } else {
-        // ไม่อนุญาตให้ลบผ่าน checkbox
-        $(this).prop('checked', true);
-        return false;
+        
+        // ทำให้ checkbox กลับมาเป็นสถานะไม่ถูกเลือกทันที
+        setTimeout(() => {
+            $(this).prop('checked', false);
+        }, 0);
     }
     updateAvailableLocations(data.product_id);
     updateProductSelectionStatus(data.product_id);
@@ -623,10 +630,10 @@ if (isExisting) {
 }
 
 updateAvailableLocations(product.product_id);
-updateProductSelectionStatus(product.product_id);
-updateFormStatus();
+    updateProductSelectionStatus(product.product_id);
+    updateAllProductSelectionStatus();
+    updateFormStatus();
 }
-
 
 
 
@@ -761,8 +768,17 @@ function removeProductFromIssueTable(productId) {
         productSelectionCount[productId]--;
     }
 
-    updateProductSelectionStatus(productId);
+    // ตรวจสอบว่ายังมีรายการของสินค้านี้เหลืออยู่หรือไม่
+    var remainingRows = $('#issueTable tbody').find(`tr[data-product-id="${productId}"]`).length;
+    if (remainingRows === 0) {
+        // ถ้าไม่มีรายการเหลืออยู่ ให้รีเซ็ต productSelectionCount และ productLocationSelections
+        delete productSelectionCount[productId];
+        delete productLocationSelections[productId];
+    }
+
+updateProductSelectionStatus(productId);
     updateAvailableLocations(productId);
+    updateAllProductSelectionStatus();
 
     $('#issueTable tbody tr').each(function () {
         updateAvailableLocations($(this).data('product-id'));
@@ -770,6 +786,12 @@ function removeProductFromIssueTable(productId) {
 
     updateFormStatus();
 }
+$('#issueTable').on('click', '.remove-row', function () {
+    var row = $(this).closest('tr');
+    var productId = row.data('product-id');
+    removeProductFromIssueTable(productId);
+    updateAllProductSelectionStatus(); // เพิ่มบรรทัดนี้
+});
 
 $('#issueTable').on('click', '.remove-row', function () {
     var row = $(this).closest('tr');
@@ -812,15 +834,13 @@ function updateProductSelectionStatus(productId) {
 
         if (data && data.locations) {
             var availableLocations = data.locations.filter(loc => parseInt(loc.quantity) > 0).length;
-            var selectedLocations = productSelectionCount[productId] || 0;
+            var selectedLocations = $('#issueTable tbody tr[data-product-id="' + productId + '"]').length;
 
-            if (selectedLocations >= availableLocations) {
-                checkbox.prop('disabled', true);
-            } else {
-                checkbox.prop('disabled', false);
-            }
+            // ตรวจสอบว่ายังมีคลังสินค้าที่สามารถเลือกได้หรือไม่
+            var canSelectMore = availableLocations > selectedLocations;
 
-            // ไม่ติ๊ก checkbox โดยอัตโนมัติ แต่ยังคงการ disable ไว้
+            checkbox.prop('disabled', !canSelectMore);
+            // ไม่ตั้งค่า checked ที่นี่ เพื่อให้ติ๊กถูกหายไปทันที
             checkbox.prop('checked', false);
         } else {
             console.warn('Product data or locations not available for product ID:', productId);
@@ -922,8 +942,7 @@ function updateProductSelectionStatus(productId) {
         return;
     }
 
-    // ถ้าทุกอย่างถูกต้อง ดำเนินการส่งข้อมูล
-    console.log('Sending data:', formData);
+
 
     // แสดง loading
     Swal.fire({
@@ -936,7 +955,6 @@ function updateProductSelectionStatus(productId) {
         }
     });
 
-    // ส่งข้อมูลไปยังเซิร์ฟเวอร์
     $.ajax({
         url: '../system/update_issue.php',
         type: 'POST',

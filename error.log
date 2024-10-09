@@ -2227,3 +2227,368 @@
 
 )
 
+[10-Oct-2024 02:13:11 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670005
+    [issueDate] => 2024-10-10
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 5
+                    [originalQuantity] => 5
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:15:35 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-09
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 5
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 5
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:25:59 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670001
+    [issueDate] => 2024-01-20
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670001
+                    [quantity] => 20
+                    [originalQuantity] => 20
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [3] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [4] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [5] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:27:10 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670001
+    [issueDate] => 2024-01-20
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 20
+                    [originalQuantity] => 20
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [3] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [4] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [5] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:27:37 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-09
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 5
+                    [originalQuantity] => 5
+                )
+
+            [1] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+            [2] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 5
+                    [originalQuantity] => 5
+                )
+
+            [3] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [4] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 2
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:43:44 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670004
+    [issueDate] => 2024-10-09
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 5
+                    [originalQuantity] => 5
+                )
+
+            [1] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 1
+                )
+
+            [2] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 10
+                    [originalQuantity] => 10
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:45:04 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670005
+    [issueDate] => 2024-10-10
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670001
+                    [quantity] => 5
+                    [originalQuantity] => 5
+                )
+
+            [1] => Array
+                (
+                    [productId] => A002
+                    [locationId] => LOC5670002
+                    [quantity] => 5
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:46:37 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670005
+    [issueDate] => 2024-10-10
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [1] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 0
+                )
+
+            [2] => Array
+                (
+                    [productId] => A004
+                    [locationId] => LOC5670002
+                    [quantity] => 2
+                    [originalQuantity] => 0
+                )
+
+        )
+
+)
+
+[10-Oct-2024 02:46:45 Asia/Bangkok] Received data: Array
+(
+    [issueId] => D670005
+    [issueDate] => 2024-10-10
+    [issueType] => sale
+    [customerId] => 5
+    [projectId] => 
+    [items] => Array
+        (
+            [0] => Array
+                (
+                    [productId] => A003
+                    [locationId] => LOC5670001
+                    [quantity] => 1
+                    [originalQuantity] => 1
+                )
+
+            [1] => Array
+                (
+                    [productId] => A001
+                    [locationId] => LOC5670002
+                    [quantity] => 1
+                    [originalQuantity] => 1
+                )
+
+        )
+
+)
+
