@@ -2172,3 +2172,21 @@
 
 )
 
+[2024-10-09 21:01:47] Received transfer data: Array
+(
+    [transfer_date] => 2024-10-09
+    [products] => Array
+        (
+            [0] => Array
+                (
+                    [product_id] => A001
+                    [from_location_id] => LOC5670001
+                    [to_location_id] => LOC5670002
+                    [quantity] => 50
+                    [unit] => เครื่อง
+                )
+
+        )
+
+)
+
