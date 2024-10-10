@@ -90,7 +90,7 @@ require_once '../config/permission.php';
                                     </div>
                                     <div class="col-12">
                                     <button type="submit" class="btn btn-submit me-2">บันทึก</button>
-                                    <a href="javascript:void(0);" class="btn btn-cancel">ยกเลิก</a>
+                       <a href="javascript:history.back();" class="btn btn-cancel">ยกเลิก</a>
                                 </div>
                                 </div>
                             </form>
