@@ -67,6 +67,18 @@ class PDF extends FPDF
         $this->settings = $settings;
     }
 
+    private function getImageFileType($file) {
+        if (!file_exists($file)) {
+            return false;
+        }
+        $size = getimagesize($file);
+        if ($size === false) {
+            return false;
+        }
+        $extension = image_type_to_extension($size[2], false);
+        return strtoupper($extension);
+    }
+
     function Header()
     {
         $this->AddFont('THSarabunNew', '', 'THSarabunNew.php');
@@ -74,8 +86,23 @@ class PDF extends FPDF
         $this->SetFont('THSarabunNew', 'B', 18);
         
         $logoPath = isset($this->settings['logo']) ? '../assets/img/' . $this->settings['logo'] : '../assets/img/logo.png';
-        $this->Image($logoPath, 5, 6, 30);
         
+        if (file_exists($logoPath)) {
+            $imageType = $this->getImageFileType($logoPath);
+            if ($imageType) {
+                $this->Image($logoPath, 5, 6, 30, 0, $imageType);
+            } else {
+                $this->SetXY(5, 6);
+                $this->SetFont('THSarabunNew', '', 10);
+                $this->Cell(30, 10, iconv('UTF-8', 'cp874', 'โลโก้ไม่ถูกต้อง'), 1, 0, 'C');
+            }
+        } else {
+            $this->SetXY(5, 6);
+            $this->SetFont('THSarabunNew', '', 10);
+            $this->Cell(30, 10, iconv('UTF-8', 'cp874', 'ไม่พบโลโก้'), 1, 0, 'C');
+        }
+        
+        $this->SetFont('THSarabunNew', 'B', 18);
         $this->Cell(0, 5, iconv('UTF-8', 'cp874', $this->settings['company_name'] ?? ''), 0, 1, 'C');
         $this->SetFont('THSarabunNew', '', 11);
         $this->Cell(0, 7, iconv('UTF-8', 'cp874', $this->settings['company_address'] ?? ''), 0, 1, 'C');
@@ -99,7 +126,6 @@ class PDF extends FPDF
             $this->Ln();
         }
     }
-
     function Footer()
     {
         $this->SetY(-15);

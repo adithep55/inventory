@@ -68,6 +68,16 @@ class PDF extends FPDF
         $this->settings = $settings;
     }
 
+    // เพิ่มฟังก์ชันใหม่สำหรับตรวจสอบประเภทของไฟล์รูปภาพ
+    private function getImageFileType($file) {
+        $size = getimagesize($file);
+        if ($size === false) {
+            return false;
+        }
+        $extension = image_type_to_extension($size[2], false);
+        return strtoupper($extension); // ส่งคืนนามสกุลไฟล์เป็นตัวพิมพ์ใหญ่ (JPG, PNG, GIF)
+    }
+
     function Header()
     {
         $this->AddFont('THSarabunNew', '', 'THSarabunNew.php');
@@ -75,7 +85,23 @@ class PDF extends FPDF
         $this->SetFont('THSarabunNew', 'B', 18);
         
         $logoPath = isset($this->settings['logo']) ? '../assets/img/' . $this->settings['logo'] : '../assets/img/logo.png';
-        $this->Image($logoPath, 5, 6, 30);
+        
+        // ตรวจสอบว่าไฟล์มีอยู่จริง
+        if (file_exists($logoPath)) {
+            $imageType = $this->getImageFileType($logoPath);
+            if ($imageType) {
+                // ใช้ Image() แทน โดยระบุประเภทของไฟล์
+                $this->Image($logoPath, 5, 6, 30, 0, $imageType);
+            } else {
+                // ถ้าไม่สามารถระบุประเภทของไฟล์ได้ ให้แสดงข้อความแทน
+                $this->SetXY(5, 6);
+                $this->Cell(30, 10, 'Logo Error', 1, 0, 'C');
+            }
+        } else {
+            // ถ้าไม่พบไฟล์ ให้แสดงข้อความแทน
+            $this->SetXY(5, 6);
+            $this->Cell(30, 10, 'No Logo', 1, 0, 'C');
+        }
         
         $this->Cell(0, 5, iconv('UTF-8', 'cp874', $this->settings['company_name'] ?? ''), 0, 1, 'C');
         $this->SetFont('THSarabunNew', '', 11);

@@ -1,6 +1,6 @@
 
 <?php
-session_start();
+
 if (!isset($_SESSION['UserID'])) {
     header("Location: " . base_url() . "/login");
     exit();
