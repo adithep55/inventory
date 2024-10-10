@@ -7,7 +7,7 @@ require_once '../config/permission.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>โปรไฟล์ผู้ใช้</title>
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/favicon.jpg">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/logo-small.png">
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/animate.css">
     <link rel="stylesheet" href="../assets/plugins/select2/css/select2.min.css">
@@ -28,7 +28,7 @@ require_once '../config/permission.php';
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">โปรไฟล์</h3>
+                        <h3 class="page-title"> <i class="fa fa-user" aria-hidden="true"></i> โปรไฟล์</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">โปรไฟล์ผู้ใช้</li>

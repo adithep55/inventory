@@ -82,18 +82,19 @@
                             <li><a href="<?php echo base_url(); ?>/views/transfer_history" <?php echo (basename($_SERVER['PHP_SELF']) == 'transfer_history.php' || basename($_SERVER['PHP_SELF']) == 'transfer_details.php') ? 'class="active"' : ''; ?>>รายการย้ายสินค้า</a></li>
                         </ul>
                     </li>
+                    <?php endif; ?>
 
                     <?php if (checkPermission(['manage_reports'])): ?>
-                    <?php endif; ?>
+                 
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/time.svg" alt="img"><span> รายงาน</span> <span class="menu-arrow"></span></a>
                         <ul>
                             <li><a href="<?php echo base_url();?>/report/product_movement" <?php echo (basename($_SERVER['PHP_SELF']) == 'product_movement.php') ? 'class="active"' : ''; ?>>รายงานสินค้าเคลื่อนไหว</a></li>
                         </ul>
                     </li>
+                    <?php endif; ?>
 
                     <?php if (checkPermission(['manage_users'])): ?>
-                    <?php endif; ?>
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/users1.svg" alt="img"><span> ผู้ใช้งาน</span> <span class="menu-arrow"></span></a>
                         <ul>
@@ -101,9 +102,9 @@
                             <li><a href="<?php echo base_url(); ?>/views/userlist" <?php echo (basename($_SERVER['PHP_SELF']) == 'userlist.php') ? 'class="active"' : ''; ?>>จัดการผู้ใช้</a></li>
                         </ul>
                     </li>
+                    <?php endif; ?>
 
                     <?php if (checkPermission(['manage_settings'])): ?>
-                    <?php endif; ?>
                     <li class="submenu">
                         <a href="javascript:void(0);"><img src="../assets/img/icons/settings.svg" alt="img"><span>ตั้งค่า</span> <span class="menu-arrow"></span></a>
                         <ul>

@@ -22,46 +22,51 @@ requirePermission(['manage_projects']);
     <?php require_once '../includes/sidebar.php'; ?>
 
     <div class="page-wrapper">
-    <div class="content container-fluid">
-    <?php require_once '../includes/notification.php'; ?>
-    <div class="page-header">
-                <div class="row">
-                    <div class="col">
-                        <h3 class="page-title"><i class="fas fa-project-diagram"></i> โครงการ</h3>
-                        <ul class="breadcrumb">
+        <div class="content container-fluid">
+            <?php require_once '../includes/notification.php'; ?>
+            <div class="page-header">
+                <div class="page-title">
+                    <h4><i class="fas fa-project-diagram"></i> โครงการ</h4>
+                    <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item active">จัดการโครงการ</li>
-                        </ul>
-                    </div>
+                        <li class="breadcrumb-item active">จัดการโครงการ</li>
+                    </ul>
+                </div>
+                <div class="page-btn">
+                    <a href="#" class="btn btn-added" data-bs-toggle="modal" data-bs-target="#add_project">
+                        <img src="../assets/img/icons/plus.svg" alt="img" class="me-1">เพิ่มโครงการใหม่
+                    </a>
                 </div>
             </div>
             <div class="card">
-                        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="table-responsive">
-                        <table class="table table-striped custom-table mb-0" id="projectsTable">
-                            <thead>
-                                <tr>
-                                    <th>รหัสโครงการ</th>
-                                    <th>ชื่อโครงการ</th>
-                                    <th>รายละเอียด</th>
-                                    <th>วันที่เริ่ม</th>
-                                    <th>วันที่สิ้นสุด</th>
-                                    <th>ผู้รับผิดชอบ</th>
-                                    <th>การดำเนินการ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- ข้อมูลโครงการจะถูกเพิ่มที่นี่โดย JavaScript -->
-                            </tbody>
-                        </table>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped custom-table mb-0" id="projectsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>รหัสโครงการ</th>
+                                            <th>ชื่อโครงการ</th>
+                                            <th>รายละเอียด</th>
+                                            <th>วันที่เริ่ม</th>
+                                            <th>วันที่สิ้นสุด</th>
+                                            <th>ผู้รับผิดชอบ</th>
+                                            <th>การดำเนินการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- ข้อมูลโครงการจะถูกเพิ่มที่นี่โดย JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            </div>
+        </div>
     </div>
-    </div>
+
     <!-- Modal เพิ่มโครงการ -->
     <div class="modal fade" id="add_project" tabindex="-1" aria-labelledby="addProjectModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -213,17 +218,33 @@ requirePermission(['manage_projects']);
 
     function setupDateInputs() {
     const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const maxDate = today.toISOString().split('T')[0]; 
+    
+    const formatDate = (date) => {
+        let d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
 
-    $('#start_date').attr('max', maxDate);
+        if (month.length < 2) 
+            month = '0' + month;
+        if (day.length < 2) 
+            day = '0' + day;
+
+        return [year, month, day].join('-');
+    };
+
+    const todayFormatted = formatDate(today);
+
+    // Set maximum date for start_date to today
+    $('#start_date').attr('max', todayFormatted);
 
     $('#start_date').on('change', function() {
         const selectedStartDate = new Date($(this).val());
-        if (selectedStartDate > today) { 
-            $(this).val(maxDate);
-            Swal.fire('ข้อผิดพลาด', 'ไม่สามารถเลือกวันที่เริ่มโครงการในอนาคตได้', 'error');
+        const today = new Date();
+        today.setDate(today.getDate() + 1); // เพิ่มหนึ่งวันให้กับวันที่ปัจจุบัน
+        if (selectedStartDate > today) {
+            $(this).val(todayFormatted);
+            Swal.fire('แจ้งเตือน', 'ไม่สามารถเลือกวันที่ในอนาคตได้', 'warning');
         }
         $('#end_date').attr('min', $(this).val());
     });
@@ -231,9 +252,9 @@ requirePermission(['manage_projects']);
     $('#end_date').on('change', function() {
         const startDate = new Date($('#start_date').val());
         const endDate = new Date($(this).val());
-        if (endDate < startDate) {
-            $(this).val($('#start_date').val());
-            Swal.fire('ข้อผิดพลาด', 'วันที่สิ้นสุดโครงการต้องไม่น้อยกว่าวันที่เริ่มโครงการ', 'error');
+        if (endDate <= startDate) {
+            $(this).val('');
+            Swal.fire('แจ้งเตือน', 'วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการอย่างน้อย 1 วัน', 'warning');
         }
     });
 }
@@ -355,7 +376,12 @@ function addProject() {
         }
     });
 }
-
+$('#submit_project').on('click', function(e) {
+    e.preventDefault();
+    if (validateForm()) {
+        addProject();
+    }
+});
     $('#projectsTable').on('click', '.delete-project', function(e) {
     e.preventDefault();
     var projectId = $(this).data('id');

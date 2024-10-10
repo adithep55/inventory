@@ -72,7 +72,7 @@ $(document).ready(function () {
                     title: 'สำเร็จ',
                     text: result.message
                 }).then(function () {
-                    window.location.href = 'index';
+                    window.location.href = '<?php echo base_url() ?>';
                 });
             } else if (result.status == "fail") {
                 Swal.fire({

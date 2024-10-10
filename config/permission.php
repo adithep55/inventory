@@ -23,12 +23,12 @@ function checkPermission($requiredPermissions = []) {
     }
     
     foreach ($requiredPermissions as $permission) {
-        if (!isset($result[$permission]) || $result[$permission] != 1) {
-            return false;
+        if (isset($result[$permission]) && $result[$permission] == 1) {
+            return true; // ถ้ามีสิทธิ์ใดสิทธิ์หนึ่ง ให้ return true ทันที
         }
     }
     
-    return true;
+    return false; // ถ้าไม่มีสิทธิ์ใดเลย
 }
 
 function requirePermission($requiredPermissions = []) {

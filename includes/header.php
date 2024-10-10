@@ -56,7 +56,7 @@ $links_re = base_url();
                 </div>
             </div>
             <hr class="m-0">
-            <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile"> <i class="me-2" data-feather="user"></i> My Profile</a>
+            <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile"> <i class="me-2" data-feather="user"></i> โปรไฟล์ของฉัน</a>
             <hr class="m-0">
             <a class="dropdown-item logout pb-0" href="<?php echo base_url(); ?>/logout"><img
                     src="../assets/img/icons/log-out.svg" class="me-2" alt="img">Logout</a>
@@ -70,8 +70,8 @@ $links_re = base_url();
             <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
                 aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile">My Profile</a>
-                <a class="dropdown-item" href="signin.html">Logout</a>
+                <a class="dropdown-item" href="<?php echo base_url(); ?>/views/profile">โปรไฟล์ของฉัน</a>
+                <a class="dropdown-item" href="<?php echo base_url(); ?>/logout">Logout</a>
             </div>
         </div>
 

@@ -47,6 +47,16 @@ require_once 'config/permission.php';
             font-size: 0.875rem;
         }
     }
+    #recent-transactions-table th::after {
+    display: none !important;
+}
+#recent-transactions-table th::before {
+    display: none !important;
+}
+
+#recent-transactions-table th {
+    cursor: pointer;
+}
 </style>
 
 <body>
@@ -216,6 +226,10 @@ require_once 'config/permission.php';
     <script>
 $(document).ready(function () {
     loadDashboardData();
+    $('#recent-transactions-table th').off('click');
+    
+    // ลบคลาส sortable และ cursor: pointer
+    $('#recent-transactions-table th').removeClass('sortable').css('cursor', 'default');
 });
 
 function loadDashboardData() {
@@ -395,6 +409,7 @@ function updateRecentTransactionsTable(transactions) {
         `);
     });
 }
+
     </script>
 </body>
 </html>
