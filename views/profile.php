@@ -18,6 +18,25 @@ require_once '../config/permission.php';
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+<style>
+    .profile-set .profile-top .profile-contentimg {
+  margin-top: -40px;
+  width: 130px;
+  height: 130px; /* Add this line to make it square */
+  position: relative;
+  border: 10px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 4px 4px 0 #00000040;
+  overflow: hidden; /* Add this to ensure the image doesn't overflow */
+}
+
+.profile-set .profile-top .profile-contentimg img {
+  width: 100%; /* Ensure the image fills the container */
+  height: 100%; /* Ensure the image fills the container */
+  object-fit: cover; /* This will maintain aspect ratio and cover the area */
+  border-radius: 50%; /* This is not strictly necessary but adds a safeguard */
+}
+</style>
 <body>
     <?php require_once '../includes/header.php'; ?>
     <?php require_once '../includes/sidebar.php'; ?>

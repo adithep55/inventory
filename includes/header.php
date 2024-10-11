@@ -11,6 +11,35 @@ function base_url()
 }
 $links_re = base_url();
 ?>
+<style>
+.user-img {
+  width: 39px;
+  height: 39px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.user-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+
+.header .user-img img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  margin-top: 0; 
+}
+
+
+.header .user-img .status {
+  bottom: 0;
+  right: 0;
+}
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 <div id="global-loader">
     <div class="whirly-loader"> </div>
