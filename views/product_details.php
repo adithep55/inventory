@@ -98,92 +98,110 @@ requirePermission(['manage_products']);
     <script src="../assets/plugins/owlcarousel/owl.carousel.min.js"></script>
     <script src="../assets/js/script.js"></script>
     <script>
-        $(document).ready(function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const productId = urlParams.get('id');
+    $(document).ready(function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
 
-            if (productId) {
-                $.ajax({
-                    url: '../api/get_product_details.php',
-                    type: 'GET',
-                    data: { id: productId },
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.status === 'success') {
-                            const product = response.data;
-                            updateProductDetails(product);
-                            generateBarcode(product.product_id);
-                        } else {
-                            console.error('Error fetching product details:', response.message);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('AJAX error:', error);
-                    }
-                });
-            } else {
-                console.error('Product ID not provided in URL');
+    if (productId) {
+        $.ajax({
+            url: '../api/get_product_details.php',
+            type: 'GET',
+            data: { id: productId },
+            dataType: 'json',
+            success: function (response) {
+                if (response.status === 'success' && response.data) {
+                    const product = response.data;
+                    updateProductDetails(product);
+                    generateBarcode(product.product_id);
+                } else {
+                    console.error('Error fetching product details:', response.message || 'Unknown error');
+                    showError('เกิดข้อผิดพลาดในการโหลดข้อมูลสินค้า');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', status, error);
+                // Log the response text for debugging
+                console.log('Response text:', xhr.responseText);
+                if (xhr.responseText.trim().startsWith('<')) {
+                    showError('เซิร์ฟเวอร์ส่งข้อมูลที่ไม่ถูกต้อง โปรดติดต่อผู้ดูแลระบบ');
+                } else {
+                    showError('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+                }
             }
         });
+    } else {
+        console.error('Product ID not provided in URL');
+        showError('ไม่พบรหัสสินค้าในURL');
+    }
+});
 
-        function updateProductDetails(product) {
-            const detailsList = [
-                { label: '  รหัสสินค้า', value: product.product_id, icon: 'fas fa-barcode' },
-                { label: '  ชื่อสินค้า (ไทย)', value: product.name_th, icon: 'fas fa-box' },
-                { label: '  ชื่อสินค้า (อังกฤษ)', value: product.name_en, icon: 'fas fa-language' },
-                { label: '  ประเภทสินค้า', value: product.product_type_name, icon: 'fas fa-tags' },
-                { label: '  หมวดหมู่', value: product.product_category_name, icon: 'fas fa-folder' },
-                { label: '  ขนาด', value: product.size, icon: 'fas fa-ruler-combined' },
-                { label: '  หน่วย', value: product.unit, icon: 'fas fa-balance-scale' },
-                { label: '  ระดับการแจ้งเตือนสินค้าใกล้หมด', value: product.low_level, icon: 'fas fa-bell' },
-                { label: '  สร้างโดย', value: product.created_by, icon: 'fas fa-user' },
-                { label: '  วันที่อัปเดต', value: product.updated_at, icon: 'fas fa-calendar-alt' }
-            ];
+function updateProductDetails(product) {
+    const detailsList = [
+        { label: 'รหัสสินค้า', value: product.product_id, icon: 'fas fa-barcode' },
+        { label: 'ชื่อสินค้า (ไทย)', value: product.name_th, icon: 'fas fa-box' },
+        { label: 'ชื่อสินค้า (อังกฤษ)', value: product.name_en, icon: 'fas fa-language' },
+        { label: 'ประเภทสินค้า', value: product.product_type_name, icon: 'fas fa-tags' },
+        { label: 'หมวดหมู่', value: product.product_category_name, icon: 'fas fa-folder' },
+        { label: 'ขนาด', value: product.size, icon: 'fas fa-ruler-combined' },
+        { label: 'หน่วย', value: product.unit, icon: 'fas fa-balance-scale' },
+        { label: 'ระดับการแจ้งเตือนสินค้าใกล้หมด', value: product.low_level, icon: 'fas fa-bell' },
+        { label: 'สร้างโดย', value: product.created_by, icon: 'fas fa-user' },
+        { label: 'วันที่อัปเดต', value: product.updated_at, icon: 'fas fa-calendar-alt' }
+    ];
 
-            let detailsHtml = '';
-            detailsList.forEach(item => {
-                detailsHtml += `
-                <li>
-                    <h4><i class="${item.icon}"></i>${item.label}</h4>
-                    <h6>${item.value || 'N/A'}</h6>
-                </li>
-            `;
-            });
+    let detailsHtml = '';
+    detailsList.forEach(item => {
+        detailsHtml += `
+            <li>
+                <h4><i class="${item.icon}"></i> ${item.label}</h4>
+                <h6>${item.value || 'N/A'}</h6>
+            </li>
+        `;
+    });
 
-            $('.productdetails ul').html(detailsHtml);
+    $('.productdetails ul').html(detailsHtml);
 
-            // Update product image
-            const imageUrl = product.img ? `../img/product/${product.img}` : '../img/product/default-image.jpg';
-            $('.product-slide').html(`
-            <div class="slider-product">
-                <img src="${imageUrl}" alt="${product.name_th}" class="product-image">
-                <h4>${product.name_th}</h4>
-            </div>
-        `);
+    // Update product image
+    const imageUrl = product.img ? `../img/product/${product.img}` : '../img/product/default-image.jpg';
+    $('.product-slide').html(`
+        <div class="slider-product">
+            <img src="${imageUrl}" alt="${product.name_th}" class="product-image">
+            <h4>${product.name_th}</h4>
+        </div>
+    `);
 
-            // Update barcode
-            $('#barcodeNumber').text(product.product_id);
-
-            // Initialize owl carousel
-            $('.owl-carousel').owlCarousel({
-                loop: true,
-                margin: 10,
-                nav: true,
-                responsive: {
-                    0: {
-                        items: 1
-                    }
-                }
-            });
+    // Initialize owl carousel
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: true,
+        responsive: {
+            0: {
+                items: 1
+            }
         }
-        function generateBarcode(productId) {
-            JsBarcode("#barcode", productId, {
-                format: "CODE128",
-                width: 2,
-                height: 100,
-                displayValue: true
-            });
-        }
+    });
+}
+
+function generateBarcode(productId) {
+    JsBarcode("#barcode", productId, {
+        format: "CODE128",
+        width: 2,
+        height: 100,
+        displayValue: true
+    });
+}
+
+function showError(message) {
+    $('.content.container-fluid').prepend(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    `);
+}
     </script>
 </body>
 

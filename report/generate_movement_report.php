@@ -360,14 +360,14 @@ LEFT JOIN (
 
     UNION ALL
 
-    SELECT 'transfer_out' as type, dt.quantity, ht.from_location_id AS location_id
+    SELECT 'transfer_out' as type, dt.quantity, dt.from_location_id AS location_id
     FROM d_transfer dt
     JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
     WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
 
     UNION ALL
 
-    SELECT 'transfer_in' as type, dt.quantity, ht.to_location_id AS location_id
+    SELECT 'transfer_in' as type, dt.quantity, dt.to_location_id AS location_id
     FROM d_transfer dt
     JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
     WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
@@ -386,38 +386,38 @@ foreach ($openingBalancesData as $balance) {
 
     // Fetch movements
     $movementsQuery = "
+  SELECT 
+    DATE(movement_date) as date,
+    type,
+    quantity,
+    from_location,
+    to_location
+FROM (
+    SELECT hr.received_date as movement_date, 'receive' as type, dr.quantity, NULL as from_location, dr.location_id as to_location
+    FROM d_receive dr
+    JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
+    WHERE dr.product_id = :productId AND hr.received_date BETWEEN :startDate AND :endDate
+
+    UNION ALL
+
+    SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location
+    FROM d_issue di
+    JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
+    WHERE di.product_id = :productId AND hi.issue_date BETWEEN :startDate AND :endDate
+
+    UNION ALL
+
     SELECT 
-        DATE(movement_date) as date,
-        type,
-        quantity,
-        from_location,
-        to_location
-    FROM (
-        SELECT hr.received_date as movement_date, 'receive' as type, dr.quantity, NULL as from_location, dr.location_id as to_location
-        FROM d_receive dr
-        JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
-        WHERE dr.product_id = :productId AND hr.received_date BETWEEN :startDate AND :endDate
-
-        UNION ALL
-
-        SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location
-        FROM d_issue di
-        JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
-        WHERE di.product_id = :productId AND hi.issue_date BETWEEN :startDate AND :endDate
-
-        UNION ALL
-
-        SELECT 
-            ht.transfer_date as movement_date, 
-            'transfer' as type,
-            dt.quantity, 
-            ht.from_location_id as from_location,
-            ht.to_location_id as to_location
-        FROM d_transfer dt
-        JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
-        WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
-    ) AS combined_movements
-    ORDER BY date, type
+        ht.transfer_date as movement_date, 
+        'transfer' as type,
+        dt.quantity, 
+        dt.from_location_id as from_location,
+        dt.to_location_id as to_location
+    FROM d_transfer dt
+    JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
+    WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
+) AS combined_movements
+ORDER BY date, type
     ";
 
     $stmt = $conn->prepare($movementsQuery);

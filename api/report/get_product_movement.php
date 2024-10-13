@@ -60,14 +60,14 @@ LEFT JOIN (
 
     UNION ALL
 
-    SELECT 'transfer_out' as type, dt.quantity, ht.from_location_id AS location_id
+    SELECT 'transfer_out' as type, dt.quantity, dt.from_location_id AS location_id
     FROM d_transfer dt
     JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
     WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
 
     UNION ALL
 
-    SELECT 'transfer_in' as type, dt.quantity, ht.to_location_id AS location_id
+    SELECT 'transfer_in' as type, dt.quantity, dt.to_location_id AS location_id
     FROM d_transfer dt
     JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
     WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
@@ -108,9 +108,9 @@ GROUP BY l.location_id, l.location
             ht.transfer_date as movement_date, 
             'transfer_out' as type,
             dt.quantity, 
-            ht.from_location_id as from_location,
-            ht.to_location_id as to_location,
-            ht.from_location_id as location_id
+            dt.from_location_id as from_location,
+            dt.to_location_id as to_location,
+            dt.from_location_id as location_id
         FROM d_transfer dt
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
@@ -121,9 +121,9 @@ GROUP BY l.location_id, l.location
             ht.transfer_date as movement_date, 
             'transfer_in' as type,
             dt.quantity, 
-            ht.from_location_id as from_location,
-            ht.to_location_id as to_location,
-            ht.to_location_id as location_id
+            dt.from_location_id as from_location,
+            dt.to_location_id as to_location,
+            dt.to_location_id as location_id
         FROM d_transfer dt
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
@@ -150,19 +150,19 @@ GROUP BY l.location_id, l.location
     $runningBalances = array_column($openingBalances, 'opening_balance', 'location_id');
     $totalBalance = array_sum($runningBalances);
 
-// เพิ่มยอดยกมาสำหรับแต่ละตำแหน่ง
-foreach ($openingBalances as $balance) {
-    $processedMovements[] = [
-        'date' => formatThaiDate($startDate),
-        'location' => $locations[$balance['location_id']] ?? 'ไม่ทราบ',
-        'receive' => null,
-        'issue' => null,
-        'transfer' => null,
-        'balance' => floatval($balance['opening_balance']),
-        'unit' => $productUnit,
-        'entry_type' => 'opening_balance'
-    ];
-}
+    // เพิ่มยอดยกมาสำหรับแต่ละตำแหน่ง
+    foreach ($openingBalances as $balance) {
+        $processedMovements[] = [
+            'date' => formatThaiDate($startDate),
+            'location' => $locations[$balance['location_id']] ?? 'ไม่ทราบ',
+            'receive' => null,
+            'issue' => null,
+            'transfer' => null,
+            'balance' => floatval($balance['opening_balance']),
+            'unit' => $productUnit,
+            'entry_type' => 'opening_balance'
+        ];
+    }
 
     foreach ($movements as $movement) {
         $quantity = floatval($movement['quantity']);

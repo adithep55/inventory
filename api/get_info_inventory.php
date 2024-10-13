@@ -45,13 +45,13 @@ LEFT JOIN (
 LEFT JOIN (
     SELECT 
         dt.product_id,
-        ht.to_location_id AS location_id,
+        dt.to_location_id AS location_id,
         MAX(ht.transfer_date) AS transfer_date
     FROM 
         h_transfer ht
     JOIN d_transfer dt ON ht.transfer_header_id = dt.transfer_header_id
     WHERE dt.product_id = :product_id
-    GROUP BY dt.product_id, ht.to_location_id
+    GROUP BY dt.product_id, dt.to_location_id
 ) ht ON p.product_id = ht.product_id AND l.location_id = ht.location_id
 WHERE p.product_id = :product_id
 HAVING current_quantity > 0 
@@ -62,7 +62,7 @@ $result = dd_q($query, [':product_id' => $productId]);
 $productData = $result->fetchAll(PDO::FETCH_ASSOC);
 
 if (empty($productData)) {
-    echo json_encode(['status' => 'error', 'message' => 'Product not found or has no inventory']);
+    echo json_encode(['status' => 'error', 'message' => 'Product not found']);
     exit;
 }
 
