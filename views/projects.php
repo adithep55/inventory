@@ -134,89 +134,15 @@ requirePermission(['manage_projects']);
     <script src="../assets/js/script.js"></script>
     
     <script>
-    $(document).ready(function() {
-        $('.close').on('click', function() {
-        $('#add_project').modal('hide');
-    });
-
-    var projectsTable = $('#projectsTable').DataTable({
-        ajax: {
-            url: '../api/get_projects.php',
-            dataSrc: function(json) {
- 
-                if (json.status === 'success' && json.data) {
-                    return json.data;
-                } else {
-                    console.error('Error fetching projects:', json.message);
-                    return [];
-                }
-            }
-        },
-        columns: [
-            { data: 'project_id' },
-            { data: 'project_name' },
-            { data: 'project_description', defaultContent: '' },
-            { data: 'start_date' },
-            { data: 'end_date' },
-            { data: 'user_name', defaultContent: '' },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    return '<a href="edit_project.php?id=' + row.project_id + '" class="me-3 edit-project" data-id="' + row.project_id + '"><img src="../assets/img/icons/edit.svg" alt="แก้ไข"></a>' +
-                    '<img src="../assets/img/icons/delete.svg" alt="ลบ" class="delete-project" data-id="' + row.project_id + '" style="cursor: pointer;">';
-                }
-            }
-        ]
-        ,
-                    "language": {
-                        "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
-                        "emptyTable": "ไม่พบข้อมูลสินค้า",
-                        "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
-                        "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
-                        "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
-                        "search": "ค้นหา:",
-                        "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
-                        "paginate": {
-                            "first": "หน้าแรก",
-                            "last": "หน้าสุดท้าย",
-                            "next": "ถัดไป",
-                            "previous": "ก่อนหน้า"
-                        }
-                    }
-    });
-
-    $('.select').select2({
-        dropdownParent: $('#add_project')
-    });
-
-    loadUsers();
+$(document).ready(function() {
     setupDateInputs();
+    setupFormSubmission();
+    loadUsers();
+    initializeDataTable();
+    setupModalClose();
+});
 
-    // Event Listeners
-    $('.add-btn').on('click', function(e) {
-        e.preventDefault();
-        $('#add_project').modal('show');
-    });
-
-    $('#add_project').on('show.bs.modal', function (e) {
-        console.log('Modal is showing');
-    });
-
-    $('#add_project').on('shown.bs.modal', function (e) {
-        console.log('Modal is shown');
-        $('select[name="user_id"]').select2({
-            dropdownParent: $('#add_project')
-        });
-    });
-
-    $('#add_project_form').on('submit', function(e) {
-        e.preventDefault();
-        if (validateForm()) {
-            addProject();
-        }
-    });
-
-    function setupDateInputs() {
+function setupDateInputs() {
     const today = new Date();
     
     const formatDate = (date) => {
@@ -235,28 +161,121 @@ requirePermission(['manage_projects']);
 
     const todayFormatted = formatDate(today);
 
-    // Set maximum date for start_date to today
     $('#start_date').attr('max', todayFormatted);
 
-    $('#start_date').on('change', function() {
-        const selectedStartDate = new Date($(this).val());
-        const today = new Date();
-        today.setDate(today.getDate() + 1); // เพิ่มหนึ่งวันให้กับวันที่ปัจจุบัน
-        if (selectedStartDate > today) {
-            $(this).val(todayFormatted);
-            Swal.fire('แจ้งเตือน', 'ไม่สามารถเลือกวันที่ในอนาคตได้', 'warning');
+    $('#start_date, #end_date').on('input', function(e) {
+        let input = $(this).val();
+        let parts = input.split('-');
+        
+        if (parts[0] && parts[0].length > 4) {
+            parts[0] = parts[0].substr(0, 4);
+            $(this).val(parts.join('-'));
         }
-        $('#end_date').attr('min', $(this).val());
     });
+}
 
-    $('#end_date').on('change', function() {
-        const startDate = new Date($('#start_date').val());
-        const endDate = new Date($(this).val());
-        if (endDate <= startDate) {
-            $(this).val('');
-            Swal.fire('แจ้งเตือน', 'วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการอย่างน้อย 1 วัน', 'warning');
+function setupFormSubmission() {
+    $('#submit_project').on('click', function(e) {
+        e.preventDefault();
+        if (validateForm()) {
+            addProject();
         }
     });
+}
+
+function validateForm() {
+    let isValid = true;
+    let errorMessages = [];
+
+    if ($('#project_name').val().trim() === '') {
+        isValid = false;
+        errorMessages.push('กรุณากรอกชื่อโครงการ');
+    }
+
+    if ($('#user_id').val() === '') {
+        isValid = false;
+        errorMessages.push('กรุณาเลือกผู้รับผิดชอบ');
+    }
+
+    const startDate = new Date($('#start_date').val());
+    const endDate = new Date($('#end_date').val());
+    const today = new Date();
+    today.setDate(today.getDate() + 1); // เพิ่มหนึ่งวันให้กับวันที่ปัจจุบัน
+
+    if (startDate > today) {
+        isValid = false;
+        errorMessages.push('ไม่สามารถเลือกวันที่เริ่มในอนาคตได้');
+    }
+
+    if (endDate <= startDate) {
+        isValid = false;
+        errorMessages.push('วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการอย่างน้อย 1 วัน');
+    }
+
+    if (!isValid) {
+        Swal.fire({
+            title: 'แจ้งเตือน',
+            html: errorMessages.join('<br>'),
+            icon: 'warning'
+        });
+    }
+
+    return isValid;
+}
+
+function addProject() {
+    var formData = $('#add_project_form').serialize();
+    $.ajax({
+        url: '../system/add_project.php',
+        type: 'POST',
+        data: formData,
+        dataType: 'json',
+        success: function(response) {
+            if (response.status === 'success') {
+           
+                resetProjectForm();
+                
+  
+                $('#add_project').modal('hide');
+                
+                Swal.fire({
+                    title: 'สำเร็จ',
+                    text: 'เพิ่มโครงการใหม่เรียบร้อยแล้ว',
+                    icon: 'success',
+                    confirmButtonText: 'ตกลง'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+        
+                        window.location.href = '<?php echo base_url();?>/views/projects';
+                    }
+                });
+            } else {
+                Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มโครงการได้', 'error');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error('AJAX Error:', textStatus, errorThrown);
+            Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเพิ่มโครงการ', 'error');
+        }
+    });
+}
+
+function resetProjectForm() {
+    $('#add_project_form')[0].reset();
+    $('#user_id').val('').trigger('change'); 
+    $('.is-invalid').removeClass('is-invalid');
+    
+
+}
+
+function resetProjectForm() {
+    $('#project_name').val('');
+    $('#user_id').val('').trigger('change');
+    $('#project_description').val('');
+    $('#start_date').val('');
+    $('#end_date').val('');
+    
+    $('.is-invalid').removeClass('is-invalid');
 }
 
 function loadUsers() {
@@ -283,111 +302,61 @@ function loadUsers() {
     });
 }
 
-    function validateForm() {
-        var isValid = true;
-        var errorMessages = [];
-
-        // ตรวจสอบชื่อโครงการ
-        if ($('#project_name').val().trim() === '') {
-            isValid = false;
-            errorMessages.push('กรุณากรอกชื่อโครงการ');
-            $('#project_name').addClass('is-invalid');
-        } else {
-            $('#project_name').removeClass('is-invalid');
-        }
-
-        // ตรวจสอบผู้รับผิดชอบ
-        if ($('#user_id').val() === '') {
-            isValid = false;
-            errorMessages.push('กรุณาเลือกผู้รับผิดชอบ');
-            $('#user_id').next('.select2-container').addClass('is-invalid');
-        } else {
-            $('#user_id').next('.select2-container').removeClass('is-invalid');
-        }
-
-        // ตรวจสอบวันที่เริ่มโครงการ
-        if ($('#start_date').val() === '') {
-            isValid = false;
-            errorMessages.push('กรุณาเลือกวันที่เริ่มโครงการ');
-            $('#start_date').addClass('is-invalid');
-        } else {
-            $('#start_date').removeClass('is-invalid');
-        }
-
-        // ตรวจสอบวันที่สิ้นสุดโครงการ
-        if ($('#end_date').val() === '') {
-            isValid = false;
-            errorMessages.push('กรุณาเลือกวันที่สิ้นสุดโครงการ');
-            $('#end_date').addClass('is-invalid');
-        } else {
-            $('#end_date').removeClass('is-invalid');
-        }
-
-        // ตรวจสอบว่าวันที่สิ้นสุดต้องมาหลังวันที่เริ่ม
-        if ($('#start_date').val() !== '' && $('#end_date').val() !== '') {
-            if (new Date($('#start_date').val()) > new Date($('#end_date').val())) {
-                isValid = false;
-                errorMessages.push('วันที่สิ้นสุดโครงการต้องมาหลังวันที่เริ่มโครงการ');
-                $('#end_date').addClass('is-invalid');
-            }
-        }
-
-        if (!isValid) {
-            Swal.fire({
-                icon: 'error',
-                title: 'กรุณาตรวจสอบข้อมูล',
-                html: errorMessages.join('<br>'),
-            });
-        }
-
-        return isValid;
-    }
-    function resetProjectForm() {
-    $('#project_name').val('');
-    $('#user_id').val('').trigger('change');
-    $('#project_description').val('');
-    $('#start_date').val('');
-    $('#end_date').val('');
-    
-    $('.is-invalid').removeClass('is-invalid');
-}
-function addProject() {
-    var formData = $('#add_project_form').serialize();
-    $.ajax({
-        url: '../system/add_project.php',
-        type: 'POST',
-        data: formData,
-        dataType: 'json',
-        success: function(response) {
-            if (response.status === 'success') {
-                Swal.fire('สำเร็จ', 'เพิ่มโครงการใหม่เรียบร้อยแล้ว', 'success')
-                .then(() => {
-                    $('#add_project').modal('hide');
-                    projectsTable.ajax.reload();
-                    resetProjectForm(); // เรียกใช้ฟังก์ชันรีเซ็ตฟอร์ม
-                });
-            } else {
-                Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถเพิ่มโครงการได้', 'error');
+function initializeDataTable() {
+    var projectsTable = $('#projectsTable').DataTable({
+        ajax: {
+            url: '../api/get_projects.php',
+            dataSrc: function(json) {
+                if (json.status === 'success' && json.data) {
+                    return json.data;
+                } else {
+                    console.error('Error fetching projects:', json.message);
+                    return [];
+                }
             }
         },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.error('AJAX Error:', textStatus, errorThrown);
-            Swal.fire('ข้อผิดพลาด', 'เกิดข้อผิดพลาดในการเพิ่มโครงการ', 'error');
+        columns: [
+            { data: 'project_id' },
+            { data: 'project_name' },
+            { data: 'project_description', defaultContent: '' },
+            { data: 'start_date' },
+            { data: 'end_date' },
+            { data: 'user_name', defaultContent: '' },
+            {
+                data: null,
+                render: function(data, type, row) {
+                    return '<a href="edit_project.php?id=' + row.project_id + '" class="me-3 edit-project" data-id="' + row.project_id + '"><img src="../assets/img/icons/edit.svg" alt="แก้ไข"></a>' +
+                    '<img src="../assets/img/icons/delete.svg" alt="ลบ" class="delete-project" data-id="' + row.project_id + '" style="cursor: pointer;">';
+                }
+            }
+        ],
+        language: {
+            lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+            emptyTable: "ไม่พบข้อมูลสินค้า",
+            info: "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+            infoEmpty: "แสดง 0 ถึง 0 จาก 0 รายการ",
+            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+            search: "ค้นหา:",
+            zeroRecords: "ไม่พบข้อมูลที่ตรงกัน",
+            paginate: {
+                first: "หน้าแรก",
+                last: "หน้าสุดท้าย",
+                next: "ถัดไป",
+                previous: "ก่อนหน้า"
+            }
         }
     });
+
+  
 }
-$('#submit_project').on('click', function(e) {
-    e.preventDefault();
-    if (validateForm()) {
-        addProject();
-    }
-});
-    $('#projectsTable').on('click', '.delete-project', function(e) {
-    e.preventDefault();
-    var projectId = $(this).data('id');
-    deleteProject(projectId);
-});
-    function deleteProject(projectId) {
+
+function setupModalClose() {
+    $('.close').on('click', function() {
+        $('#add_project').modal('hide');
+    });
+}
+
+function deleteProject(projectId) {
     Swal.fire({
         title: 'คุณแน่ใจหรือไม่?',
         text: "คุณไม่สามารถยกเลิกการดำเนินการนี้ได้!",
@@ -402,12 +371,21 @@ $('#submit_project').on('click', function(e) {
             $.ajax({
                 url: '../system/delete_project.php',
                 type: 'POST',
-                data: { project_id: projectId },  // เปลี่ยนจาก projectId เป็น project_id
+                data: { project_id: projectId },
                 dataType: 'json',
                 success: function(response) {
                     if (response.status === 'success') {
-                        projectsTable.ajax.reload();
-                        Swal.fire('ลบแล้ว!', 'โครงการถูกลบเรียบร้อยแล้ว', 'success');
+                        Swal.fire({
+                            title: 'ลบแล้ว!',
+                            text: 'โครงการถูกลบเรียบร้อยแล้ว',
+                            icon: 'success',
+                            confirmButtonText: 'ตกลง'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Reload the page instead of using DataTable reload
+                                window.location.reload();
+                            }
+                        });
                     } else {
                         Swal.fire('ผิดพลาด', 'ไม่สามารถลบโครงการได้: ' + response.message, 'error');
                     }
@@ -420,7 +398,12 @@ $('#submit_project').on('click', function(e) {
         }
     });
 }
-});
+
+$('#projectsTable').on('click', '.delete-project', function(e) {
+        e.preventDefault();
+        var projectId = $(this).data('id');
+        deleteProject(projectId);
+    });
 </script>
 </body>
 </html>

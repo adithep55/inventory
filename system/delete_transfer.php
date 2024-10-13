@@ -16,8 +16,7 @@ try {
     $conn->beginTransaction();
 
     // Fetch transfer details
-    $stmt = $conn->prepare("SELECT h.transfer_header_id, h.from_location_id, h.to_location_id,
-                                   d.product_id, d.quantity
+    $stmt = $conn->prepare("SELECT d.transfer_detail_id, d.product_id, d.from_location_id, d.to_location_id, d.quantity
                             FROM h_transfer h
                             JOIN d_transfer d ON h.transfer_header_id = d.transfer_header_id
                             WHERE h.transfer_header_id = :transfer_id");

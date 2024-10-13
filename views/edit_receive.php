@@ -163,28 +163,37 @@ $(document).ready(function() {
             Swal.fire('Error', 'ไม่สามารถโหลดข้อมูลได้', 'error');
         });
 
-    function populateForm(data) {
-        $('#receiveId').val(data.receive_header_id);
-        $('#billNumber').val(data.bill_number);
+        function populateForm(data) {
+    $('#receiveId').val(data.receive_header_id);
+    $('#billNumber').val(data.bill_number);
+    
+    // แปลงวันที่จากรูปแบบ DD-MM-YYYY (พ.ศ.) เป็น YYYY-MM-DD (ค.ศ.)
+    const dateParts = data.received_date.split('-');
+    if (dateParts.length === 3) {
+        let day = dateParts[0].padStart(2, '0');
+        let month = dateParts[1].padStart(2, '0');
+        let yearBE = parseInt(dateParts[2]);
+        let yearCE = yearBE - 543; // แปลงปี พ.ศ. เป็น ค.ศ.
         
-        // แปลงวันที่จากรูปแบบ DD-MM-YYYY เป็น YYYY-MM-DD
-        const dateParts = data.received_date.split('-');
-        const formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        const formattedDate = `${yearCE}-${month}-${day}`;
         $('#receiveDate').val(formattedDate);
         
         // เก็บค่าวันที่เดิมไว้เพื่อใช้ในการเปรียบเทียบการเปลี่ยนแปลง
         $('#receiveDate').data('original', formattedDate);
-        
-        $('#receiveType').val(data.is_opening_balance == 1 ? 'opening' : 'normal');
-
-        const tbody = $('#receiveItemsTable tbody');
-        tbody.empty();
-        data.items.forEach(function(item) {
-            addItemRow(item);
-        });
-        $('#receiveItemsTable').data('original-row-count', data.items.length);
-        updateFormStatus();
+    } else {
+        console.error('Invalid date format:', data.received_date);
     }
+    
+    $('#receiveType').val(data.is_opening_balance == 1 ? 'opening' : 'normal');
+
+    const tbody = $('#receiveItemsTable tbody');
+    tbody.empty();
+    data.items.forEach(function(item) {
+        addItemRow(item);
+    });
+    $('#receiveItemsTable').data('original-row-count', data.items.length);
+    updateFormStatus();
+}
 
 
 function addItemRow(item) {

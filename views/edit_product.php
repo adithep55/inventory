@@ -28,10 +28,10 @@ requirePermission(['manage_products']);
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">แก้ไขข้อมูลสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-edit"></i> แก้ไขข้อมูลสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item"><a href="productlist.php">รายการสินค้า</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>/views/productlist">รายการสินค้า</a></li>
                             <li class="breadcrumb-item active">แก้ไขข้อมูลสินค้า</li>
                         </ul>
                     </div>
@@ -363,7 +363,7 @@ function updateProduct() {
             if (response.status === 'success') {
                 Swal.fire('Success', 'อัปเดตข้อมูลสินค้าสำเร็จ', 'success')
                     .then(() => {
-                        window.location.href = 'productlist.php';
+                        window.location.href = '<?php echo base_url()?>/views/productlist';
                     });
             } else {
                 Swal.fire('Error', response.message || 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลสินค้า', 'error');

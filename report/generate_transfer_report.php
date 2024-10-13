@@ -34,19 +34,19 @@ SELECT
     ht.transfer_date,
     u.fname AS transferer_fname,
     u.lname AS transferer_lname,
-    l1.location AS from_location,
-    l2.location AS to_location,
     dt.product_id,
     p.name_th AS product_name,
     dt.quantity,
-    p.unit
+    p.unit,
+    l1.location AS from_location,
+    l2.location AS to_location
 FROM 
     h_transfer ht
 JOIN d_transfer dt ON ht.transfer_header_id = dt.transfer_header_id
 JOIN products p ON dt.product_id = p.product_id
 JOIN users u ON ht.user_id = u.UserID
-JOIN locations l1 ON ht.from_location_id = l1.location_id
-JOIN locations l2 ON ht.to_location_id = l2.location_id
+JOIN locations l1 ON dt.from_location_id = l1.location_id
+JOIN locations l2 ON dt.to_location_id = l2.location_id
 WHERE ht.transfer_header_id = :transfer_id
 ";
 
@@ -120,9 +120,11 @@ class PDF extends FPDF
             $this->SetFillColor(240, 240, 240);
             $this->Cell(15, 5, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
             $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
-            $this->Cell(70, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+            $this->Cell(50, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
             $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
-            $this->Cell(50, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+            $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+            $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'จากคลัง'), 1, 0, 'C', true);
+            $this->Cell(25, 5, iconv('UTF-8', 'cp874', 'ไปคลัง'), 1, 0, 'C', true);
             $this->Ln();
         }
     }
@@ -157,15 +159,6 @@ $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่พิมพ์เ�
 $pdf->SetFont('THSarabunNew', '', 11);
 $pdf->Cell(0, 5, date('d/m/Y H:i:s'), 0, 1);
 
-$pdf->SetFont('THSarabunNew', 'B', 11);
-$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'จากคลัง:'), 0);
-$pdf->SetFont('THSarabunNew', '', 11);
-$pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $transferData[0]['from_location']), 0);
-$pdf->SetFont('THSarabunNew', 'B', 11);
-$pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'ไปยังคลัง:'), 0);
-$pdf->SetFont('THSarabunNew', '', 11);
-$pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $transferData[0]['to_location']), 0, 1);
-
 $pdf->Ln(5);
 $pdf->SetFont('THSarabunNew', 'B', 14);
 $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', 'รายการสินค้าที่โอนย้าย'), 0, 1, 'C');
@@ -175,9 +168,11 @@ $pdf->SetFillColor(240, 240, 240);
 $pdf->SetFont('THSarabunNew', 'B', 11);
 $pdf->Cell(15, 5, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
 $pdf->Cell(25, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
-$pdf->Cell(70, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
+$pdf->Cell(50, 5, iconv('UTF-8', 'cp874', 'รายละเอียด'), 1, 0, 'C', true);
 $pdf->Cell(30, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
-$pdf->Cell(50, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+$pdf->Cell(20, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
+$pdf->Cell(25, 5, iconv('UTF-8', 'cp874', 'จากคลัง'), 1, 0, 'C', true);
+$pdf->Cell(25, 5, iconv('UTF-8', 'cp874', 'ไปคลัง'), 1, 0, 'C', true);
 $pdf->Ln();
 
 $pdf->SetFont('THSarabunNew', '', 11);
@@ -189,18 +184,20 @@ foreach ($transferData as $item) {
     }
     $pdf->Cell(15, 5, $i, 1, 0, 'C');
     $pdf->Cell(25, 5, $item['product_id'], 1, 0, 'C');
-    $pdf->Cell(70, 5, iconv('UTF-8', 'cp874', $item['product_name']), 1);
+    $pdf->Cell(50, 5, iconv('UTF-8', 'cp874', $item['product_name']), 1);
     $pdf->Cell(30, 5, number_format($item['quantity'], 2), 1, 0, 'R');
-    $pdf->Cell(50, 5, iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'C');
+    $pdf->Cell(20, 5, iconv('UTF-8', 'cp874', $item['unit']), 1, 0, 'C');
+    $pdf->Cell(25, 5, iconv('UTF-8', 'cp874', $item['from_location']), 1, 0, 'C');
+    $pdf->Cell(25, 5, iconv('UTF-8', 'cp874', $item['to_location']), 1, 0, 'C');
     $pdf->Ln();
     $total += $item['quantity'];
     $i++;
 }
 
 $pdf->SetFont('THSarabunNew', 'B', 11);
-$pdf->Cell(110, 5, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
+$pdf->Cell(90, 5, iconv('UTF-8', 'cp874', 'รวมทั้งสิ้น'), 1, 0, 'R', true);
 $pdf->Cell(30, 5, number_format($total, 2), 1, 0, 'R', true);
-$pdf->Cell(50, 5, '', 1, 0, 'C', true);
+$pdf->Cell(70, 5, '', 1, 0, 'C', true);
 $pdf->Ln(20);
 
 // ตรวจสอบว่ามีพื้นที่เพียงพอสำหรับลายเซ็นหรือไม่ ถ้าไม่พอให้ขึ้นหน้าใหม่

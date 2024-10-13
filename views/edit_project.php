@@ -39,10 +39,10 @@ requirePermission(['manage_projects']);
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">แก้ไขข้อมูลโครงการ</h3>
+                        <h3 class="page-title"> <i class ="fas fa-edit"></i> แก้ไขข้อมูลโครงการ</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item"><a href="projects.php">รายการโครงการ</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>/views/projects">รายการโครงการ</a></li>
                             <li class="breadcrumb-item active">แก้ไขข้อมูลโครงการ</li>
                         </ul>
                     </div>
@@ -299,7 +299,7 @@ requirePermission(['manage_projects']);
                         if (response.status === 'success') {
                             Swal.fire('สำเร็จ', 'อัปเดตข้อมูลโครงการเรียบร้อยแล้ว', 'success')
                                 .then(() => {
-                                    window.location.href = '<?php echo base_url(); ?>/views/projects.php';
+                                    window.location.href = '<?php echo base_url(); ?>/views/projects';
                                 });
                         } else {
                             Swal.fire('ข้อผิดพลาด', response.message || 'ไม่สามารถอัปเดตข้อมูลโครงการได้', 'error');

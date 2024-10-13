@@ -66,7 +66,8 @@ try {
     $stmt->execute([':transfer_id' => $transferId]);
 
     // เพิ่มข้อมูลรายการสินค้าใหม่และปรับปรุงสต็อก
-    $insertDetailsSql = "INSERT INTO d_transfer (transfer_header_id, product_id, quantity, unit) VALUES (:transfer_id, :product_id, :quantity, :unit)";
+    $insertDetailsSql = "INSERT INTO d_transfer (transfer_header_id, product_id, from_location_id, to_location_id, quantity, unit) 
+                         VALUES (:transfer_id, :product_id, :from_location_id, :to_location_id, :quantity, :unit)";
     $stmt = $conn->prepare($insertDetailsSql);
 
     $updateInventorySql = "INSERT INTO inventory (product_id, location_id, quantity, user_id) 
@@ -78,6 +79,8 @@ try {
         $stmt->execute([
             ':transfer_id' => $transferId,
             ':product_id' => $product['product_id'],
+            ':from_location_id' => $product['from_location_id'],
+            ':to_location_id' => $product['to_location_id'],
             ':quantity' => $product['quantity'],
             ':unit' => $product['unit']
         ]);

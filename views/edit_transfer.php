@@ -28,10 +28,10 @@ requirePermission(['manage_transfers']);
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">แก้ไขการโอนย้ายสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-edit"></i> แก้ไขการโอนย้ายสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
-                            <li class="breadcrumb-item"><a href="transfer_history.php">ประวัติการโอนย้าย</a></li>
+                            <li class="breadcrumb-item"><a href="<?php base_url();?>">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php base_url();?>/views/transfer_history">ประวัติการโอนย้าย</a></li>
                             <li class="breadcrumb-item active">แก้ไขการโอนย้ายสินค้า</li>
                         </ul>
                     </div>
@@ -123,7 +123,7 @@ requirePermission(['manage_transfers']);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        $(document).ready(function () {
+       $(document).ready(function () {
             const urlParams = new URLSearchParams(window.location.search);
             const transferId = urlParams.get('id');
             let formData;
@@ -148,52 +148,60 @@ requirePermission(['manage_transfers']);
             }
 
             function loadTransferDetails(transferId) {
-    $.ajax({
-        url: '../api/get_transfer_details.php',
-        type: 'GET',
-        data: { id: transferId },
-        dataType: 'json',
-        success: function (response) {
-            if (response.error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ข้อผิดพลาด',
-                    text: response.error,
-                    confirmButtonText: 'ตกลง'
+                $.ajax({
+                    url: '../api/get_transfer_details.php',
+                    type: 'GET',
+                    data: { id: transferId },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'ข้อผิดพลาด',
+                                text: response.error,
+                                confirmButtonText: 'ตกลง'
+                            });
+                            return;
+                        }
+                        console.log('Transfer details:', response);
+                        displayTransferDetails(response);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error loading transfer details:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ข้อผิดพลาด',
+                            text: 'ไม่สามารถโหลดข้อมูลการโอนย้ายได้',
+                            confirmButtonText: 'ตกลง'
+                        });
+                    }
                 });
-                return;
             }
-            console.log('Transfer details:', response);
-            displayTransferDetails(response);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error loading transfer details:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'ข้อผิดพลาด',
-                text: 'ไม่สามารถโหลดข้อมูลการโอนย้ายได้',
-                confirmButtonText: 'ตกลง'
-            });
-        }
-    });
-}
-
             function displayTransferDetails(data) {
     $('#billNumber').val(data.bill_number);
-    $('#transferDate').val(data.transfer_date);
-    $('#fromLocation').val(data.from_location);
-    $('#toLocation').val(data.to_location);
+    
+    // แยกส่วนของวันที่
+    let dateParts = data.transfer_date.split("-");
+    
+    // แปลงปี พ.ศ. เป็น ค.ศ. โดยลบ 543
+    let year = parseInt(dateParts[2]) - 543;
+    
+    // สร้างวันที่ใหม่ในรูปแบบ yyyy-mm-dd
+    let formattedDate = `${year}-${dateParts[1].padStart(2, '0')}-${dateParts[0].padStart(2, '0')}`;
+    
+    $('#transferDate').val(formattedDate);
+    
     console.log('Displaying transfer details:', data);
     const itemsTable = $('#transferItemsTable tbody');
     itemsTable.empty();
-
+    
     data.items.forEach(function (item) {
         addProductToTransfer(
             item.product_id,
             item.product_name_th,
             item.product_name_en,
-            item.from_location_id,
-            item.to_location_id,
+            item.from_location,
+            item.to_location,
             item.quantity,
             item.unit
         );
@@ -213,7 +221,7 @@ function addProductToTransfer(productId, productNameTh, productNameEn, fromLocat
                 console.log('Product locations:', response);
                 let totalQuantity = response.locations.reduce((sum, loc) => sum + parseFloat(loc.quantity), 0);
                 let fromLocationOptions = response.locations.map(loc => {
-                    let isSelected = loc.location_id === fromLocation;
+                    let isSelected = loc.location === fromLocation;
                     return `<option value="${loc.location_id}" 
                         ${isSelected ? 'selected' : ''} 
                         data-quantity="${loc.quantity}">
@@ -223,7 +231,7 @@ function addProductToTransfer(productId, productNameTh, productNameEn, fromLocat
 
                 let toLocationOptions = response.all_locations.map(loc =>
                     `<option value="${loc.location_id}" 
-                        ${loc.location_id === toLocation ? 'selected' : ''}>
+                        ${loc.location === toLocation ? 'selected' : ''}>
                         ${loc.location || 'ไม่ระบุ'}
                     </option>`
                 ).join('');
@@ -266,6 +274,7 @@ function addProductToTransfer(productId, productNameTh, productNameEn, fromLocat
         }
     });
 }
+
 
 function updateQuantityLimit(productId) {
     let row = $(`#transferItemsTable tbody tr[data-product-id="${productId}"]`);
@@ -387,89 +396,87 @@ function updateQuantityLimit(productId) {
             });
 
          
-    $('#editTransferForm').submit(function (e) {
-        e.preventDefault();
-        let transferDate = new Date($('#transferDate').val());
-        let maxAllowedDate = new Date(maxDate);
+            $('#editTransferForm').submit(function (e) {
+    e.preventDefault();
+    let transferDate = new Date($('#transferDate').val());
+    let maxAllowedDate = new Date(maxDate);
 
-        if (transferDate > maxAllowedDate) {
-            Swal.fire({
-                icon: 'error',
-                title: 'วันที่ไม่ถูกต้อง',
-                text: 'วันที่โอนย้ายต้องไม่เป็นวันในอนาคต',
-                confirmButtonText: 'ตกลง'
-            });
-            return;
-        }
-
-        formData = {
-            transfer_id: transferId,
-            transfer_date: $('#transferDate').val(),
-            from_location: $('#fromLocation').val(),
-            to_location: $('#toLocation').val(),
-            products: []
-        };
-
-        let isValid = true;
-
-        $('#transferItemsTable tbody tr').each(function () {
-            let productId = $(this).find('input[name="product_ids[]"]').val();
-            let fromLocation = $(this).find('.from-location').val();
-            let toLocation = $(this).find('.to-location').val();
-            let quantity = parseFloat($(this).find('.quantity').val());
-            let currentFromLocationQuantity = parseFloat($(this).find('.from-location option:selected').data('quantity')) || 0;
-            let unit = $(this).find('td:eq(4)').text();
-
-            if (fromLocation === toLocation) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'คลังสินค้าไม่ถูกต้อง',
-                    text: 'คลังสินค้าต้นทางและปลายทางต้องไม่เป็นคลังเดียวกัน',
-                    confirmButtonText: 'ตกลง'
-                });
-                isValid = false;
-                return false;
-            }
-
-            if (quantity > currentFromLocationQuantity) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'คำเตือน',
-                    text: `จำนวนที่โอนย้ายของสินค้า ${productId} (${quantity}) มากกว่าจำนวนที่มีในคลังต้นทาง (${currentFromLocationQuantity})`,
-                    showCancelButton: true,
-                    confirmButtonText: 'ดำเนินการต่อ',
-                    cancelButtonText: 'ยกเลิก'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // เพิ่มสินค้าลงใน formData และดำเนินการต่อ
-                        addProductToFormData(productId, fromLocation, toLocation, quantity, unit);
-                        if (isLastProduct()) {
-                            submitTransferData();
-                        }
-                    }
-                });
-                return false;
-            }
-
-            addProductToFormData(productId, fromLocation, toLocation, quantity, unit);
+    if (transferDate > maxAllowedDate) {
+        Swal.fire({
+            icon: 'error',
+            title: 'วันที่ไม่ถูกต้อง',
+            text: 'วันที่โอนย้ายต้องไม่เป็นวันในอนาคต',
+            confirmButtonText: 'ตกลง'
         });
+        return;
+    }
 
-        if (!isValid) {
-            return;
-        }
+    formData = {
+        transfer_id: transferId,
+        transfer_date: $('#transferDate').val(),
+        products: []
+    };
 
-        if (formData.products.length === 0) {
+    let isValid = true;
+
+    $('#transferItemsTable tbody tr').each(function () {
+        let row = $(this);
+        let productId = row.find('input[name="product_ids[]"]').val();
+        let fromLocation = row.find('.from-location').val();
+        let toLocation = row.find('.to-location').val();
+        let quantity = parseFloat(row.find('.quantity').val());
+        let unit = row.find('td:eq(4)').text();
+        let currentFromLocationQuantity = parseFloat(row.find('.from-location option:selected').data('quantity')) || 0;
+
+        if (fromLocation === toLocation) {
             Swal.fire({
                 icon: 'error',
-                title: 'ข้อมูลไม่ครบถ้วน',
-                text: 'กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ',
+                title: 'คลังสินค้าไม่ถูกต้อง',
+                text: 'คลังสินค้าต้นทางและปลายทางต้องไม่เป็นคลังเดียวกัน',
                 confirmButtonText: 'ตกลง'
             });
-            return;
+            isValid = false;
+            return false;
         }
 
-        submitTransferData();
+        if (quantity > currentFromLocationQuantity) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'คำเตือน',
+                text: `จำนวนที่โอนย้ายของสินค้า ${productId} (${quantity}) มากกว่าจำนวนที่มีในคลังต้นทาง (${currentFromLocationQuantity})`,
+                showCancelButton: true,
+                confirmButtonText: 'ดำเนินการต่อ',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    addProductToFormData(productId, fromLocation, toLocation, quantity, unit);
+                    if (isLastProduct()) {
+                        submitTransferData();
+                    }
+                }
+            });
+            return false;
+        }
+
+        addProductToFormData(productId, fromLocation, toLocation, quantity, unit);
     });
+
+    if (!isValid) {
+        return;
+    }
+
+    if (formData.products.length === 0) {
+        Swal.fire({
+            icon: 'error',
+            title: 'ข้อมูลไม่ครบถ้วน',
+            text: 'กรุณาเพิ่มสินค้าอย่างน้อย 1 รายการ',
+            confirmButtonText: 'ตกลง'
+        });
+        return;
+    }
+
+    submitTransferData();
+});
 
     function addProductToFormData(productId, fromLocation, toLocation, quantity, unit) {
     console.log('Adding product to formData:', { productId, fromLocation, toLocation, quantity, unit });
@@ -487,67 +494,50 @@ function updateQuantityLimit(productId) {
     }
 
     function submitTransferData() {
-    formData.products = [];
-    $('#transferItemsTable tbody tr').each(function() {
-        let productId = $(this).data('product-id');
-        let fromLocation = $(this).find('.from-location').val();
-        let toLocation = $(this).find('.to-location').val();
-        let quantity = parseFloat($(this).find('.quantity').val());
-        let unit = $(this).find('td:eq(4)').text();
+                console.log('Submitting transfer data:', formData);
 
-        formData.products.push({
-            product_id: productId,
-            from_location_id: fromLocation,
-            to_location_id: toLocation,
-            quantity: quantity,
-            unit: unit
-        });
-    });
-
-    console.log('Submitting transfer data:', formData);
-
-    $.ajax({
-        url: '../system/update_transfer.php',
-        type: 'POST',
-        data: JSON.stringify(formData),
-        contentType: 'application/json',
-        dataType: 'json',
-        success: function (response) {
-            console.log('Server response:', response);
-            if (response.status === 'success') {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'สำเร็จ',
-                    text: 'บันทึกการแก้ไขการโอนย้ายสินค้าเรียบร้อยแล้ว',
-                    confirmButtonText: 'ตกลง'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = 'transfer_history.php';
+                $.ajax({
+                    url: '../system/update_transfer.php',
+                    type: 'POST',
+                    data: JSON.stringify(formData),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (response) {
+                        console.log('Server response:', response);
+                        if (response.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ',
+                                text: 'บันทึกการแก้ไขการโอนย้ายสินค้าเรียบร้อยแล้ว',
+                                confirmButtonText: 'ตกลง'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = 'transfer_history.php';
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'เกิดข้อผิดพลาด',
+                                text: response.message,
+                                confirmButtonText: 'ตกลง'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("XHR Status:", status);
+                        console.error("Error:", error);
+                        console.error("Response Text:", xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: 'ไม่สามารถบันทึกการแก้ไขการโอนย้ายสินค้าได้ โปรดลองอีกครั้งหรือติดต่อผู้ดูแลระบบ',
+                            confirmButtonText: 'ตกลง'
+                        });
                     }
                 });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: response.message,
-                    confirmButtonText: 'ตกลง'
-                });
             }
-        },
-        error: function (xhr, status, error) {
-            console.error("XHR Status:", status);
-            console.error("Error:", error);
-            console.error("Response Text:", xhr.responseText);
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                text: 'ไม่สามารถบันทึกการแก้ไขการโอนย้ายสินค้าได้ โปรดลองอีกครั้งหรือติดต่อผู้ดูแลระบบ',
-                confirmButtonText: 'ตกลง'
-            });
-        }
-    });
-}
-});
+        });
     </script>
 </body>
 

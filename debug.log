@@ -4320,3 +4320,15 @@
 [2024-10-10 23:27:05] Opening Balances: [{"location_id":"LOC5670001","location_name":"\u0e04\u0e25\u0e31\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01","opening_balance":"17.00"},{"location_id":"LOC5670002","location_name":"\u0e04\u0e25\u0e31\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e23\u0e2d\u0e07","opening_balance":"8.00"}]
 [2024-10-10 23:27:05] Raw movements data: [{"date":"2024-10-10","type":"issue","quantity":"1.00","from_location":"LOC5670001","to_location":null,"location_id":"LOC5670001"}]
 [2024-10-10 23:27:05] Final processed movements: [{"date":"01-10-2567","location":"\u0e04\u0e25\u0e31\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01","receive":null,"issue":null,"transfer":null,"balance":17,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07","entry_type":"opening_balance"},{"date":"01-10-2567","location":"\u0e04\u0e25\u0e31\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e23\u0e2d\u0e07","receive":null,"issue":null,"transfer":null,"balance":8,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07","entry_type":"opening_balance"},{"date":"10-10-2567","location":"\u0e04\u0e25\u0e31\u0e07\u0e2a\u0e34\u0e19\u0e04\u0e49\u0e32\u0e2b\u0e25\u0e31\u0e01","receive":null,"issue":1,"transfer":null,"balance":16,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07","entry_type":"transaction"},{"date":"","location":"\u0e23\u0e27\u0e21\u0e17\u0e31\u0e49\u0e07\u0e2a\u0e34\u0e49\u0e19","receive":null,"issue":null,"transfer":null,"balance":24,"unit":"\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07","entry_type":"total"}]
+[2024-10-14 01:34:58] Received POST data: {"productId":"BG06","endDate":"2024-10-30"}
+[2024-10-14 01:34:58] Processing report for Product ID: BG06, End Date: 2024-10-30, Start Date: 2024-10-01
+[2024-10-14 01:34:58] Received POST data: {"productId":"CS042","endDate":"2024-10-30"}
+[2024-10-14 01:34:58] Processing report for Product ID: CS042, End Date: 2024-10-30, Start Date: 2024-10-01
+[2024-10-14 01:34:58] Received POST data: {"productId":"FP012","endDate":"2024-10-30"}
+[2024-10-14 01:34:58] Processing report for Product ID: FP012, End Date: 2024-10-30, Start Date: 2024-10-01
+[2024-10-14 01:35:03] Received POST data: {"productId":"BG06","endDate":"2024-10-30"}
+[2024-10-14 01:35:03] Processing report for Product ID: BG06, End Date: 2024-10-30, Start Date: 2024-10-01
+[2024-10-14 01:35:03] Received POST data: {"productId":"CS042","endDate":"2024-10-30"}
+[2024-10-14 01:35:03] Processing report for Product ID: CS042, End Date: 2024-10-30, Start Date: 2024-10-01
+[2024-10-14 01:35:03] Received POST data: {"productId":"FP012","endDate":"2024-10-30"}
+[2024-10-14 01:35:03] Processing report for Product ID: FP012, End Date: 2024-10-30, Start Date: 2024-10-01

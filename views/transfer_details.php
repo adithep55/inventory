@@ -2,6 +2,7 @@
 require_once '../config/permission.php';
 requirePermission(['manage_transfers']);
 ?>
+
 <!DOCTYPE html>
 <html lang="th">
 
@@ -65,18 +66,18 @@ requirePermission(['manage_transfers']);
                                         <input type="text" class="form-control" id="transferDate" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label><i class="fas fa-warehouse mr-2"></i> จากคลัง</label>
-                                        <input type="text" class="form-control" id="fromLocation" readonly>
+                                        <label><i class="fas fa-user mr-2"></i> ผู้ดำเนินการ</label>
+                                        <input type="text" class="form-control" id="username" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><i class="fas fa-warehouse mr-2"></i> ไปคลัง</label>
-                                        <input type="text" class="form-control" id="toLocation" readonly>
+                                        <label><i class="fas fa-hashtag mr-2"></i> จำนวนรายการ</label>
+                                        <input type="text" class="form-control" id="itemCount" readonly>
                                     </div>
                                     <div class="form-group">
-                                        <label><i class="fas fa-user mr-2"></i> ผู้ดำเนินการ</label>
-                                        <input type="text" class="form-control" id="username" readonly>
+                                        <label><i class="fas fa-cubes mr-2"></i> ปริมาณรวม</label>
+                                        <input type="text" class="form-control" id="totalQuantity" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label><i class="fas fa-clock mr-2"></i> เวลาอัพเดตล่าสุด</label>
@@ -105,6 +106,8 @@ requirePermission(['manage_transfers']);
                                             <th><i class="fas fa-box mr-2"></i> ชื่อสินค้า (อังกฤษ)</th>
                                             <th><i class="fas fa-hashtag mr-2"></i> จำนวน</th>
                                             <th><i class="fas fa-balance-scale mr-2"></i> หน่วย</th>
+                                            <th><i class="fas fa-warehouse mr-2"></i> จากคลัง</th>
+                                            <th><i class="fas fa-warehouse mr-2"></i> ไปคลัง</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -160,9 +163,9 @@ requirePermission(['manage_transfers']);
                     // Populate transfer details
                     $('#billNumber').val(response.bill_number);
                     $('#transferDate').val(response.transfer_date);
-                    $('#fromLocation').val(response.from_location);
-                    $('#toLocation').val(response.to_location);
                     $('#username').val(response.username);
+                    $('#itemCount').val(response.item_count);
+                    $('#totalQuantity').val(response.total_quantity);
                     $('#updatedAt').val(response.updated_at);
 
                     // Populate items table
@@ -176,6 +179,8 @@ requirePermission(['manage_transfers']);
                                 <td>${item.product_name_en}</td>
                                 <td>${item.quantity}</td>
                                 <td>${item.unit}</td>
+                                <td>${item.from_location}</td>
+                                <td>${item.to_location}</td>
                             </tr>
                         `);
                     });

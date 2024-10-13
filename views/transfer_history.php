@@ -23,7 +23,6 @@ requirePermission(['manage_transfers']);
 <body>
     <?php require_once '../includes/header.php'; ?>
     <?php require_once '../includes/sidebar.php'; ?>
-
     <div class="page-wrapper">
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
@@ -45,8 +44,6 @@ requirePermission(['manage_transfers']);
                                         <tr>
                                             <th>เลขบิล</th>
                                             <th>วันที่โอนย้าย</th>
-                                            <th>จากคลัง</th>
-                                            <th>ไปคลัง</th>
                                             <th>จำนวนรายการ</th>
                                             <th>ปริมาณรวม</th>
                                             <th>ผู้ดำเนินการ</th>
@@ -64,6 +61,7 @@ requirePermission(['manage_transfers']);
         </div>
     </div>
 
+
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/feather.min.js"></script>
     <script src="../assets/js/jquery.slimscroll.min.js"></script>
@@ -74,7 +72,7 @@ requirePermission(['manage_transfers']);
     <script src="../assets/js/script.js"></script>
 
     <script>
-        $(document).ready(function () {
+  $(document).ready(function () {
             var transferHistoryTable = $('#transferHistoryTable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -85,16 +83,13 @@ requirePermission(['manage_transfers']);
                 columns: [
                     { data: 'bill_number' },
                     { data: 'transfer_date' },
-                    { data: 'from_location' },
-                    { data: 'to_location' },
                     { data: 'item_count' },
                     { data: 'total_quantity' },
                     { data: 'username' },
                     { data: 'actions', orderable: false, searchable: false }
                 ],
-                order: [[1, 'desc']]
-                ,
-                    "language": {
+                order: [[1, 'desc']],
+                language: {
                         "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
                         "emptyTable": "ไม่พบข้อมูลสินค้า",
                         "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
