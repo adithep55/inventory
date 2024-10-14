@@ -207,69 +207,94 @@ $(document).ready(function () {
     }
 
     function addProductToTransfer(productId, productNameTh, productNameEn, fromLocation, toLocation, quantity, unit) {
-        $.ajax({
-            url: '../api/get_product_locations.php',
-            type: 'POST',
-            data: { product_id: productId },
-            dataType: 'json',
-            success: function (response) {
-                if (response.status === 'success') {
-                    console.log('Product locations:', response);
-                    let totalQuantity = response.locations.reduce((sum, loc) => sum + parseFloat(loc.quantity), 0);
-                    let fromLocationOptions = response.locations.map(loc => {
-                        let isSelected = loc.location === fromLocation;
-                        return `<option value="${loc.location_id}" 
-                            ${isSelected ? 'selected' : ''} 
-                            data-quantity="${loc.quantity}">
-                            ${loc.location || 'ไม่ระบุ'} (${loc.quantity} ${unit})
-                        </option>`;
-                    }).join('');
+    // ตรวจสอบจำนวนครั้งที่สินค้านี้ถูกเพิ่มไปแล้ว
+    let existingRows = $(`#transferItemsTable tbody tr[data-product-id="${productId}"]`);
+    let availableLocations = 0;
 
-                    let toLocationOptions = response.all_locations.map(loc =>
-                        `<option value="${loc.location_id}" 
-                            ${loc.location === toLocation ? 'selected' : ''}>
-                            ${loc.location || 'ไม่ระบุ'}
-                        </option>`
-                    ).join('');
-
-                    let newRow = `
-                        <tr data-product-id="${productId}">
-                            <td>${productNameTh || productNameEn || 'ไม่ระบุ'}</td>
-                            <td>
-                                <select class="form-control from-location" required>
-                                    <option value="">เลือกคลังสินค้าต้นทาง</option>
-                                    ${fromLocationOptions}
-                                </select>
-                            </td>
-                            <td>
-                                <select class="form-control to-location" required>
-                                    <option value="">เลือกคลังสินค้าปลายทาง</option>
-                                    ${toLocationOptions}
-                                </select>
-                            </td>
-                            <td><input type="number" class="form-control quantity" min="1" step="1" value="${quantity}" required></td>
-                            <td>${unit || 'ไม่ระบุ'}</td>
-                            <td><button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button></td>
-                            <input type="hidden" name="product_ids[]" value="${productId}">
-                            <input type="hidden" class="original-quantity" value="${quantity}">
-                            <input type="hidden" class="total-available-quantity" value="${totalQuantity}">
-                        </tr>
-                    `;
-                    $('#transferItemsTable tbody').append(newRow);
-                    
-                    updateQuantityLimit(productId);
-                    
-                    console.log('Added product row:', { productId, productNameTh, productNameEn, fromLocation, toLocation, quantity, unit, totalQuantity });
-                } else {
-                    console.error('Error fetching product locations:', response.message);
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error('Error fetching product locations:', error);
-                console.error('Response:', xhr.responseText);
-            }
-        });
+    // ตรวจสอบว่ามีข้อมูล available_locations หรือไม่
+    let productData = productTable.rows().data().toArray().find(row => row.product_id === productId);
+    if (productData && productData.available_locations) {
+        availableLocations = parseInt(productData.available_locations);
+    } else {
+        // ถ้าไม่มีข้อมูล available_locations ให้ใช้จำนวนคลังสินค้าทั้งหมดแทน
+        availableLocations = productData && productData.locations ? productData.locations.length : 1;
     }
+
+    if (existingRows.length >= availableLocations) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'คำเตือน',
+            text: 'ไม่สามารถเพิ่มสินค้านี้ได้อีก เนื่องจากได้เลือกทุกคลังที่มีสินค้านี้แล้ว',
+            confirmButtonText: 'ตกลง'
+        });
+        return;
+    }
+
+    $.ajax({
+        url: '../api/get_product_locations.php',
+        type: 'POST',
+        data: { product_id: productId },
+        dataType: 'json',
+        success: function (response) {
+            if (response.status === 'success') {
+                console.log('Product locations:', response);
+                let totalQuantity = response.locations.reduce((sum, loc) => sum + parseFloat(loc.quantity), 0);
+                let fromLocationOptions = response.locations.map(loc => {
+                    let isSelected = loc.location === fromLocation;
+                    return `<option value="${loc.location_id}" 
+                        ${isSelected ? 'selected' : ''} 
+                        data-quantity="${loc.quantity}">
+                        ${loc.location || 'ไม่ระบุ'} (${loc.quantity} ${unit})
+                    </option>`;
+                }).join('');
+
+                let toLocationOptions = response.all_locations.map(loc =>
+                    `<option value="${loc.location_id}" 
+                        ${loc.location === toLocation ? 'selected' : ''}>
+                        ${loc.location || 'ไม่ระบุ'}
+                    </option>`
+                ).join('');
+
+                let newRow = `
+                    <tr data-product-id="${productId}">
+                        <td>${productNameTh || productNameEn || 'ไม่ระบุ'}</td>
+                        <td>
+                            <select class="form-control from-location" required>
+                                <option value="">เลือกคลังสินค้าต้นทาง</option>
+                                ${fromLocationOptions}
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control to-location" required>
+                                <option value="">เลือกคลังสินค้าปลายทาง</option>
+                                ${toLocationOptions}
+                            </select>
+                        </td>
+                        <td><input type="number" class="form-control quantity" min="1" step="1" value="${quantity}" required></td>
+                        <td>${unit || 'ไม่ระบุ'}</td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove-row">ลบ</button></td>
+                        <input type="hidden" name="product_ids[]" value="${productId}">
+                        <input type="hidden" class="original-quantity" value="${quantity}">
+                        <input type="hidden" class="total-available-quantity" value="${totalQuantity}">
+                        <input type="hidden" class="available-locations" value="${availableLocations}">
+                    </tr>
+                `;
+                $('#transferItemsTable tbody').append(newRow);
+                
+                updateQuantityLimit(productId);
+                updateLocationSelections();
+                
+                console.log('Added product row:', { productId, productNameTh, productNameEn, fromLocation, toLocation, quantity, unit, totalQuantity, availableLocations });
+            } else {
+                console.error('Error fetching product locations:', response.message);
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching product locations:', error);
+            console.error('Response:', xhr.responseText);
+        }
+    });
+}
 
     function updateQuantityLimit(productId) {
         let row = $(`#transferItemsTable tbody tr[data-product-id="${productId}"]`);
@@ -287,7 +312,7 @@ $(document).ready(function () {
             totalAvailableQuantity 
         });
 
-        let maxTransferQuantity = Math.max(originalQuantity, totalAvailableQuantity);
+        let maxTransferQuantity = Math.max(originalQuantity, currentFromLocationQuantity);
         quantityInput.attr('max', maxTransferQuantity);
 
         quantityInput.off('input').on('input', function() {
@@ -300,11 +325,57 @@ $(document).ready(function () {
                     confirmButtonText: 'ตกลง'
                 });
                 $(this).val(maxTransferQuantity);
-            } else if (enteredQuantity > currentFromLocationQuantity) {
-                console.log('จำนวนที่โอนย้ายมากกว่าจำนวนในคลังปัจจุบัน แต่ไม่เกินจำนวนเดิม');
             }
         });
     }
+
+    function updateLocationSelections() {
+    let productLocations = {};
+    
+    // รวบรวมข้อมูลการเลือกคลังสินค้าสำหรับแต่ละสินค้า
+    $('#transferItemsTable tbody tr').each(function() {
+        let productId = $(this).data('product-id');
+        let fromLocation = $(this).find('.from-location').val();
+        let toLocation = $(this).find('.to-location').val();
+        
+        if (!productLocations[productId]) {
+            productLocations[productId] = {
+                from: new Set(),
+                to: new Set(),
+                availableLocations: parseInt($(this).find('.available-locations').val()) || 1
+            };
+        }
+        
+        if (fromLocation) productLocations[productId].from.add(fromLocation);
+        if (toLocation) productLocations[productId].to.add(toLocation);
+    });
+
+    // อัปเดตตัวเลือกคลังสินค้าสำหรับแต่ละแถว
+    $('#transferItemsTable tbody tr').each(function() {
+        let row = $(this);
+        let productId = row.data('product-id');
+        let fromSelect = row.find('.from-location');
+        let toSelect = row.find('.to-location');
+        let currentFrom = fromSelect.val();
+        let currentTo = toSelect.val();
+
+        fromSelect.find('option').each(function() {
+            let optionValue = $(this).val();
+            if (optionValue && optionValue !== currentFrom) {
+                let isDisabled = productLocations[productId].from.size >= productLocations[productId].availableLocations && !productLocations[productId].from.has(optionValue);
+                $(this).prop('disabled', isDisabled);
+            }
+        });
+
+        toSelect.find('option').each(function() {
+            let optionValue = $(this).val();
+            if (optionValue && optionValue !== currentTo) {
+                let isDisabled = productLocations[productId].to.has(optionValue) && optionValue !== currentFrom;
+                $(this).prop('disabled', isDisabled);
+            }
+        });
+    });
+}
 
     $('#editTransferForm').submit(function (e) {
         e.preventDefault();
@@ -337,8 +408,7 @@ $(document).ready(function () {
             let quantity = parseFloat(row.find('.quantity').val());
             let unit = row.find('td:eq(4)').text();
             let originalQuantity = parseFloat(row.find('.original-quantity').val());
-            let totalAvailableQuantity = parseFloat(row.find('.total-available-quantity').val());
-            let maxTransferQuantity = Math.max(originalQuantity, totalAvailableQuantity);
+            let maxTransferQuantity = parseFloat(row.find('.from-location option:selected').data('quantity'));
 
             if (fromLocation === toLocation) {
                 Swal.fire({
@@ -362,7 +432,14 @@ $(document).ready(function () {
                 return false;
             }
 
-            addProductToFormData(productId, fromLocation, toLocation, quantity, unit, originalQuantity);
+            formData.products.push({
+                product_id: productId,
+                from_location_id: fromLocation,
+                to_location_id: toLocation,
+                quantity: quantity,
+                unit: unit,
+                original_quantity: originalQuantity
+            });
         });
 
         if (!isValid) {
@@ -381,18 +458,6 @@ $(document).ready(function () {
 
         submitTransferData();
     });
-
- function addProductToFormData(productId, fromLocation, toLocation, quantity, unit, originalQuantity) {
-        console.log('Adding product to formData:', { productId, fromLocation, toLocation, quantity, unit, originalQuantity });
-        formData.products.push({
-            product_id: productId,
-            from_location_id: fromLocation,
-            to_location_id: toLocation,
-            quantity: quantity,
-            unit: unit,
-            original_quantity: originalQuantity
-        });
-    }
 
     function submitTransferData() {
         console.log('Submitting transfer data:', formData);
@@ -433,7 +498,8 @@ $(document).ready(function () {
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาด',
                     text: 'ไม่สามารถบันทึกการแก้ไขการโอนย้ายสินค้าได้ โปรดลองอีกครั้งหรือติดต่อผู้ดูแลระบบ',
-                    confirmButtonText: 'ตกลง'});
+                    confirmButtonText: 'ตกลง'
+                });
             }
         });
     }
@@ -463,28 +529,47 @@ $(document).ready(function () {
             { "data": "product_id" },
             { "data": "product_type_name" },
             { "data": "product_category_name" },
-            { "data": "unit" }
-        ]
-    });
-
-    $('#productTable').on('change', '.product-select', function () {
-        var row = $(this).closest('tr');
-        var data = productTable.row(row).data();
-        if (this.checked) {
-            addProductToTransfer(data.product_id, data.name_th, data.name_en, '', '', 1, data.unit);
-        } else {
-            $('#transferItemsTable tbody').find(`input[value="${data.product_id}"]`).closest('tr').remove();
+            { "data": "unit" },
+            { 
+            "data": "available_locations",
+            "visible": false  // ซ่อนคอลัมน์นี้
+        }
+        ],
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json"
         }
     });
 
+    $('#productTable').on('change', '.product-select', function () {
+    var row = $(this).closest('tr');
+    var data = productTable.row(row).data();
+    if (this.checked) {
+        addProductToTransfer(data.product_id, data.name_th, data.name_en, '', '', 1, data.unit);
+        // ทำให้ checkbox กลับมาเป็นสถานะไม่ถูกเลือกทันที
+        setTimeout(() => {
+            $(this).prop('checked', false);
+        }, 0);
+    }
+});
+
+    function removeProductFromTransfer(productId) {
+        $('#transferItemsTable tbody').find(`tr[data-product-id="${productId}"]`).remove();
+        updateLocationSelections();
+    }
+
     $('#transferItemsTable').on('click', '.remove-row', function () {
-        $(this).closest('tr').remove();
+        var row = $(this).closest('tr');
+        var productId = row.data('product-id');
+        row.remove();
+        updateLocationSelections();
+        $('#productTable').find(`.product-select[value="${productId}"]`).prop('checked', false);
     });
 
     $('#transferItemsTable').on('change', '.from-location', function () {
         let row = $(this).closest('tr');
         let productId = row.data('product-id');
         updateQuantityLimit(productId);
+        updateLocationSelections();
     });
 
     $('#transferItemsTable').on('change', '.to-location', function () {
@@ -501,6 +586,7 @@ $(document).ready(function () {
             });
             toLocation.val('');
         }
+        updateLocationSelections();
     });
 
     $('#transferDate').on('change', function () {

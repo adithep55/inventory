@@ -1,0 +1,76 @@
+[2024-10-14 10:54:11] Received data: {"transfer_id":"190","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670003","to_location_id":"LOC5670002","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5}]}
+[2024-10-14 10:54:11] Initial inventory data: {"BG06":{"LOC5670003":5,"LOC5670001":5,"LOC5670002":5}}
+[2024-10-14 10:54:11] Total inventory data: {"BG06":15}
+[2024-10-14 10:54:11] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":10,"LOC5670001":5,"LOC5670002":0}}
+[2024-10-14 10:54:11] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 10:54:11] Inventory after new transfers: {"BG06":{"LOC5670003":5,"LOC5670001":5,"LOC5670002":5}}
+[2024-10-14 10:56:07] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670003","to_location_id":"LOC5670002","quantity":15,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5}]}
+[2024-10-14 10:56:07] Initial inventory data: {"BG06":{"LOC5670003":5,"LOC5670001":5,"LOC5670002":5}}
+[2024-10-14 10:56:07] Total inventory data: {"BG06":15}
+[2024-10-14 10:56:07] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":10,"LOC5670001":5,"LOC5670002":0}}
+[2024-10-14 10:56:07] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 10:56:07] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670001":0,"LOC5670002":15}}
+[2024-10-14 11:00:35] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":15,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5}]}
+[2024-10-14 11:00:35] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670001":0,"LOC5670002":15}}
+[2024-10-14 11:00:35] Total inventory data: {"BG06":15}
+[2024-10-14 11:00:35] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670001":5,"LOC5670002":10}}
+[2024-10-14 11:00:35] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 11:00:35] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":0}}
+[2024-10-14 11:04:29] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:04:29] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:29] Total inventory data: {"BG06":20}
+[2024-10-14 11:04:29] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:29] Total inventory after cancelling: {"BG06":20}
+[2024-10-14 11:04:29] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670001":10,"LOC5670002":5,"":5}}
+[2024-10-14 11:04:29] Error updating transfer: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`inventory`.`inventory`, CONSTRAINT `inventory_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `locations` (`location_id`))
+[2024-10-14 11:04:34] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:04:34] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:34] Total inventory data: {"BG06":20}
+[2024-10-14 11:04:34] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:34] Total inventory after cancelling: {"BG06":20}
+[2024-10-14 11:04:34] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670001":10,"LOC5670002":5,"":5}}
+[2024-10-14 11:04:34] Error updating transfer: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`inventory`.`inventory`, CONSTRAINT `inventory_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `locations` (`location_id`))
+[2024-10-14 11:04:48] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670003","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:04:48] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:48] Total inventory data: {"BG06":20}
+[2024-10-14 11:04:48] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670001":15,"LOC5670002":5}}
+[2024-10-14 11:04:48] Total inventory after cancelling: {"BG06":20}
+[2024-10-14 11:04:48] Inventory after new transfers: {"BG06":{"LOC5670003":5,"LOC5670001":5,"LOC5670002":5,"":5}}
+[2024-10-14 11:04:48] Error updating transfer: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`inventory`.`inventory`, CONSTRAINT `inventory_ibfk_2` FOREIGN KEY (`location_id`) REFERENCES `locations` (`location_id`))
+[2024-10-14 11:07:00] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":1,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:07:00] Error updating transfer: Invalid location IDs: 
+[2024-10-14 11:07:04] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670003","quantity":1,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:07:04] Error updating transfer: Invalid location IDs: 
+[2024-10-14 11:07:40] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5}]}
+[2024-10-14 11:07:40] Error updating transfer: Invalid location IDs: 
+[2024-10-14 11:08:48] Received data: {"transfer_id":"191","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670001","to_location_id":null,"quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":1,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:08:48] Error updating transfer: Invalid location IDs: 
+Valid locations are:
+ID: LOC5670001, Name: ลานโล่ง
+ID: LOC5670002, Name: คลังสินค้าหลัก
+ID: LOC5670003, Name: โกดังเก็บเสาปูน
+
+[2024-10-14 11:16:08] Received data: {"transfer_id":"192","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":10}]}
+[2024-10-14 11:16:08] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670002":5,"LOC5670001":10}}
+[2024-10-14 11:16:08] Total inventory data: {"BG06":15}
+[2024-10-14 11:16:08] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670002":15,"LOC5670001":0}}
+[2024-10-14 11:16:08] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 11:16:08] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670002":10,"LOC5670001":5}}
+[2024-10-14 11:16:33] Received data: {"transfer_id":"192","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670003","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:16:33] Initial inventory data: {"BG06":{"LOC5670003":0,"LOC5670002":10,"LOC5670001":5}}
+[2024-10-14 11:16:33] Total inventory data: {"BG06":15}
+[2024-10-14 11:16:33] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670002":15,"LOC5670001":0}}
+[2024-10-14 11:16:33] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 11:16:33] Inventory after new transfers: {"BG06":{"LOC5670003":5,"LOC5670002":5,"LOC5670001":5}}
+[2024-10-14 11:17:01] Received data: {"transfer_id":"192","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5}]}
+[2024-10-14 11:17:01] Initial inventory data: {"BG06":{"LOC5670003":5,"LOC5670002":5,"LOC5670001":5}}
+[2024-10-14 11:17:01] Total inventory data: {"BG06":15}
+[2024-10-14 11:17:01] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670002":10,"LOC5670001":5}}
+[2024-10-14 11:17:01] Total inventory after cancelling: {"BG06":15}
+[2024-10-14 11:17:01] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670002":5,"LOC5670001":10}}
+[2024-10-14 11:18:02] Received data: {"transfer_id":"193","transfer_date":"2024-10-14","products":[{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670003","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":5},{"product_id":"IP015","from_location_id":"LOC5670001","to_location_id":"LOC5670002","quantity":1,"unit":"\u0e15\u0e49\u0e19","original_quantity":1},{"product_id":"BG06","from_location_id":"LOC5670002","to_location_id":"LOC5670001","quantity":5,"unit":"\u0e17\u0e48\u0e2d\u0e19","original_quantity":1}]}
+[2024-10-14 11:18:02] Initial inventory data: {"BG06":{"LOC5670003":5,"LOC5670002":5,"LOC5670001":5},"IP015":{"LOC5670001":10,"LOC5670002":5,"LOC5670003":1}}
+[2024-10-14 11:18:02] Total inventory data: {"BG06":15,"IP015":16}
+[2024-10-14 11:18:02] Inventory after cancelling old transfer: {"BG06":{"LOC5670003":0,"LOC5670002":10,"LOC5670001":5},"IP015":{"LOC5670001":10,"LOC5670002":5,"LOC5670003":1}}
+[2024-10-14 11:18:02] Total inventory after cancelling: {"BG06":15,"IP015":16}
+[2024-10-14 11:18:02] Inventory after new transfers: {"BG06":{"LOC5670003":0,"LOC5670002":5,"LOC5670001":10},"IP015":{"LOC5670001":9,"LOC5670002":6,"LOC5670003":1}}
