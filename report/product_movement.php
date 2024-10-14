@@ -17,6 +17,8 @@ requirePermission(['manage_reports']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
+    <style>
         .card {
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
@@ -26,6 +28,37 @@ requirePermission(['manage_reports']);
         .btn-generate {
             min-width: 150px;
         }
+        @media screen and (max-width: 767px) {
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+        float: none;
+        text-align: center;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 0.5em;
+    }
+
+    div.dtr-modal {
+        font-size: 14px;
+    }
+
+    div.dtr-modal-content {
+        width: 90%;
+    }
+}
+
+.opening-balance {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.product-header {
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
     </style>
 </head>
 
@@ -38,9 +71,9 @@ requirePermission(['manage_reports']);
             <div class="page-header">
                 <div class="row align-items-center">
                     <div class="col">
-                        <h3 class="page-title">รายงานการเคลื่อนไหวสินค้า</h3>
+                        <h3 class="page-title"><i class="fas fa-chart-bar"></i> รายงานการเคลื่อนไหวสินค้า</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">หน้าหลัก</a></li>
+                            <li class="breadcrumb-item"><a href="<?php echo base_url()?>">หน้าหลัก</a></li>
                             <li class="breadcrumb-item active">รายงานการเคลื่อนไหวสินค้า</li>
                         </ul>
                     </div>
@@ -133,7 +166,7 @@ requirePermission(['manage_reports']);
             </div>
         </div>
     </div>
-
+  
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/feather.min.js"></script>
     <script src="../assets/js/jquery.slimscroll.min.js"></script>
@@ -145,8 +178,8 @@ requirePermission(['manage_reports']);
     <script src="../assets/plugins/sweetalert/sweetalerts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <script src="../assets/js/script.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="../assets/js/script.js"></script>
     <script>
         $(document).ready(function () {
             $('.select2').select2();
@@ -176,7 +209,7 @@ requirePermission(['manage_reports']);
             }
 
             function initializeDataTable(productId, data) {
-    // แยกข้อมูลยอดยกมา รายการปกติ และยอดรวม
+    // Separate opening balances, main data, and total row
     var openingBalances = data.filter(function(row) {
         return row.entry_type === 'opening_balance';
     });
@@ -187,7 +220,7 @@ requirePermission(['manage_reports']);
         return row.entry_type === 'total';
     });
 
-    // สร้างข้อมูลสำหรับแสดงในตาราง
+    // Combine data for table display
     var tableData = openingBalances.concat(mainData);
 
     $('#movementTable_' + productId).DataTable({
@@ -228,8 +261,21 @@ requirePermission(['manage_reports']);
             }
         ],
         order: [[0, 'asc'], [1, 'asc']],
-        language: {
-            url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Thai.json'
+        
+        "language": {
+            "lengthMenu": "แสดง _MENU_ รายการต่อหน้า",
+            "emptyTable": "ไม่พบข้อมูลสินค้า",
+            "info": "แสดง _START_ ถึง _END_ จาก _TOTAL_ รายการ",
+            "infoEmpty": "แสดง 0 ถึง 0 จาก 0 รายการ",
+            "infoFiltered": "(กรองจากทั้งหมด _MAX_ รายการ)",
+            "search": "ค้นหา:",
+            "zeroRecords": "ไม่พบข้อมูลที่ตรงกัน",
+            "paginate": {
+                "first": "หน้าแรก",
+                "last": "หน้าสุดท้าย",
+                "next": "ถัดไป",
+                "previous": "ก่อนหน้า"
+            }
         },
         drawCallback: function (settings) {
             var api = this.api();
@@ -258,29 +304,33 @@ function formatNumber(number) {
 function displayReport(results, products) {
     $('#productReports').empty();
     results.forEach(function(result, index) {
-        var product = products[index];
-        var $productSection = $('<div>').addClass('mb-4');
-        $productSection.append($('<div>').addClass('product-header').append($('<h4>').text('รายงานสินค้า: ' + product.product_id + ' - ' + (product.name_th || product.name_en))));
+        if (result && result.data) {
+            var product = products[index];
+            var $productSection = $('<div>').addClass('mb-4');
+            $productSection.append($('<div>').addClass('product-header').append($('<h4>').text('รายงานสินค้า: ' + product.product_id + ' - ' + (product.name_th || product.name_en))));
 
-        var $table = $('<table>').addClass('table table-striped table-bordered responsive nowrap')
-            .attr('id', 'movementTable_' + product.product_id)
-            .attr('width', '100%');
+            var $table = $('<table>').addClass('table table-striped table-bordered responsive nowrap')
+    .attr('id', 'movementTable_' + product.product_id)
+    .attr('width', '100%');
 
-        var $thead = $('<thead>').append($('<tr>')
-            .append($('<th>').text('วันที่'))
-            .append($('<th>').text('ตำแหน่ง'))
-            .append($('<th>').text('รายการ'))
-            .append($('<th>').text('รับ'))
-            .append($('<th>').text('เบิก'))
-            .append($('<th>').text('โอนย้าย'))
-            .append($('<th>').text('คงเหลือ'))
-        );
+            var $thead = $('<thead>').append($('<tr>')
+                .append($('<th>').text('วันที่'))
+                .append($('<th>').text('ตำแหน่ง'))
+                .append($('<th>').text('รายการ'))
+                .append($('<th>').text('รับ'))
+                .append($('<th>').text('เบิก'))
+                .append($('<th>').text('โอนย้าย'))
+                .append($('<th>').text('คงเหลือ'))
+            );
 
-        $table.append($thead);
-        $productSection.append($table);
-        $('#productReports').append($productSection);
+            $table.append($thead);
+            $productSection.append($table);
+            $('#productReports').append($productSection);
 
-        initializeDataTable(product.product_id, result.data);
+            initializeDataTable(product.product_id, result.data);
+        } else {
+            console.error("Invalid result data for product at index", index);
+        }
     });
 }
 
@@ -367,7 +417,7 @@ function displayReport(results, products) {
     var typeId = $('#type_id').val();
     var endDate = $('#endDate').val();
 
-    if (!reportType || !endDate || (reportType === 'product' && (!startId || !endId)) || 
+    if (!reportType || !endDate || (reportType === 'product' && !startId) || 
         (reportType === 'category' && !categoryId)) {
         Swal.fire({
             icon: 'error',
@@ -378,6 +428,10 @@ function displayReport(results, products) {
         return;
     }
 
+    // If endId is not set, use startId for both
+    if (reportType === 'product' && !endId) {
+        endId = startId;
+    }
 
     $.ajax({
         url: '../api/report/get_report_data.php',
@@ -399,8 +453,7 @@ function displayReport(results, products) {
                     text: response.error,
                     confirmButtonText: 'ตกลง'
                 });
-            } else {
-                // เรียก API ที่สองสำหรับแต่ละสินค้า
+            } else if (response.data && response.data.length > 0) {
                 var products = response.data;
                 var promises = [];
                 
@@ -418,13 +471,23 @@ function displayReport(results, products) {
                     );
                 });
 
-                // รอให้ทุก request เสร็จสิ้น
-                $.when.apply($, promises).then(function() {
-                    var results = [];
-                    for (var i = 0; i < arguments.length; i++) {
-                        results.push(arguments[i][0]);
-                    }
+                Promise.all(promises).then(function(results) {
                     displayReport(results, products);
+                }).catch(function(error) {
+                    console.error("Error in promises:", error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาดในการดึงข้อมูล',
+                        text: 'กรุณาลองใหม่อีกครั้ง',
+                        confirmButtonText: 'ตกลง'
+                    });
+                });
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'ไม่พบข้อมูล',
+                    text: 'ไม่พบข้อมูลสินค้าตามเงื่อนไขที่ระบุ',
+                    confirmButtonText: 'ตกลง'
                 });
             }
         },
@@ -439,7 +502,6 @@ function displayReport(results, products) {
         }
     });
 });
-
     $('#generatePdfReport').click(function() {
         var reportType = $('#reportType').val();
         var startId = $('#startProductId').val();
