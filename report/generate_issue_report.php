@@ -202,11 +202,11 @@ if ($issueData[0]['issue_type'] == 'sale') {
     $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วงเงินเครดิต:'), 0);
     $pdf->SetFont('THSarabunNew', '', 11);
     $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', ($issueData[0]['customer_credit_limit'] !== null ? number_format($issueData[0]['customer_credit_limit'], 2) . ' บาท' : '-')), 0, 1);
-
+    
     $pdf->SetFont('THSarabunNew', 'B', 11);
     $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'เงื่อนไขการชำระเงิน:'), 0);
     $pdf->SetFont('THSarabunNew', '', 11);
-    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', $issueData[0]['customer_credit_terms'] ?? '-'), 0, 1);
+    $pdf->Cell(0, 5, iconv('UTF-8', 'cp874', ($issueData[0]['customer_credit_terms'] !== null && $issueData[0]['customer_credit_terms'] !== '' ? $issueData[0]['customer_credit_terms'] . ' วัน' : '-')), 0, 1);
 } else {
     $pdf->SetFont('THSarabunNew', 'B', 11);
     $pdf->Cell(40, 5, iconv('UTF-8', 'cp874', 'วันที่เริ่มโครงการ:'), 0);

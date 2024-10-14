@@ -564,7 +564,7 @@ function addProductToIssueTable(product) {
                                 text: 'บันทึกการเบิกสินค้าเรียบร้อยแล้ว (เลขที่บิล: ' + response.billNumber + ')',
                                 confirmButtonText: 'ตกลง'
                             }).then(function () {
-                                location.reload();
+                                window.location.href = '<?php echo base_url();?>/views/issue_history';
                             });
                         } else {
                             Swal.fire({

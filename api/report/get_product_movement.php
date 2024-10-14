@@ -73,6 +73,7 @@ LEFT JOIN (
     WHERE dt.product_id = :productId AND ht.transfer_date < :startDate
 ) AS combined_movements ON l.location_id = combined_movements.location_id
 GROUP BY l.location_id, l.location
+HAVING opening_balance != 0
 ";
 
     $stmt = dd_q($openingBalanceQuery, [':productId' => $productId, ':startDate' => $startDate]);
@@ -150,18 +151,20 @@ GROUP BY l.location_id, l.location
     $runningBalances = array_column($openingBalances, 'opening_balance', 'location_id');
     $totalBalance = array_sum($runningBalances);
 
-    // เพิ่มยอดยกมาสำหรับแต่ละตำแหน่ง
+    // เพิ่มยอดยกมาสำหรับแต่ละตำแหน่งที่ไม่เป็น 0
     foreach ($openingBalances as $balance) {
-        $processedMovements[] = [
-            'date' => formatThaiDate($startDate),
-            'location' => $locations[$balance['location_id']] ?? 'ไม่ทราบ',
-            'receive' => null,
-            'issue' => null,
-            'transfer' => null,
-            'balance' => floatval($balance['opening_balance']),
-            'unit' => $productUnit,
-            'entry_type' => 'opening_balance'
-        ];
+        if (floatval($balance['opening_balance']) != 0) {
+            $processedMovements[] = [
+                'date' => formatThaiDate($startDate),
+                'location' => $locations[$balance['location_id']] ?? 'ไม่ทราบ',
+                'receive' => null,
+                'issue' => null,
+                'transfer' => null,
+                'balance' => floatval($balance['opening_balance']),
+                'unit' => $productUnit,
+                'entry_type' => 'opening_balance'
+            ];
+        }
     }
 
     foreach ($movements as $movement) {
@@ -171,7 +174,7 @@ GROUP BY l.location_id, l.location
         
         switch($movement['type']) {
             case 'receive':
-                $runningBalances[$locationId] += $quantity;
+                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) + $quantity;
                 $totalBalance += $quantity;
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),
@@ -185,7 +188,7 @@ GROUP BY l.location_id, l.location
                 ];
                 break;
             case 'issue':
-                $runningBalances[$locationId] -= $quantity;
+                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) - $quantity;
                 $totalBalance -= $quantity;
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),
@@ -199,7 +202,7 @@ GROUP BY l.location_id, l.location
                 ];
                 break;
             case 'transfer_out':
-                $runningBalances[$locationId] -= $quantity;
+                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) - $quantity;
                 $toLocation = $locations[$movement['to_location']] ?? 'ไม่ทราบ';
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),
@@ -213,7 +216,7 @@ GROUP BY l.location_id, l.location
                 ];
                 break;
             case 'transfer_in':
-                $runningBalances[$locationId] += $quantity;
+                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) + $quantity;
                 $fromLocation = $locations[$movement['from_location']] ?? 'ไม่ทราบ';
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),

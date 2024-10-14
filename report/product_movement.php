@@ -17,48 +17,14 @@ requirePermission(['manage_reports']);
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/fontawesome.min.css">
     <link rel="stylesheet" href="../assets/plugins/fontawesome/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css">
-    <style>
-        .opening-balance {
-            background-color: #f8f9fa;
+        .card {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
             font-weight: bold;
         }
-
-        .product-header {
-            background-color: #e9ecef;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        /* เพิ่ม CSS สำหรับปรับแต่งตารางให้ responsive */
-        @media screen and (max-width: 767px) {
-
-            .dataTables_wrapper .dataTables_info,
-            .dataTables_wrapper .dataTables_paginate {
-                float: none;
-                text-align: center;
-            }
-
-            .dataTables_wrapper .dataTables_paginate {
-                margin-top: 0.5em;
-            }
-
-            /* ปรับขนาดฟอนต์สำหรับ modal */
-            div.dtr-modal {
-                font-size: 14px;
-            }
-
-            /* ปรับความกว้างของ modal */
-            div.dtr-modal-content {
-                width: 90%;
-            }
-        }
-
-        .error-highlight,
-        .error-highlight+.select2-container .select2-selection {
-            border: 2px solid red !important;
+        .btn-generate {
+            min-width: 150px;
         }
     </style>
 </head>
@@ -84,45 +50,82 @@ requirePermission(['manage_reports']);
             <div class="row">
                 <div class="col-md-12">
                     <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">กำหนดเงื่อนไขรายงาน</h4>
+                        </div>
                         <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-md-3 m-1">
-                                    <select id="reportType" class="form-control select2">
-                                        <option value="">เลือกวิธีการรายงาน</option>
-                                        <option value="product">ตามรหัสสินค้า</option>
-                                        <option value="category">ตามหมวดหมู่</option>
-                                    </select>
+                            <form id="reportForm">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="reportType"><i class="fas fa-file-alt"></i> วิธีการรายงาน</label>
+                                            <select id="reportType" class="form-control select2">
+                                                <option value="">เลือกวิธีการรายงาน</option>
+                                                <option value="product">ตามรหัสสินค้า</option>
+                                                <option value="category">ตามหมวดหมู่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" id="startProductDiv" style="display:none;">
+                                            <label for="startProductId"><i class="fas fa-barcode"></i> รหัสสินค้าเริ่มต้น</label>
+                                            <select id="startProductId" class="form-control select2">
+                                                <option value="">เลือกรหัสสินค้าเริ่มต้น</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="categoryDiv" style="display:none;">
+                                            <label for="category_id"><i class="fas fa-tags"></i> หมวดหมู่</label>
+                                            <select id="category_id" class="form-control select2">
+                                                <option value="">เลือกหมวดหมู่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" id="endProductDiv" style="display:none;">
+                                            <label for="endProductId"><i class="fas fa-barcode"></i> รหัสสินค้าสิ้นสุด</label>
+                                            <select id="endProductId" class="form-control select2">
+                                                <option value="">เลือกรหัสสินค้าสิ้นสุด</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="typeDiv" style="display:none;">
+                                            <label for="type_id"><i class="fas fa-sitemap"></i> ประเภทย่อย</label>
+                                            <select id="type_id" class="form-control select2">
+                                                <option value="">เลือกประเภทย่อย (ไม่บังคับ)</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 m-1" id="startProductDiv" style="display:none;">
-                                    <select id="startProductId" class="form-control select2">
-                                        <option value="">เลือกรหัสสินค้าเริ่มต้น</option>
-                                    </select>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="endDate"><i class="fas fa-calendar-alt"></i> วันที่สิ้นสุดรายงาน</label>
+                                            <input type="date" id="endDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group text-right" style="margin-top: 32px;">
+                                            <button type="button" id="generateReport" class="btn btn-primary btn-generate mr-2">
+                                                <i class="fas fa-chart-bar"></i> สร้างรายงาน
+                                            </button>
+                                            <button type="button" id="generatePdfReport" class="btn btn-secondary btn-generate">
+                                                <i class="fas fa-file-pdf"></i> สร้าง PDF Report
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-3 m-1" id="endProductDiv" style="display:none;">
-                                    <select id="endProductId" class="form-control select2">
-                                        <option value="">เลือกรหัสสินค้าสิ้นสุด</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 m-1" id="categoryDiv" style="display:none;">
-                                    <select id="category_id" class="form-control select2">
-                                        <option value="">เลือกหมวดหมู่</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 m-1" id="typeDiv" style="display:none;">
-                                    <select id="type_id" class="form-control select2">
-                                        <option value="">เลือกประเภทย่อย (ไม่บังคับ)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3 m-1">
-                                    <input type="date" id="endDate" class="form-control" placeholder="วันที่สิ้นสุดรายงาน">
-                                </div>
-                                <div class="col-md-3 m-1">
-                                    <button id="generateReport" class="btn btn-primary">สร้างรายงาน</button>
-                                </div>
-                                <div class="col-md-3 m-1">
-                                    <button id="generatePdfReport" class="btn btn-secondary">สร้าง PDF Report</button>
-                                </div>
-                            </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">ผลลัพธ์รายงาน</h4>
+                        </div>
+                        <div class="card-body">
                             <div id="productReports"></div>
                         </div>
                     </div>
@@ -130,7 +133,6 @@ requirePermission(['manage_reports']);
             </div>
         </div>
     </div>
-
 
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/feather.min.js"></script>
