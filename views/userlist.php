@@ -29,9 +29,12 @@ requirePermission(['manage_users']);
     <div class="content container-fluid">
     <?php require_once '../includes/notification.php'; ?>
             <div class="page-header">
-                <div class="page-title">
-                    <h4>รายการผู้ใช้</h4>
-                    <h6>จัดการผู้ใช้ของคุณ</h6>
+            <div class="page-title">
+                    <h4><i class="fas fa-users"></i> ผู้ใช้งานระบบ</h4>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="<?php echo base_url();?>">หน้าหลัก</a></li>
+                        <li class="breadcrumb-item active">จัดการผู้ใช้งานระบบ</li>
+                    </ul>
                 </div>
                 <div class="page-btn">
                     <a href="adduser" class="btn btn-added"><img src="../assets/img/icons/plus.svg" alt="img" class="me-1">เพิ่มผู้ใช้ใหม่</a>
@@ -41,30 +44,6 @@ requirePermission(['manage_users']);
             <div class="card">
                 <div class="card-body">
                     <div class="table-top">
-                        <div class="search-set">
-                            <div class="search-path">
-                                <a class="btn btn-filter" id="filter_search">
-                                    <img src="../assets/img/icons/filter.svg" alt="img">
-                                    <span><img src="../assets/img/icons/closes.svg" alt="img"></span>
-                                </a>
-                            </div>
-                            <div class="search-input">
-                                <a class="btn btn-searchset"><img src="../assets/img/icons/search-white.svg" alt="img"></a>
-                            </div>
-                        </div>
-                        <div class="wordset">
-                            <ul>
-                                <li>
-                                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="pdf"><img src="../assets/img/icons/pdf.svg" alt="img"></a>
-                                </li>
-                                <li>
-                                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="excel"><img src="../assets/img/icons/excel.svg" alt="img"></a>
-                                </li>
-                                <li>
-                                    <a data-bs-toggle="tooltip" data-bs-placement="top" title="print"><img src="../assets/img/icons/printer.svg" alt="img"></a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
 
                     <div class="table-responsive">
