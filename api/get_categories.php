@@ -1,7 +1,7 @@
 <?php
 require_once '../config/connect.php';
 require_once '../config/permission.php';
-requirePermission(['manage_products']);
+requirePermission(['manage_products' , 'manage_reports']);
 header('Content-Type: application/json');
 
 // รับค่าพารามิเตอร์ type_name จาก query string
