@@ -160,9 +160,9 @@ class PDF extends FPDF
             $locationMovements = array_filter($movements, function($m) use ($locationId) {
                 return $m['from_location'] == $locationId || $m['to_location'] == $locationId;
             });
-
+    
             $openingBalance = $openingBalances[$locationId] ?? 0;
-
+    
             if (empty($locationMovements) && $openingBalance == 0) {
                 continue;
             }
@@ -170,7 +170,7 @@ class PDF extends FPDF
             $this->SetFont('THSarabunNew', 'B', 11);
             $this->Cell(195, 5, iconv('UTF-8', 'cp874', $locationName), 1, 1, 'L', true);
             $this->SetFont('THSarabunNew', '', 11);
-
+    
             $balance = $openingBalance;
             $locationTotal = ['receive' => 0, 'issue' => 0, 'transfer' => 0];
 
@@ -186,62 +186,73 @@ class PDF extends FPDF
                 $this->Cell(20, 5, number_format($balance, 2), 1, 0, 'R');
                 $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
             }
-
+    
+            $currentDate = null;
+            $dailyBalance = $balance;
+    
             foreach ($locationMovements as $movement) {
                 $quantity = floatval($movement['quantity']);
                 $transferText = '';
 
-                switch($movement['type']) {
-                    case 'receive':
-                        $balance += $quantity;
-                        $locationTotal['receive'] += $quantity;
-                        $this->Cell(30, 5, '', 1, 0, 'C');
-                        $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
-                        $this->Cell(25, 5, '-', 1, 0, 'C');
-                        $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
-                        $this->Cell(20, 5, '-', 1, 0, 'C');
-                        $this->Cell(20, 5, '-', 1, 0, 'C');
-                        $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'รับสินค้า'), 1, 0, 'C');
-                        break;
-                    case 'issue':
-                        $balance -= $quantity;
-                        $locationTotal['issue'] += $quantity;
-                        $this->Cell(30, 5, '', 1, 0, 'C');
-                        $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
-                        $this->Cell(25, 5, '-', 1, 0, 'C');
-                        $this->Cell(20, 5, '-', 1, 0, 'C');
-                        $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
-                        $this->Cell(20, 5, '-', 1, 0, 'C');
-                        $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'เบิกสินค้า'), 1, 0, 'C');
-                        break;
-                    case 'transfer':
-                        $locationTotal['transfer'] += $quantity;
-                        if ($movement['from_location'] == $locationId) {
-                            $balance -= $quantity;
-                            $transferText = 'โอนย้ายไป ' . ($this->locations[$movement['to_location']] ?? '-');
-                            $this->Cell(30, 5, '', 1, 0, 'C');
-                            $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
-                            $this->Cell(25, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
-                        } else {
-                            $balance += $quantity;
-                            $transferText = 'รับโอนจาก ' . ($this->locations[$movement['from_location']] ?? '-');
-                            $this->Cell(30, 5, '', 1, 0, 'C');
-                            $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
-                            $this->Cell(25, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, '-', 1, 0, 'C');
-                            $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
-                        }
-                        $this->Cell(30, 5, iconv('UTF-8', 'cp874', $transferText), 1, 0, 'C');
-                        break;
-                }
-
-                $this->Cell(20, 5, number_format($balance, 2), 1, 0, 'R');
-                $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
+                  // If it's a new date, update the balance and reset daily balance
+            if ($currentDate !== $movement['date']) {
+                $balance = $dailyBalance;
+                $currentDate = $movement['date'];
             }
+
+              switch($movement['type']) {
+                case 'receive':
+                    $dailyBalance += $quantity;
+                    $locationTotal['receive'] += $quantity;
+                    $this->Cell(30, 5, '', 1, 0, 'C');
+                    $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
+                    $this->Cell(25, 5, '-', 1, 0, 'C');
+                    $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
+                    $this->Cell(20, 5, '-', 1, 0, 'C');
+                    $this->Cell(20, 5, '-', 1, 0, 'C');
+                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'รับสินค้า'), 1, 0, 'C');
+                    break;
+                case 'issue':
+                    $dailyBalance -= $quantity;
+                    $locationTotal['issue'] += $quantity;
+                    $this->Cell(30, 5, '', 1, 0, 'C');
+                    $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
+                    $this->Cell(25, 5, '-', 1, 0, 'C');
+                    $this->Cell(20, 5, '-', 1, 0, 'C');
+                    $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
+                    $this->Cell(20, 5, '-', 1, 0, 'C');
+                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'เบิกสินค้า'), 1, 0, 'C');
+                    break;
+                case 'transfer':
+                    $locationTotal['transfer'] += $quantity;
+                    if ($movement['from_location'] == $locationId) {
+                        $dailyBalance -= $quantity;
+                        $transferText = 'โอนย้ายไป ' . ($this->locations[$movement['to_location']] ?? '-');
+                        $this->Cell(30, 5, '', 1, 0, 'C');
+                        $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
+                        $this->Cell(25, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
+                    } else {
+                        $dailyBalance += $quantity;
+                        $transferText = 'รับโอนจาก ' . ($this->locations[$movement['from_location']] ?? '-');
+                        $this->Cell(30, 5, '', 1, 0, 'C');
+                        $this->Cell(20, 5, formatThaiDate($movement['date']), 1, 0, 'C');
+                        $this->Cell(25, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, '-', 1, 0, 'C');
+                        $this->Cell(20, 5, number_format($quantity, 2), 1, 0, 'R');
+                    }
+                    $this->Cell(30, 5, iconv('UTF-8', 'cp874', $transferText), 1, 0, 'C');
+                    break;
+            }
+
+            $this->Cell(20, 5, number_format($dailyBalance, 2), 1, 0, 'R');
+            $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
+        }
+
+        $balance = $dailyBalance;
 
             // Location total row
             $this->SetFont('THSarabunNew', 'B', 11);
@@ -253,7 +264,7 @@ class PDF extends FPDF
             $this->Cell(30, 5, '-', 1, 0, 'C');
             $this->Cell(20, 5, number_format($balance, 2), 1, 0, 'R');
             $this->Cell(10, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 1, 'C');
-
+    
             $locationTotals[$locationId] = $locationTotal;
             $grandTotal['receive'] += $locationTotal['receive'];
             $grandTotal['issue'] += $locationTotal['issue'];
@@ -447,16 +458,16 @@ foreach ($products as $product) {
         FROM d_receive dr
         JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
         WHERE dr.product_id = :productId AND hr.received_date BETWEEN :startDate AND :endDate
-
+    
         UNION ALL
-
+    
         SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location
         FROM d_issue di
         JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
         WHERE di.product_id = :productId AND hi.issue_date BETWEEN :startDate AND :endDate
-
+    
         UNION ALL
-
+    
         SELECT 
             ht.transfer_date as movement_date, 
             'transfer' as type,
@@ -467,7 +478,7 @@ foreach ($products as $product) {
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
     ) AS combined_movements
-    ORDER BY date, type
+    ORDER BY date, FIELD(type, 'receive', 'issue', 'transfer')
     ";
 
     $stmt = $conn->prepare($movementsQuery);

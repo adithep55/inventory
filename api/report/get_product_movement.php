@@ -11,9 +11,16 @@ function logMessage($message) {
     error_log(date('[Y-m-d H:i:s] ') . $message . "\n", 3, '../../debug.log');
 }
 
-function formatThaiDate($date) {
+function formatThaiDate($date, $isOpeningBalance = false) {
     $timestamp = strtotime($date);
     $thai_year = date('Y', $timestamp) + 543;
+    
+    if ($isOpeningBalance) {
+        // Get the last day of the previous month
+        $lastDayOfPreviousMonth = date('Y-m-t', strtotime($date . ' -1 month'));
+        return date('d-m-', strtotime($lastDayOfPreviousMonth)) . $thai_year;
+    }
+    
     return date('d-m-', $timestamp) . $thai_year;
 }
 
@@ -95,16 +102,16 @@ HAVING opening_balance != 0
         FROM d_receive dr
         JOIN h_receive hr ON dr.receive_header_id = hr.receive_header_id
         WHERE dr.product_id = :productId AND hr.received_date BETWEEN :startDate AND :endDate
-
+    
         UNION ALL
-
+    
         SELECT hi.issue_date as movement_date, 'issue' as type, di.quantity, di.location_id as from_location, NULL as to_location, di.location_id
         FROM d_issue di
         JOIN h_issue hi ON di.issue_header_id = hi.issue_header_id
         WHERE di.product_id = :productId AND hi.issue_date BETWEEN :startDate AND :endDate
-
+    
         UNION ALL
-
+    
         SELECT 
             ht.transfer_date as movement_date, 
             'transfer_out' as type,
@@ -115,9 +122,9 @@ HAVING opening_balance != 0
         FROM d_transfer dt
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
-
+    
         UNION ALL
-
+    
         SELECT 
             ht.transfer_date as movement_date, 
             'transfer_in' as type,
@@ -129,7 +136,14 @@ HAVING opening_balance != 0
         JOIN h_transfer ht ON dt.transfer_header_id = ht.transfer_header_id
         WHERE dt.product_id = :productId AND ht.transfer_date BETWEEN :startDate AND :endDate
     ) AS combined_movements
-    ORDER BY date, type
+    ORDER BY date, 
+        CASE 
+            WHEN type = 'receive' THEN 1
+            WHEN type = 'transfer_in' THEN 2
+            WHEN type = 'issue' THEN 3
+            WHEN type = 'transfer_out' THEN 4
+            ELSE 5
+        END
     ";
 
     $stmt = dd_q($movementsQuery, [':productId' => $productId, ':startDate' => $startDate, ':endDate' => $endDate]);
@@ -155,7 +169,7 @@ HAVING opening_balance != 0
     foreach ($openingBalances as $balance) {
         if (floatval($balance['opening_balance']) != 0) {
             $processedMovements[] = [
-                'date' => formatThaiDate($startDate),
+                'date' => formatThaiDate($startDate, true),
                 'location' => $locations[$balance['location_id']] ?? 'ไม่ทราบ',
                 'receive' => null,
                 'issue' => null,
@@ -174,56 +188,30 @@ HAVING opening_balance != 0
         
         switch($movement['type']) {
             case 'receive':
+            case 'transfer_in':
                 $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) + $quantity;
                 $totalBalance += $quantity;
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),
                     'location' => $locationName,
-                    'receive' => $quantity,
+                    'receive' => $movement['type'] == 'receive' ? $quantity : null,
                     'issue' => null,
-                    'transfer' => null,
+                    'transfer' => $movement['type'] == 'transfer_in' ? "+ $quantity (จาก " . ($locations[$movement['from_location']] ?? 'ไม่ทราบ') . ")" : null,
                     'balance' => $runningBalances[$locationId],
                     'unit' => $productUnit,
                     'entry_type' => 'transaction'
                 ];
                 break;
             case 'issue':
+            case 'transfer_out':
                 $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) - $quantity;
                 $totalBalance -= $quantity;
                 $processedMovements[] = [
                     'date' => formatThaiDate($movement['date']),
                     'location' => $locationName,
                     'receive' => null,
-                    'issue' => $quantity,
-                    'transfer' => null,
-                    'balance' => $runningBalances[$locationId],
-                    'unit' => $productUnit,
-                    'entry_type' => 'transaction'
-                ];
-                break;
-            case 'transfer_out':
-                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) - $quantity;
-                $toLocation = $locations[$movement['to_location']] ?? 'ไม่ทราบ';
-                $processedMovements[] = [
-                    'date' => formatThaiDate($movement['date']),
-                    'location' => $locationName,
-                    'receive' => null,
-                    'issue' => null,
-                    'transfer' => "- $quantity (ไปยัง $toLocation)",
-                    'balance' => $runningBalances[$locationId],
-                    'unit' => $productUnit,
-                    'entry_type' => 'transaction'
-                ];
-                break;
-            case 'transfer_in':
-                $runningBalances[$locationId] = ($runningBalances[$locationId] ?? 0) + $quantity;
-                $fromLocation = $locations[$movement['from_location']] ?? 'ไม่ทราบ';
-                $processedMovements[] = [
-                    'date' => formatThaiDate($movement['date']),
-                    'location' => $locationName,
-                    'receive' => null,
-                    'issue' => null,
-                    'transfer' => "+ $quantity (จาก $fromLocation)",
+                    'issue' => $movement['type'] == 'issue' ? $quantity : null,
+                    'transfer' => $movement['type'] == 'transfer_out' ? "- $quantity (ไปยัง " . ($locations[$movement['to_location']] ?? 'ไม่ทราบ') . ")" : null,
                     'balance' => $runningBalances[$locationId],
                     'unit' => $productUnit,
                     'entry_type' => 'transaction'
