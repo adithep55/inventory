@@ -124,10 +124,23 @@ function updateLowStockModal(products) {
     list.innerHTML = '';
 
     products.forEach(function (product) {
-        const isLowStock = parseInt(product.total_quantity) <= parseInt(product.low_level);
-        const status = isLowStock ? 'ต่ำกว่าเกณฑ์' : 'ปกติ';
-        const statusClass = isLowStock ? 'text-danger' : 'text-success';
-        const statusBadge = isLowStock ? '<span class="badge bg-danger">ใกล้หมด</span>' : '<span class="badge bg-success">ปกติ</span>';
+        const quantity = parseInt(product.total_quantity);
+        const lowLevel = parseInt(product.low_level);
+        let status, statusClass, badgeClass;
+
+        if (quantity === 0) {
+            status = 'สินค้าหมด';
+            statusClass = 'text-danger';
+            badgeClass = 'bg-danger';
+        } else if (quantity <= lowLevel) {
+            status = 'ใกล้หมด';
+            statusClass = 'text-warning';
+            badgeClass = 'bg-warning text-dark';
+        } else {
+            status = 'ปกติ';
+            statusClass = 'text-success';
+            badgeClass = 'bg-success';
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -135,24 +148,21 @@ function updateLowStockModal(products) {
             <td>${escapeHtml(product.name_th)}</td>
             <td>${escapeHtml(product.total_quantity)}</td>
             <td>${escapeHtml(product.low_level)}</td>
-            <td>${statusBadge}</td>
+            <td><span class="badge ${badgeClass}">${status}</span></td>
         `;
         table.appendChild(tr);
 
         const listItem = document.createElement('div');
         listItem.className = 'list-group-item m-1';
         listItem.innerHTML = `
-            <div class="d-flex w-100 justify-content-between">
-                <h5 class="mb-1">${escapeHtml(product.name_th)}</h5>
-                <small class="text-muted">${escapeHtml(product.product_id)}</small>
-            </div>
+            <h5 class="mb-1">${escapeHtml(product.name_th)}</h5>
+            <p class="mb-1">รหัสสินค้า: ${escapeHtml(product.product_id)}</p>
             <p class="mb-1">จำนวนคงเหลือ: <strong>${escapeHtml(product.total_quantity)}</strong> / ระดับต่ำสุด: ${escapeHtml(product.low_level)}</p>
-            <small class="${statusClass}">${status}</small>
+            <span class="badge ${badgeClass}">${status}</span>
         `;
         list.appendChild(listItem);
     });
 }
-
 function escapeHtml(unsafe) {
     return unsafe
          .replace(/&/g, "&amp;")

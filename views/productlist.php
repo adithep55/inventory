@@ -51,6 +51,15 @@ requirePermission(['manage_products']);
                                     </button>
                                 </li>
                             </ul>
+                            <div class="wordset">
+                                    <ul class="list-inline mb-0">
+                                        <li class="list-inline-item">
+                                            <a id="pdfButton" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
+                                                <img src="../assets/img/icons/pdf.svg" alt="PDF">
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                     </div>
 
                     <div class="table-responsive">

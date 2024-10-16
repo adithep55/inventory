@@ -126,7 +126,7 @@ requirePermission(['manage_products']);
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="low_level"><i class="fas fa-bell"></i>
-                                            ระดับการแจ้งเตือน</label>
+                                            จุดสั่งซื้อ (ระดับการแจ้งเตือน)</label>
                                         <input type="number" class="form-control" id="low_level" name="low_level"
                                             step="1" required>
                                     </div>
