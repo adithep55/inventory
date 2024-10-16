@@ -54,7 +54,7 @@ requirePermission(['manage_products']);
                             <div class="wordset">
                                     <ul class="list-inline mb-0">
                                         <li class="list-inline-item">
-                                            <a id="pdfButton" href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
+                                            <a href="<?php echo base_url()?>/report/products_PDF.php" id="pdfButton" target="_blank" data-bs-toggle="tooltip" data-bs-placement="top" title="PDF">
                                                 <img src="../assets/img/icons/pdf.svg" alt="PDF">
                                             </a>
                                         </li>
