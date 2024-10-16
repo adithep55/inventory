@@ -445,82 +445,81 @@ requirePermission(['manage_reports']);
             });
 
             function displayWarehouseReport(data) {
-    $('#productReports').empty();
-    data.forEach(function (warehouse) {
-        var $warehouseSection = $('<div>').addClass('warehouse-section mb-5');
-        $warehouseSection.append($('<h3>').text('คลังสินค้า: ' + warehouse.location));
+                $('#productReports').empty();
+                data.forEach(function (warehouse) {
+                    var $warehouseSection = $('<div>').addClass('warehouse-section mb-5');
+                    $warehouseSection.append($('<h3>').text('คลังสินค้า: ' + warehouse.location));
 
-        warehouse.products.forEach(function (product) {
-            var $productSection = $('<div>').addClass('product-section mb-4 text-center');
-            $productSection.append($('<h4>').addClass('product-header').text('สินค้า: ' + product.name));
+                    warehouse.products.forEach(function (product) {
+                        var $productSection = $('<div>').addClass('product-section mb-4 text-center');
+                        $productSection.append($('<h4>').addClass('product-header').text('สินค้า: ' + product.name));
 
-            var $table = $('<table>').addClass('table table-striped table-bordered responsive nowrap').attr('width', '100%');
-            var $thead = $('<thead>').appendTo($table);
-            var $headerRow = $('<tr>').appendTo($thead);
+                        var $table = $('<table>').addClass('table table-striped table-bordered responsive nowrap').attr('width', '100%');
+                        var $thead = $('<thead>').appendTo($table);
+                        var $headerRow = $('<tr>').appendTo($thead);
 
-            $('<th>').text('วันที่').appendTo($headerRow);
-            $('<th>').text('รับ').appendTo($headerRow);
-            $('<th>').text('เบิก').appendTo($headerRow);
-            $('<th>').text('โอนย้าย').appendTo($headerRow);
-            $('<th>').text('รายละเอียด').appendTo($headerRow);
-            $('<th>').text('คงเหลือ').appendTo($headerRow);
+                        $('<th>').text('วันที่').appendTo($headerRow);
+                        $('<th>').text('รับ').appendTo($headerRow);
+                        $('<th>').text('เบิก').appendTo($headerRow);
+                        $('<th>').text('โอนย้าย').appendTo($headerRow);
+                        $('<th>').text('รายละเอียด').appendTo($headerRow);
+                        $('<th>').text('คงเหลือ').appendTo($headerRow);
 
-            var $tbody = $('<tbody>').appendTo($table);
+                        var $tbody = $('<tbody>').appendTo($table);
 
-            // Add movement rows
-            product.movements.forEach(function (movement) {
-                // Skip the opening balance row if it's 0.00
-                if (movement.details !== 'ยอดยกมา' || parseFloat(product.opening_balance) !== 0) {
-                    var $row = $('<tr>');
-                    $('<td>').text(movement.date).appendTo($row);
-                    $('<td>').text(movement.receive ? formatNumber(movement.receive) : '-').appendTo($row);
-                    $('<td>').text(movement.issue ? formatNumber(movement.issue) : '-').appendTo($row);
-                    $('<td>').text(movement.transfer ? formatNumber(movement.transfer) : '-').appendTo($row);
-                    $('<td>').text(movement.details).appendTo($row);
-                    $('<td>').text(formatNumber(movement.balance) + ' ' + product.unit).appendTo($row);
-                    $row.appendTo($tbody);
-                }
-            });
+                        // Add movement rows
+                        product.movements.forEach(function (movement) {
+                            if (movement.details !== 'ยอดยกมา' || parseFloat(product.opening_balance) !== 0) {
+                                var $row = $('<tr>');
+                                $('<td>').text(movement.date).appendTo($row);
+                                $('<td>').text(movement.receive ? formatNumber(movement.receive) : '-').appendTo($row);
+                                $('<td>').text(movement.issue ? formatNumber(movement.issue) : '-').appendTo($row);
+                                $('<td>').text(movement.transfer ? formatNumber(movement.transfer) : '-').appendTo($row);
+                                $('<td>').text(movement.details).appendTo($row);
+                                $('<td>').text(formatNumber(movement.balance) + ' ' + product.unit).appendTo($row);
+                                $row.appendTo($tbody);
+                            }
+                        });
 
-            // Add total row
-            var $totalRow = $('<tr>').addClass('total-row');
-            $('<td>').text('รวม').appendTo($totalRow);
-            $('<td>').text(formatNumber(product.total_receive)).appendTo($totalRow);
-            $('<td>').text(formatNumber(product.total_issue)).appendTo($totalRow);
-            $('<td>').text(formatNumber(product.total_transfer)).appendTo($totalRow);
-            $('<td>').text('-').appendTo($totalRow);
-            $('<td>').text(formatNumber(product.closing_balance) + ' ' + product.unit).appendTo($totalRow);
-            $totalRow.appendTo($tbody);
+                        // Add total row
+                        var $totalRow = $('<tr>').addClass('total-row');
+                        $('<td>').text('รวม').appendTo($totalRow);
+                        $('<td>').text(formatNumber(product.total_receive)).appendTo($totalRow);
+                        $('<td>').text(formatNumber(product.total_issue)).appendTo($totalRow);
+                        $('<td>').text(formatNumber(product.total_transfer)).appendTo($totalRow);
+                        $('<td>').text('-').appendTo($totalRow);
+                        $('<td>').text(formatNumber(product.closing_balance) + ' ' + product.unit).appendTo($totalRow);
+                        $totalRow.appendTo($tbody);
 
-            $productSection.append($table);
-            $warehouseSection.append($productSection);
-        });
+                        $productSection.append($table);
+                        $warehouseSection.append($productSection);
+                    });
 
-        $('#productReports').append($warehouseSection);
-    });
+                    $('#productReports').append($warehouseSection);
+                });
 
-    // Initialize DataTables for each table
-    $('.warehouse-section table').each(function () {
-        $(this).DataTable({
-            responsive: true,
-            ordering: false,
-            language: {
-                lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
-                zeroRecords: "ไม่พบข้อมูล",
-                info: "แสดงหน้าที่ _PAGE_ จาก _PAGES_",
-                infoEmpty: "ไม่มีข้อมูล",
-                infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
-                search: "ค้นหา:",
-                paginate: {
-                    first: "หน้าแรก",
-                    last: "หน้าสุดท้าย",
-                    next: "ถัดไป",
-                    previous: "ก่อนหน้า"
-                }
+                // Initialize DataTables for each table
+                $('.warehouse-section table').each(function () {
+                    $(this).DataTable({
+                        responsive: true,
+                        ordering: false,
+                        language: {
+                            lengthMenu: "แสดง _MENU_ รายการต่อหน้า",
+                            zeroRecords: "ไม่พบข้อมูล",
+                            info: "แสดงหน้าที่ _PAGE_ จาก _PAGES_",
+                            infoEmpty: "ไม่มีข้อมูล",
+                            infoFiltered: "(กรองจากทั้งหมด _MAX_ รายการ)",
+                            search: "ค้นหา:",
+                            paginate: {
+                                first: "หน้าแรก",
+                                last: "หน้าสุดท้าย",
+                                next: "ถัดไป",
+                                previous: "ก่อนหน้า"
+                            }
+                        }
+                    });
+                });
             }
-        });
-    });
-}
             function displayReport(results, products) {
                 $('#productReports').empty();
                 results.forEach(function (result, index) {
@@ -641,15 +640,15 @@ requirePermission(['manage_reports']);
                 });
             }
 
-// ตั้งค่าวันที่เริ่มต้นเป็นวันปัจจุบัน
-var today = new Date();
-var dd = String(today.getDate()).padStart(2, '0');
-var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-var yyyy = today.getFullYear();
+            // ตั้งค่าวันที่เริ่มต้นเป็นวันปัจจุบัน
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            var yyyy = today.getFullYear();
 
-today = yyyy + '-' + mm + '-' + dd;
-$('#endDate').val(today);
-});
+            today = yyyy + '-' + mm + '-' + dd;
+            $('#endDate').val(today);
+        });
     </script>
 </body>
 
