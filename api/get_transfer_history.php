@@ -16,7 +16,7 @@ $countQuery = "SELECT COUNT(DISTINCT h.transfer_header_id) as total FROM h_trans
 $stmt = $conn->query($countQuery);
 $totalRecords = $stmt->fetchColumn();
 
-$query = "SELECT 
+$query = "SELECT DISTINCT
     h.transfer_header_id,
     h.bill_number,
     h.transfer_date,
@@ -28,7 +28,10 @@ FROM
 JOIN 
     d_transfer d ON h.transfer_header_id = d.transfer_header_id
 JOIN 
-    users u ON h.user_id = u.UserID";
+    users u ON h.user_id = u.UserID
+    LEFT JOIN
+    products p ON d.product_id = p.product_id
+    ";
 
 $params = array();
 
@@ -40,7 +43,7 @@ if ($search !== '%') {
 }
 
 $query .= " GROUP BY h.transfer_header_id";
-$query .= " ORDER BY h.transfer_date DESC LIMIT $start, $length";
+$query .= " ORDER BY CAST(SUBSTRING(h.bill_number, 2) AS UNSIGNED) DESC, h.bill_number DESC";
 
 $stmt = $conn->prepare($query);
 
@@ -78,11 +81,13 @@ $filteredQuery = "SELECT COUNT(DISTINCT h.transfer_header_id) FROM h_transfer h
                   JOIN users u ON h.user_id = u.UserID";
 $filteredParams = array();
 
-if ($search !== '%') {
-    $filteredQuery .= " WHERE h.bill_number LIKE :search
-                        OR h.transfer_date LIKE :search
-                        OR u.Username LIKE :search";
-    $filteredParams[':search'] = $search;
+if (!empty($search)) {
+    $query .= " WHERE h.bill_number LIKE :search
+                OR h.transfer_date LIKE :search
+                OR u.Username LIKE :search
+                OR p.name_th LIKE :search
+                OR p.name_en LIKE :search";
+    $params[':search'] = "%$search%";
 }
 
 $stmt = $conn->prepare($filteredQuery);
