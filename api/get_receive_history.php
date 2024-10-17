@@ -29,7 +29,7 @@ try {
     $search = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
     // Base query
-    $query = "SELECT h.receive_header_id, h.bill_number, h.received_date, 
+    $query = " SELECT DISTINCT h.receive_header_id, h.bill_number, h.received_date, 
                      u.Username AS user_name, 
                      CASE 
                          WHEN h.is_opening_balance = 1 THEN 'ยอดยกมา'
@@ -37,13 +37,20 @@ try {
                      END AS status,
                      (SELECT COUNT(*) FROM d_receive WHERE receive_header_id = h.receive_header_id) as item_count
               FROM h_receive h
-              JOIN users u ON h.user_id = u.UserID";
+              JOIN users u ON h.user_id = u.UserID
+              LEFT JOIN d_receive dr ON h.receive_header_id = dr.receive_header_id
+              LEFT JOIN products p ON dr.product_id = p.product_id";
 
     // Search condition
     $searchCondition = "";
     $params = [];
     if (!empty($search)) {
-        $searchCondition = " WHERE h.bill_number LIKE :search OR h.received_date LIKE :search OR u.Username LIKE :search";
+        $searchCondition = " WHERE h.bill_number LIKE :search 
+        OR h.received_date LIKE :search 
+        OR u.Username LIKE :search
+        OR (CASE WHEN h.is_opening_balance = 1 THEN 'ยอดยกมา' ELSE 'ปกติ' END) LIKE :search
+        OR p.name_th LIKE :search
+        OR p.name_en LIKE :search";
         $params[':search'] = "%$search%";
     }
 

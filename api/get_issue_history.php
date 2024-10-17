@@ -32,7 +32,7 @@ try {
     $search = isset($_POST['search']['value']) ? $_POST['search']['value'] : '';
 
     // Base query
-    $query = "SELECT h.issue_header_id as issue_id, h.bill_number, h.issue_date, h.issue_type, 
+    $query = "SELECT DISTINCT h.issue_header_id as issue_id, h.bill_number, h.issue_date, h.issue_type, 
     CASE 
         WHEN h.issue_type = 'sale' THEN c.name 
         WHEN h.issue_type = 'project' THEN p.project_name
@@ -44,13 +44,22 @@ try {
 FROM h_issue h
 LEFT JOIN customers c ON h.customer_id = c.customer_id
 LEFT JOIN projects p ON h.project_id = p.project_id
-JOIN users u ON h.user_id = u.UserID";
+JOIN users u ON h.user_id = u.UserID
+LEFT JOIN d_issue di ON h.issue_header_id = di.issue_header_id
+LEFT JOIN products pr ON di.product_id = pr.product_id";
 
     // Search condition
     $searchCondition = "";
     $params = [];
     if (!empty($search)) {
-        $searchCondition = " WHERE h.issue_date LIKE :search OR h.issue_type LIKE :search OR c.name LIKE :search OR p.project_name LIKE :search OR u.Username LIKE :search";
+      $searchCondition = " WHERE h.bill_number LIKE :search 
+        OR h.issue_date LIKE :search 
+        OR h.issue_type LIKE :search 
+        OR c.name LIKE :search 
+        OR p.project_name LIKE :search 
+        OR u.Username LIKE :search
+        OR pr.name_th LIKE :search
+        OR pr.name_en LIKE :search";
         $params[':search'] = "%$search%";
     }
 
@@ -61,7 +70,7 @@ JOIN users u ON h.user_id = u.UserID";
     $totalRecords = $stmt->fetchColumn();
 
     // Fetch data
-    $query .= "$searchCondition ORDER BY h.issue_date DESC LIMIT :start, :length";
+    $query .= "$searchCondition ORDER BY CAST(SUBSTRING(h.bill_number, 2) AS UNSIGNED) DESC, h.bill_number DESC LIMIT :start, :length";
     $stmt = $conn->prepare($query);
     foreach ($params as $key => &$val) {
         $stmt->bindParam($key, $val, PDO::PARAM_STR);
