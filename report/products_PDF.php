@@ -11,9 +11,15 @@ define('FPDF_FONTPATH', '../assets/fpdf186/font/');
 
 // Fetch website settings
 function getWebsiteSettings($conn) {
-    $stmt = $conn->query("SELECT setting_key, setting_value FROM website_settings");
-    return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    try {
+        $stmt = $conn->prepare("SELECT setting_key, setting_value FROM website_settings");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    } catch (PDOException $e) {
+        return [];
+    }
 }
+
 
 $settings = getWebsiteSettings($conn);
 
@@ -92,10 +98,10 @@ class PDF extends FPDF
         $this->SetFillColor(240, 240, 240);
         $this->Cell(10, 5, iconv('UTF-8', 'cp874', 'ลำดับ'), 1, 0, 'C', true);
         $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'รหัสสินค้า'), 1, 0, 'C', true);
-        $this->Cell(50, 5, iconv('UTF-8', 'cp874', 'ชื่อสินค้า'), 1, 0, 'C', true);
+        $this->Cell(60, 5, iconv('UTF-8', 'cp874', 'ชื่อสินค้า'), 1, 0, 'C', true);
         $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'หมวดหมู่'), 1, 0, 'C', true);
         $this->Cell(30, 5, iconv('UTF-8', 'cp874', 'ประเภทย่อย'), 1, 0, 'C', true);
-        $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
+        // $this->Cell(20, 5, iconv('UTF-8', 'cp874', 'จำนวน'), 1, 0, 'C', true);
         $this->Cell(15, 5, iconv('UTF-8', 'cp874', 'หน่วย'), 1, 0, 'C', true);
         $this->Cell(15, 5, iconv('UTF-8', 'cp874', 'จุดสั่งซื้อ'), 1, 0, 'C', true);
         $this->Ln();
@@ -114,11 +120,17 @@ $pdf->AliasNbPages();
 $pdf->AddPage();
 
 // Query to get all products
-$query = "SELECT p.*, pc.name AS category_name, pt.name AS product_type_name, 
+$query = "SELECT p.*, 
+       pt.name AS product_type_name, 
+       pc.name AS category_name,
        (SELECT SUM(quantity) FROM inventory WHERE product_id = p.product_id) AS total_quantity 
 FROM products p 
-LEFT JOIN product_cate pc ON p.product_type_id = pc.category_id 
-LEFT JOIN product_types pt ON p.product_type_id = pt.type_id 
+LEFT JOIN product_types pt ON pt.type_id = (
+    SELECT product_category_id 
+    FROM product_cate 
+    WHERE category_id = p.product_type_id
+)
+LEFT JOIN product_cate pc ON pc.category_id = p.product_type_id
 ORDER BY p.product_id;";
 
 $result = $conn->query($query);
@@ -134,10 +146,10 @@ foreach ($products as $product) {
     
     $pdf->Cell(10, 5, $i, 1, 0, 'C');
     $pdf->Cell(20, 5, $product['product_id'], 1, 0, 'C');
-    $pdf->Cell(50, 5, iconv('UTF-8', 'cp874', $product['name_th']), 1);
+    $pdf->Cell(60, 5, iconv('UTF-8', 'cp874', $product['name_th']), 1);
     $pdf->Cell(30, 5, iconv('UTF-8', 'cp874', $product['product_type_name']), 1, 0, 'C'); 
     $pdf->Cell(30, 5, iconv('UTF-8', 'cp874', $product['category_name']), 1, 0, 'C');
-    $pdf->Cell(20, 5, number_format($product['total_quantity'] ?? 0, 2), 1, 0, 'R');
+    // $pdf->Cell(20, 5, number_format($product['total_quantity'] ?? 0, 2), 1, 0, 'R');
     $pdf->Cell(15, 5, iconv('UTF-8', 'cp874', $product['unit']), 1, 0, 'C');
     $pdf->Cell(15, 5, number_format($product['low_level'], 2), 1, 0, 'C');
     $pdf->Ln();

@@ -21,8 +21,13 @@ if ($issueId <= 0) {
 
 // Fetch website settings
 function getWebsiteSettings($conn) {
-    $stmt = $conn->query("SELECT setting_key, setting_value FROM website_settings");
-    return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    try {
+        $stmt = $conn->prepare("SELECT setting_key, setting_value FROM website_settings");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 
 $settings = getWebsiteSettings($conn);
