@@ -442,7 +442,7 @@ requirePermission(['manage_receiving']);
                                 text: 'บันทึกการรับสินค้าเรียบร้อยแล้ว (เลขที่บิล: ' + response.message.split(':')[1].trim() + ')',
                                 confirmButtonText: 'ตกลง'
                             }).then(function () {
-                                location.reload();
+                                window.location.href = '<?php echo base_url(); ?>/views/receive_history';
                             });
                         } else {
                             Swal.fire({
