@@ -54,7 +54,7 @@ try {
     $totalRecords = $stmt->fetchColumn();
 
     // Fetch data
-    $query .= "$searchCondition ORDER BY h.received_date DESC LIMIT :start, :length";
+    $query .= "$searchCondition ORDER BY CAST(SUBSTRING(h.bill_number, 2) AS UNSIGNED) DESC, h.bill_number DESC LIMIT :start, :length";
     $stmt = $conn->prepare($query);
     foreach ($params as $key => &$val) {
         $stmt->bindParam($key, $val, PDO::PARAM_STR);

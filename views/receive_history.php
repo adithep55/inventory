@@ -114,7 +114,7 @@ $(document).ready(function () {
                 searchable: false
             }
         ],
-        order: [[1, 'desc']]
+        order: [[1, 'asc']]
         ,
             "language": {
                 "emptyTable": "ไม่พบข้อมูลสินค้า",
